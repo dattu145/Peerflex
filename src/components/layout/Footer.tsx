@@ -1,15 +1,20 @@
+// src/components/layout/Footer.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  GraduationCap, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  GraduationCap,
+  Mail,
+  Phone,
+  MapPin,
   ArrowUp,
   Twitter,
   Linkedin,
   Instagram,
-  Github
+  Github,
+  FileText,
+  Globe,
+  Code,
+  Users,
 } from 'lucide-react';
 import { APP_CONFIG } from '../../config/constants';
 import { useAppStore } from '../../store/useAppStore';
@@ -25,30 +30,68 @@ const Footer: React.FC = () => {
 
   const footerLinks = {
     services: [
-      { name: 'Resume Templates', href: '/services/resume' },
-      { name: 'Portfolio Building', href: '/services/portfolio' },
-      { name: 'LinkedIn Optimization', href: '/services/linkedin' },
-      { name: 'GitHub Enhancement', href: '/services/github' },
+      {
+        name: 'Resume Templates',
+        href: '/resume-templates',
+        icon: FileText,
+      },
+      {
+        name: 'Portfolio Building',
+        href: '/portfolio-templates',
+        icon: Globe,
+      },
+      {
+        name: 'Software Projects',
+        href: '/software-projects',
+        icon: Code,
+      },
+      {
+        name: 'Complete Package',
+        href: '/services#complete-package',
+        icon: Users,
+      },
     ],
     company: [
       { name: getTranslation('about', language), href: '/about' },
+      { name: 'Contact Us', href: '/contact' },
       { name: 'Privacy Policy', href: '/privacy' },
       { name: 'Terms of Service', href: '/terms' },
-      { name: 'Support', href: '/support' },
     ],
     resources: [
-      { name: 'Blog', href: '/blog' },
+      { name: 'Resume Builder', href: '/resume-builder' },
+      { name: 'Portfolio Templates', href: '/portfolio-templates' },
       { name: 'Career Tips', href: '/tips' },
-      { name: 'Templates', href: '/templates' },
-      { name: 'FAQ', href: '/faq' },
+      { name: 'Support Center', href: '/support' },
     ],
+    quickLinks: [
+      { name: 'Home', href: '/' },
+      { name: 'Services', href: '/services' },
+      { name: 'About', href: '/about' },
+      { name: 'Contact', href: '/contact' },
+    ]
   };
 
   const socialLinks = [
-    { icon: Twitter, href: APP_CONFIG.socialLinks.twitter, label: 'Twitter' },
-    { icon: Linkedin, href: APP_CONFIG.socialLinks.linkedin, label: 'LinkedIn' },
-    { icon: Instagram, href: APP_CONFIG.socialLinks.instagram, label: 'Instagram' },
-    { icon: Github, href: APP_CONFIG.socialLinks.github, label: 'GitHub' },
+    {
+      icon: Twitter,
+      href: APP_CONFIG.socialLinks.twitter,
+      label: 'Twitter',
+    },
+    {
+      icon: Linkedin,
+      href: APP_CONFIG.socialLinks.linkedin,
+      label: 'LinkedIn',
+    },
+    {
+      icon: Instagram,
+      href: APP_CONFIG.socialLinks.instagram,
+      label: 'Instagram',
+    },
+    {
+      icon: Github,
+      href: APP_CONFIG.socialLinks.github,
+      label: 'GitHub',
+    },
   ];
 
   return (
@@ -56,9 +99,9 @@ const Footer: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-12 lg:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Company Info */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-2">
               <div className="flex items-center space-x-2 mb-6">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
                   <GraduationCap className="h-5 w-5 text-white" />
@@ -66,15 +109,16 @@ const Footer: React.FC = () => {
                 <span className="text-xl font-bold">CampusPro</span>
               </div>
               <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-                Empowering students and professionals with AI-driven career tools. 
+                Empowering students and professionals with AI-driven career tools.
                 Build your future with professional resumes, portfolios, and optimized profiles.
+                Choose from multiple templates with AI-powered customization.
               </p>
-              
+
               {/* Contact Info */}
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Mail className="h-4 w-4 text-purple-400" />
-                  <a 
+                  <a
                     href={`mailto:${APP_CONFIG.contactEmail}`}
                     className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
                   >
@@ -83,7 +127,7 @@ const Footer: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-purple-400" />
-                  <a 
+                  <a
                     href={`tel:${APP_CONFIG.contactPhone}`}
                     className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
                   >
@@ -95,51 +139,62 @@ const Footer: React.FC = () => {
                   <span className="text-sm text-gray-300">India</span>
                 </div>
               </div>
+
+              {/* Social Links */}
+              <div className="flex items-center space-x-4 mt-6">
+                {socialLinks.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-purple-400 transition-colors p-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                    aria-label={label}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
             </div>
 
             {/* Services */}
             <div>
-              <h3 className="text-lg font-semibold mb-6">Services</h3>
-              <ul className="space-y-3">
-                {footerLinks.services.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h3 className="text-lg font-semibold mb-6">Company</h3>
-              <ul className="space-y-3">
-                {footerLinks.company.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
+              <h3 className="text-lg font-semibold mb-6 flex items-center">
+                Services
+              </h3>
+              <ul className="space-y-4">
+                {footerLinks.services.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <li key={link.name}>
+                      <Link
+                        to={link.href}
+                        className="group flex items-start space-x-3 text-sm text-gray-300 hover:text-purple-400 transition-colors"
+                      >
+                        <Icon className="h-4 w-4 mt-0.5 text-purple-400 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium group-hover:text-purple-400">
+                            {link.name}
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
             {/* Resources */}
             <div>
-              <h3 className="text-lg font-semibold mb-6">Resources</h3>
+              <h3 className="text-lg font-semibold mb-6 flex items-center">
+                Resources
+              </h3>
               <ul className="space-y-3">
                 {footerLinks.resources.map((link) => (
                   <li key={link.name}>
                     <Link
                       to={link.href}
-                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
+                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors block py-1"
                     >
                       {link.name}
                     </Link>
@@ -147,6 +202,23 @@ const Footer: React.FC = () => {
                 ))}
               </ul>
             </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
+              <ul className="space-y-3">
+                {footerLinks.quickLinks.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.href}
+                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors block py-1"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </div>
 
@@ -155,22 +227,21 @@ const Footer: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
             <div className="text-sm text-gray-400">
               © {new Date().getFullYear()} CampusPro. All rights reserved.
+              <span className="mx-2">•</span>
+              <span>Built with ❤️ for students and professionals</span>
             </div>
-            
-            {/* Social Links */}
-            <div className="flex items-center space-x-4">
-              {socialLinks.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-purple-400 transition-colors"
-                  aria-label={label}
-                >
-                  <Icon className="h-5 w-5" />
-                </a>
-              ))}
+
+            {/* Additional Links */}
+            <div className="flex items-center space-x-6 text-sm text-gray-400">
+              <Link to="/privacy" className="hover:text-purple-400 transition-colors">
+                Privacy
+              </Link>
+              <Link to="/terms" className="hover:text-purple-400 transition-colors">
+                Terms
+              </Link>
+              <Link to="/sitemap" className="hover:text-purple-400 transition-colors">
+                Sitemap
+              </Link>
             </div>
           </div>
         </div>
@@ -182,6 +253,7 @@ const Footer: React.FC = () => {
         size="sm"
         onClick={scrollToTop}
         className="fixed bottom-8 right-8 z-50 rounded-full p-3 shadow-lg"
+        aria-label="Back to top"
       >
         <ArrowUp className="h-5 w-5" />
       </Button>

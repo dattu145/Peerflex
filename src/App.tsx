@@ -10,7 +10,13 @@ import LoginPage from './pages/auth/LoginPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import SignupPage from './pages/auth/SignupPage';
-import ServicesPage from './pages/ServicesPage'; // Add this import
+import ServicesPage from './pages/ServicesPage';
+import ResumeTemplatesPage from './pages/ResumeTemplatesPage';
+import ResumeBuilderPage from './pages/ResumeBuilderPage';
+import PortfolioTemplatesPage from './pages/PortfolioTemplatesPage';
+import ServicePreviewPage from "./pages/ServicePreviewPage";
+import SoftwareProjectsPage from './pages/SoftwareProjectsPage';
+
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -39,6 +45,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/services" element={<ServicesPage />} /> {/* Add this route */}
+          <Route path="/resume-templates" element={<ResumeTemplatesPage />} />
+          <Route path="/resume-builder" element={<ResumeBuilderPage />} />
+          <Route path="/portfolio-templates" element={<PortfolioTemplatesPage />} />
+          <Route path="/software-projects" element={<SoftwareProjectsPage />} />
+          <Route path="/service-preview/:serviceId" element={<ServicePreviewPage />} />
 
           {/* Protected Routes */}
           <Route

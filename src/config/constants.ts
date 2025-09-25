@@ -26,9 +26,9 @@ export const APP_CONFIG = {
   },
 
   // Contact
-  contactEmail: 'support@campuspro.com',
-  contactPhone: '+91-9876543210',
-  whatsappNumber: '+919876543210'
+  contactEmail: 'yourcampuspro@gmail.com',
+  contactPhone: '+91-8008998312',
+  whatsappNumber: '+918008998312'
 };
 
 export const ORDER_STATUSES = {

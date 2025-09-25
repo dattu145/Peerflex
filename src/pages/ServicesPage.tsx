@@ -1,6 +1,6 @@
 // src/pages/ServicesPage.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
@@ -14,7 +14,9 @@ import {
   Clock,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Eye,
+  LayoutTemplate
 } from 'lucide-react';
 import { SERVICES } from '../config/services';
 import { useAppStore } from '../store/useAppStore';
@@ -26,6 +28,7 @@ import Header from '../components/layout/Header';
 
 const ServicesPage: React.FC = () => {
   const { language } = useAppStore();
+  const navigate = useNavigate();
   const [expandedService, setExpandedService] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
@@ -47,6 +50,43 @@ const ServicesPage: React.FC = () => {
     { id: 'software', name: 'Software Projects' },
     { id: 'package', name: 'Packages' },
   ];
+
+  // Handle service selection with proper routing
+  const handleServiceSelect = (serviceId: string) => {
+    switch (serviceId) {
+      case 'resume-templates':
+        navigate('/resume-templates');
+        break;
+      case 'portfolio-building':
+        navigate('/portfolio-templates');
+        break;
+      case 'software-projects':
+        navigate('/software-projects');
+        break;
+      default:
+        navigate(`/order/${serviceId}`);
+        break;
+    }
+  };
+
+  // Handle template preview
+  const handleTemplatePreview = (serviceId: string) => {
+    switch (serviceId) {
+      case 'resume-templates':
+        // Store the service ID for the resume builder page
+        localStorage.setItem('selectedService', serviceId);
+        navigate('/resume-templates');
+        break;
+      case 'portfolio-building':
+        localStorage.setItem('selectedService', serviceId);
+        navigate('/portfolio-templates');
+        break;
+      default:
+        // For other services, show a preview modal or direct to order page
+        navigate(`/service-preview/${serviceId}`);
+        break;
+    }
+  };
 
   // Fixed filteredServices logic
   const filteredServices = filterCategory === 'all' 
@@ -152,7 +192,7 @@ const ServicesPage: React.FC = () => {
               </motion.div>
             ) : (
               <motion.div
-                key={filterCategory} // This key will force re-render when filter changes
+                key={filterCategory}
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -163,12 +203,13 @@ const ServicesPage: React.FC = () => {
                     const Icon = serviceIcons[service.category as keyof typeof serviceIcons];
                     const isPopular = service.id === 'complete-package';
                     const isExpanded = expandedService === service.id;
+                    const hasTemplates = ['resume-templates', 'portfolio-building'].includes(service.id);
                     
                     return (
                       <motion.div 
                         key={service.id} 
                         variants={itemVariants}
-                        layout // This enables smooth layout animations
+                        layout
                       >
                         <Card 
                           hover={true} 
@@ -272,7 +313,8 @@ const ServicesPage: React.FC = () => {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className={`grid gap-3 ${hasTemplates ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                              {/* Details Toggle */}
                               <button
                                 onClick={() => toggleService(service.id)}
                                 className="flex items-center justify-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
@@ -289,16 +331,37 @@ const ServicesPage: React.FC = () => {
                                   </>
                                 )}
                               </button>
-                              <Link to={`/order/${service.id}`}>
+
+                              {/* Template Preview Button (for services with templates) */}
+                              {hasTemplates && (
                                 <Button 
-                                  variant={isPopular ? 'primary' : 'secondary'} 
-                                  size="sm" 
-                                  className="w-full"
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleTemplatePreview(service.id)}
+                                  leftIcon={<Eye className="w-4 h-4" />}
                                 >
-                                  {getTranslation('orderNow', language)}
+                                  Preview
                                 </Button>
-                              </Link>
+                              )}
+
+                              {/* Main CTA Button */}
+                              <Button 
+                                variant={isPopular ? 'primary' : 'secondary'} 
+                                size="sm" 
+                                className="w-full"
+                                onClick={() => handleServiceSelect(service.id)}
+                                leftIcon={hasTemplates ? <LayoutTemplate className="w-4 h-4" /> : undefined}
+                              >
+                                {hasTemplates ? 'Choose Template' : getTranslation('orderNow', language)}
+                              </Button>
                             </div>
+
+                            {/* Special note for template-based services */}
+                            {hasTemplates && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                                Choose from multiple templates and customize with AI assistance
+                              </p>
+                            )}
                           </div>
                         </Card>
                       </motion.div>

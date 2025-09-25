@@ -1,5 +1,6 @@
+// src/components/home/ServicesSection.tsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MagicBento from '../../effects/MagicBento';
 import {
@@ -11,7 +12,9 @@ import {
   Package,
   ArrowRight,
   Star,
-  Clock
+  Clock,
+  LayoutTemplate,
+  Eye
 } from 'lucide-react';
 import { SERVICES } from '../../config/services';
 import { useAppStore } from '../../store/useAppStore';
@@ -22,6 +25,7 @@ import Button from '../ui/Button';
 
 const ServicesSection: React.FC = () => {
   const { language } = useAppStore();
+  const navigate = useNavigate();
 
   const serviceIcons = {
     resume: FileText,
@@ -30,6 +34,39 @@ const ServicesSection: React.FC = () => {
     github: Github,
     package: Package,
     software: Code,
+  };
+
+  // Handle service selection with proper routing
+  const handleServiceSelect = (serviceId: string) => {
+    switch (serviceId) {
+      case 'resume-templates':
+        navigate('/resume-templates');
+        break;
+      case 'portfolio-building':
+        navigate('/portfolio-templates');
+        break;
+      case 'software-projects':
+        navigate('/software-projects');
+        break;
+      default:
+        navigate(`/order/${serviceId}`);
+        break;
+    }
+  };
+
+  // Handle template preview
+  const handleTemplatePreview = (serviceId: string) => {
+    switch (serviceId) {
+      case 'resume-templates':
+        navigate('/resume-templates');
+        break;
+      case 'portfolio-building':
+        navigate('/portfolio-templates');
+        break;
+      default:
+        navigate(`/services#${serviceId}`);
+        break;
+    }
   };
 
   const containerVariants = {
@@ -45,6 +82,11 @@ const ServicesSection: React.FC = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
+  };
+
+  // Check if service has templates
+  const hasTemplates = (serviceId: string) => {
+    return ['resume-templates', 'portfolio-building'].includes(serviceId);
   };
 
   return (
@@ -81,6 +123,7 @@ const ServicesSection: React.FC = () => {
           {SERVICES.map((service, index) => {
             const Icon = serviceIcons[service.category];
             const isPopular = service.id === 'complete-package';
+            const serviceHasTemplates = hasTemplates(service.id);
 
             return (
               <motion.div key={service.id} variants={itemVariants}>
@@ -115,8 +158,8 @@ const ServicesSection: React.FC = () => {
                   {/* Features */}
                   <div className="mb-6">
                     <ul className="space-y-2">
-                      {service.features.slice(0, 4).map((feature) => (
-                        <li key={feature} className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                      {service.features.slice(0, 4).map((feature, index) => (
+                        <li key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                           <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2 flex-shrink-0"></div>
                           {feature}
                         </li>
@@ -144,26 +187,41 @@ const ServicesSection: React.FC = () => {
                       </div>
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <Clock className="w-4 h-4 mr-1" />
-                        2-3 days
+                        {service.category === 'software' ? '2-4 weeks' : '2-3 days'}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link to={`/services/${service.id}`}>
-                        <Button variant="outline" size="sm" className="w-full">
-                          {getTranslation('viewDetails', language)}
-                        </Button>
-                      </Link>
-                      <Link to={`/order/${service.id}`}>
-                        <Button
-                          variant={isPopular ? 'primary' : 'secondary'}
-                          size="sm"
-                          className="w-full"
-                        >
-                          {getTranslation('orderNow', language)}
-                        </Button>
-                      </Link>
+                    <div className={`grid gap-2 grid-cols-2`}>
+                      {/* View Details Button */}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleTemplatePreview(service.id)}
+                        leftIcon={<Eye className="w-4 h-4" />}
+                      >
+                        Preview
+                      </Button>
+
+
+                      {/* Main CTA Button */}
+                      <Button
+                        variant={isPopular ? 'primary' : 'secondary'}
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleServiceSelect(service.id)}
+                        leftIcon={serviceHasTemplates ? <LayoutTemplate className="w-4 h-4" /> : undefined}
+                      >
+                        {serviceHasTemplates ? 'View Templates' : getTranslation('orderNow', language)}
+                      </Button>
                     </div>
+
+                    {/* Special note for template-based services */}
+                    {serviceHasTemplates && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                        Multiple templates available with AI customization
+                      </p>
+                    )}
                   </div>
                 </Card>
               </motion.div>
