@@ -24,9 +24,18 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: getTranslation('home', language), href: '/' },
-    { name: getTranslation('services', language), href: '/services' },
+    { name: 'Features', href: '#', isDropdown: true },
     { name: getTranslation('about', language), href: '/about' },
     { name: getTranslation('contact', language), href: '/contact' },
+  ];
+
+  const featuresMenu = [
+    { name: 'Notes Sharing', href: '/notes' },
+    { name: 'Student Chat', href: '/chat' },
+    { name: 'Job Listings', href: '/jobs' },
+    { name: 'Events', href: '/events' },
+    { name: 'Open Source', href: '/projects' },
+    { name: 'Resume Builder', href: '/resume-templates' },
   ];
 
   const languages = [
@@ -60,17 +69,38 @@ const Header: React.FC = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === item.href
-                      ? 'text-purple-600 bg-purple-50 dark:bg-purple-900/20'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
-                  }`}
-                >
-                  {item.name}
-                </Link>
+                item.isDropdown ? (
+                  <div key={item.name} className="relative group">
+                    <button
+                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      {item.name}
+                    </button>
+                    <div className="absolute left-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      {featuresMenu.map((feature) => (
+                        <Link
+                          key={feature.name}
+                          to={feature.href}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {feature.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      location.pathname === item.href
+                        ? 'text-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
             </div>
           </div>
@@ -176,18 +206,36 @@ const Header: React.FC = () => {
         >
           <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === item.href
-                    ? 'text-purple-600 bg-purple-50 dark:bg-purple-900/20'
-                    : 'text-gray-700 dark:text-gray-300'
-                }`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
+              item.isDropdown ? (
+                <div key={item.name}>
+                  <div className="px-3 py-2 text-base font-medium text-gray-500 dark:text-gray-400">
+                    {item.name}
+                  </div>
+                  {featuresMenu.map((feature) => (
+                    <Link
+                      key={feature.name}
+                      to={feature.href}
+                      className="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {feature.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    location.pathname === item.href
+                      ? 'text-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
             {!isAuthenticated && (
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
