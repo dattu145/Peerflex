@@ -52,14 +52,14 @@ const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="flex h-10 w-10 mr-1 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
+              <div className="flex h-10 w-10 mr-1 items-center justify-center rounded-lg bg-purple-600">
                 <GraduationCap className="h-7 w-7 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-purple-600 bg-clip-text text-transparent">
                 CampusPro
               </span>
             </Link>

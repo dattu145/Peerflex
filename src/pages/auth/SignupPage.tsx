@@ -82,14 +82,14 @@ const SignupPage: React.FC = () => {
         >
           {/* Header */}
           <div className="text-center">
-            <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-blue-600">
+            {/* <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-600">
                 <GraduationCap className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-purple-600 bg-clip-text text-transparent">
                 CampusPro
               </span>
-            </Link>
+            </Link> */}
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               Create Your Account
             </h2>

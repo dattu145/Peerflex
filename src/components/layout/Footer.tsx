@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
             {/* Company Info */}
             <div className="lg:col-span-2">
               <div className="flex items-center space-x-2 mb-6">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-blue-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600">
                   <GraduationCap className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-bold">CampusPro</span>
