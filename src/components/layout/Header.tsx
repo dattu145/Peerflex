@@ -60,7 +60,7 @@ const Header: React.FC = () => {
                 <GraduationCap className="h-7 w-7 text-white" />
               </div>
               <span className="text-xl font-bold bg-purple-600 bg-clip-text text-transparent">
-                CampusPro
+                Peerflex
               </span>
             </Link>
           </div>

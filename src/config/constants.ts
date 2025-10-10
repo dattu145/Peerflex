@@ -26,8 +26,8 @@ export const APP_CONFIG = {
   },
 
   // Contact
-  contactEmail: 'yourcampuspro@gmail.com',
-  contactPhone: '+91-8008998312',
+  contactEmail: 'peerplex-support@gmail.com',
+  contactPhone: '+91-1234567890',
   whatsappNumber: '+918008998312'
 };
 

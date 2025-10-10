@@ -106,7 +106,7 @@ const Footer: React.FC = () => {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600">
                   <GraduationCap className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">CampusPro</span>
+                <span className="text-xl font-bold">Peerflex</span>
               </div>
               <p className="text-gray-300 mb-6 text-sm leading-relaxed">
                 Empowering students and professionals with AI-driven career tools.
@@ -226,7 +226,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-800 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
             <div className="text-sm text-gray-400">
-              © {new Date().getFullYear()} CampusPro. All rights reserved.
+              © {new Date().getFullYear()} Peerflex. All rights reserved.
               <span className="mx-2">•</span>
               <span>Built with ❤️ for students and professionals</span>
             </div>

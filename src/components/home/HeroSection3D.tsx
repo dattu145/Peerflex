@@ -126,9 +126,9 @@ const HeroSection3D: React.FC<HeroSection3DProps> = ({ onExploreClick }) => {
                     transition={{ duration: 1, delay: 0.3 }}
                     className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight"
                 >
-                    Campus
+                    Peer
                     <span className="text-purple-600 sm:inline">
-                        Pro
+                        flex
                     </span>
                 </motion.h1>
 
