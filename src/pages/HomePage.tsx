@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/layout/Layout';
@@ -18,60 +18,74 @@ import {
   Users,
   TrendingUp,
   MapPin,
-  Navigation
+  Navigation,
+  Play,
+  Pause
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'events' | 'users' | 'hangouts'>('events');
   const [cursorVariant, setCursorVariant] = useState('default');
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // AI-generated student lifestyle images (placeholder URLs - replace with actual AI images)
+  const aiImages = [
+    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+  ];
 
   const features = [
     {
       icon: BookOpen,
       title: 'Notes Sharing',
       description: 'Share and discover study notes from students worldwide',
-      gradient: 'bg-purple-600',
-      link: '/notes'
+      gradient: 'from-purple-500 to-pink-500',
+      link: '/notes',
+      image: aiImages[0]
     },
     {
       icon: MessageCircle,
       title: 'Student Chat',
       description: 'Direct messaging and group chats with classmates',
-      gradient: 'bg-purple-600',
-      link: '/chat'
+      gradient: 'from-blue-500 to-cyan-500',
+      link: '/chat',
+      image: aiImages[1]
     },
     {
       icon: Briefcase,
       title: 'Job Listings',
       description: 'Find internships with auto-apply integration',
-      gradient: 'bg-purple-600',
-      link: '/jobs'
+      gradient: 'from-green-500 to-emerald-500',
+      link: '/jobs',
+      image: aiImages[2]
     },
     {
       icon: Calendar,
       title: 'Events & Hangouts',
       description: 'Join workshops, study groups, and social events',
-      gradient: 'bg-purple-600',
-      link: '/events'
+      gradient: 'from-orange-500 to-red-500',
+      link: '/events',
+      image: aiImages[3]
     },
     {
       icon: Github,
       title: 'Open Source',
       description: 'Contribute to student-led open source projects',
-      gradient: 'bg-purple-600',
+      gradient: 'from-gray-700 to-gray-900',
       link: '/projects'
     },
     {
       icon: FileText,
       title: 'Resume Builder',
       description: 'Create professional resumes with AI assistance',
-      gradient: 'bg-purple-600',
-      link: '/resume-templates'
+      gradient: 'from-indigo-500 to-purple-600'
     }
   ];
 
-  // Mock data for map markers
   const mapData = {
     events: [
       {
@@ -116,278 +130,288 @@ const HomePage: React.FC = () => {
     ]
   };
 
+  const toggleVideo = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
   const handleMouseEnter = () => setCursorVariant('hover');
   const handleMouseLeave = () => setCursorVariant('default');
 
   return (
     <Layout>
-      
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden relative">
+      {/* Video Background Section */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Hero Content Over Video */}
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <HeroSection3D />
+        </div>
+      </section>
 
-        <HeroSection3D />
-
-        {/* Features Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need, One Place
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300">
-                Powerful features designed specifically for students
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  whileHover={{ 
-                    y: -10, 
-                    scale: 1.02,
-                    transition: { duration: 0.2 } 
-                  }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <Link to={feature.link}>
-                    <div className="relative group">
-                      <div className="absolute transition-opacity duration-300 rounded-2xl blur-xl" />
-                      <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 group-hover:border-transparent backdrop-blur-sm">
-                        <div className={`inline-flex p-3 rounded-xl ${feature.gradient} mb-4`}>
-                          <feature.icon className="h-8 w-8 text-white" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                          {feature.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          {feature.description}
-                        </p>
-                        <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold group-hover:gap-1 transition-all">
-                          Explore
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Interactive Map Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-                <MapPin className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                <span className="text-lg font-semibold text-purple-900 dark:text-purple-300">
-                  Campus Network Map
-                </span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Explore Your Campus Community
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Discover events, connect with peers, and find hangout spots across campus
-              </p>
-            </motion.div>
-
-            {/* Map Controls */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-wrap justify-center gap-4 mb-8"
-            >
-              <button
-                onClick={() => setActiveTab('events')}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === 'events'
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <Calendar className="h-5 w-5" />
-                Events
-              </button>
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === 'users'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <Users className="h-5 w-5" />
-                All Users
-              </button>
-              <button
-                onClick={() => setActiveTab('hangouts')}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
-                  activeTab === 'hangouts'
-                    ? 'bg-green-600 text-white shadow-lg'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <Navigation className="h-5 w-5" />
-                Hangouts
-              </button>
-            </motion.div>
-
-            {/* Interactive Map Component */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700"
-            >
-              <InteractiveMap
-                data={mapData[activeTab]}
-                type={activeTab}
-                className="h-96 w-full"
-              />
-              
-              {/* Map Legend */}
-              <div className="p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex flex-wrap gap-6 justify-center text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-gray-700 dark:text-gray-300">Events</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-700 dark:text-gray-300">Users</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-gray-700 dark:text-gray-300">Hangouts</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
-            >
-              <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                <Users className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {mapData.users.length}+
-                </div>
-                <div className="text-gray-600 dark:text-gray-300">Active Users</div>
-              </div>
-              <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {mapData.events.length}+
-                </div>
-                <div className="text-gray-600 dark:text-gray-300">Upcoming Events</div>
-              </div>
-              <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                <Navigation className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {mapData.hangouts.length}+
-                </div>
-                <div className="text-gray-600 dark:text-gray-300">Hangout Spots</div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-purple-600 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full filter blur-3xl" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl" />
-          </div>
-
+      {/* Features Section with AI Images */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative bg-gradient-to-br from-gray-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center relative z-10"
+            className="text-center mb-16"
           >
-            <Zap className="h-16 w-16 text-white mx-auto mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Transform Your Student Life?
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-block mb-4"
+            >
+              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 mb-8 rounded-full text-sm font-semibold">
+                ✨ AI-Powered Platform
+              </div>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Everything You Need, <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">One Place</span>
             </h2>
-            <p className="text-xl text-white/90 mb-8">
-              Join thousands of students already using PeerFlex to succeed in their academic journey
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Powerful features enhanced with AI to make your student journey smoother and more productive
             </p>
-            <Link to="/signup">
+          </motion.div>
+
+          {/* Mobile-Optimized Grid (2x2 on mobile, 3x2 on desktop) */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  y: -5,
+                  transition: { duration: 0.2 } 
+                }}
+                className="col-span-2 lg:col-span-1"
+              >
+                <Link to={feature.link || '#'}>
+                  <div className="relative group h-full">
+                    {/* Background Gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                    
+                    {/* Main Card */}
+                    <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 dark:border-gray-700/50 group-hover:border-transparent transition-all duration-300 h-full flex flex-col">
+                      
+                      {/* AI Image Preview */}
+                      {feature.image && (
+                        <div className="mb-4 rounded-2xl overflow-hidden">
+                          <img 
+                            src={feature.image} 
+                            alt={feature.title}
+                            className="w-full h-32 object-cover transform group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Icon */}
+                      <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} mb-4 ${!feature.image ? 'mt-2' : ''}`}>
+                        <feature.icon className="h-6 w-6 text-white" />
+                      </div>
+                      
+                      {/* Content */}
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow line-clamp-3">
+                        {feature.description}
+                      </p>
+                      
+                      {/* CTA */}
+                      <div className="flex items-center text-blue-600 dark:text-blue-400 font-semibold text-sm group-hover:gap-2 transition-all">
+                        Explore
+                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* AI Features Showcase */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 text-center"
+          >
+            <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-3xl p-8 md:p-12 border border-purple-200/50 dark:border-purple-800/50">
+              <Sparkles className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Powered by Advanced AI
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                Our platform uses cutting-edge AI to personalize your experience, 
+                suggest relevant content, and help you achieve your academic goals faster.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Interactive Map Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
+              <MapPin className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <span className="text-lg font-semibold text-purple-900 dark:text-purple-300">
+                Campus Network Map
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Explore Your Campus Community
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Discover events, connect with peers, and find hangout spots across campus
+            </p>
+          </motion.div>
+
+          {/* Map Controls - Mobile Optimized */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8"
+          >
+            {[
+              { key: 'events', label: 'Events', icon: Calendar, color: 'purple' },
+              { key: 'users', label: 'Users', icon: Users, color: 'blue' },
+              { key: 'hangouts', label: 'Hangouts', icon: Navigation, color: 'green' }
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`px-4 py-3 md:px-6 md:py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-sm md:text-base ${
+                  activeTab === tab.key
+                    ? `bg-${tab.color}-600 text-white shadow-lg`
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                <tab.icon className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden xs:inline">{tab.label}</span>
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Interactive Map */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700"
+          >
+            <InteractiveMap
+              data={mapData[activeTab]}
+              type={activeTab}
+              className="h-64 sm:h-80 md:h-96 w-full"
+            />
+            
+            <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-wrap gap-4 md:gap-6 justify-center text-xs md:text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 bg-purple-500 rounded-full"></div>
+                  <span className="text-gray-700 dark:text-gray-300">Events</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-gray-700 dark:text-gray-300">Users</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-gray-700 dark:text-gray-300">Hangouts</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Stats - Mobile Optimized */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6 }}
+            className="grid grid-cols-3 gap-3 md:gap-6 mt-8 md:mt-12"
+          >
+            {[
+              { icon: Users, count: mapData.users.length, label: 'Active Users', color: 'blue' },
+              { icon: Calendar, count: mapData.events.length, label: 'Events', color: 'purple' },
+              { icon: Navigation, count: mapData.hangouts.length, label: 'Hangouts', color: 'green' }
+            ].map((stat, index) => (
+              <div key={stat.label} className="text-center p-4 md:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
+                <stat.icon className={`h-6 w-6 md:h-8 md:w-8 text-${stat.color}-600 mx-auto mb-2 md:mb-3`} />
+                <div className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                  {stat.count}+
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-300">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Enhanced CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white rounded-full filter blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-cyan-300 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto text-center relative z-10"
+        >
+          <Zap className="h-16 w-16 text-white mx-auto mb-6" />
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+            Ready to Transform Your Student Life?
+          </h2>
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            Join thousands of students already using PeerFlex to succeed in their academic journey with AI-powered tools
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/signup" className="flex-1 sm:flex-none">
               <Button 
-                variant="ghost" 
-                className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                size="lg"
+                className="w-full bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4 font-semibold"
               >
                 Start Your Journey
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-          </motion.div>
-        </section>
-      </div>
-
-      <style>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        
-        /* Smooth scrolling */
-        html {
-          scroll-behavior: smooth;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #c084fc;
-          border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #a855f7;
-        }
-      `}</style>
+            <Link to="/login" className="flex-1 sm:flex-none">
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full border-white text-white hover:bg-white/10 text-lg px-8 py-4 font-semibold"
+              >
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
+      </section>
     </Layout>
   );
 };

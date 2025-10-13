@@ -66,7 +66,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({ data, type, className }
       <MapContainer
         center={defaultCenter}
         zoom={12}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', zIndex:'-2' }}
         scrollWheelZoom={false}
       >
         <TileLayer
