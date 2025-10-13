@@ -69,8 +69,8 @@ const ContactPage: React.FC = () => {
     {
       icon: Mail,
       title: 'Email',
-      content: 'yourcampuspro@gmail.com',
-      link: 'mailto:yourcampuspro@gmail.com'
+      content: 'peerplex-support@gmail.com',
+      link: 'mailto:peerplex-support@gmail.com'
     },
     {
       icon: Phone,

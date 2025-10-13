@@ -19,7 +19,7 @@ import {
 import { SERVICES } from '../../config/services';
 import { useAppStore } from '../../store/useAppStore';
 import { getTranslation } from '../../config/translations';
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency } from '../../utils/authHelpers';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/helpers';
+import { cn } from '../../utils/authHelpers';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

@@ -167,9 +167,9 @@ const AboutPage: React.FC = () => {
                             </motion.div>
 
                             <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-7xl">
-                                Campus
+                                Peer
                                 <span className="bg-purple-600 bg-clip-text text-transparent">
-                                    Pro
+                                    flex
                                 </span>
                             </h1>
 

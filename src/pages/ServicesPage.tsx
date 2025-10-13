@@ -21,7 +21,7 @@ import {
 import { SERVICES } from '../config/services';
 import { useAppStore } from '../store/useAppStore';
 import { getTranslation } from '../config/translations';
-import { formatCurrency } from '../utils/helpers';
+import { formatCurrency } from '../utils/authHelpers';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Header from '../components/layout/Header';

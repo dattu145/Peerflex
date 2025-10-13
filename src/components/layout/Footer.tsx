@@ -95,7 +95,7 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="relative bg-gray-900 text-white">
+    <footer className="relative bg-gray-100 dark:bg-gray-900 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-12 lg:py-16">
@@ -106,9 +106,9 @@ const Footer: React.FC = () => {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600">
                   <GraduationCap className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Peerflex</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-gray-100">Peerflex</span>
               </div>
-              <p className="text-gray-300 mb-6 text-sm leading-relaxed">
+              <p className="text-gray-900 dark:text-gray-100 mb-6 text-sm leading-relaxed">
                 Empowering students and professionals with AI-driven career tools.
                 Build your future with professional resumes, portfolios, and optimized profiles.
                 Choose from multiple templates with AI-powered customization.
@@ -120,7 +120,7 @@ const Footer: React.FC = () => {
                   <Mail className="h-4 w-4 text-purple-400" />
                   <a
                     href={`mailto:${APP_CONFIG.contactEmail}`}
-                    className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
+                    className="text-sm hover:text-purple-400 transition-colors text-gray-900 dark:text-gray-100 hover:text-purple-700 dark:hover:text-purple-400"
                   >
                     {APP_CONFIG.contactEmail}
                   </a>
@@ -129,14 +129,14 @@ const Footer: React.FC = () => {
                   <Phone className="h-4 w-4 text-purple-400" />
                   <a
                     href={`tel:${APP_CONFIG.contactPhone}`}
-                    className="text-sm text-gray-300 hover:text-purple-400 transition-colors"
+                    className="text-sm hover:text-purple-400 transition-colors text-gray-900 dark:text-gray-100 hover:text-purple-700 dark:hover:text-purple-400"
                   >
                     {APP_CONFIG.contactPhone}
                   </a>
                 </div>
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-purple-400" />
-                  <span className="text-sm text-gray-300">India</span>
+                  <span className="text-sm text-gray-900 dark:text-gray-100">India</span>
                 </div>
               </div>
 
@@ -148,7 +148,7 @@ const Footer: React.FC = () => {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-purple-400 transition-colors p-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                    className="text-gray-100 bg-purple-600 hover:text-purple-400 transition-colors p-2 rounded-lg hover:bg-gray-700"
                     aria-label={label}
                   >
                     <Icon className="h-5 w-5" />
@@ -159,7 +159,7 @@ const Footer: React.FC = () => {
 
             {/* Services */}
             <div>
-              <h3 className="text-lg font-semibold mb-6 flex items-center">
+              <h3 className="text-lg font-semibold mb-6 flex items-center text-gray-900 dark:text-gray-100">
                 Services
               </h3>
               <ul className="space-y-4">
@@ -169,7 +169,7 @@ const Footer: React.FC = () => {
                     <li key={link.name}>
                       <Link
                         to={link.href}
-                        className="group flex items-start space-x-3 text-sm text-gray-300 hover:text-purple-400 transition-colors"
+                        className="group flex items-start space-x-3 text-sm text-gray-900 dark:text-gray-100 hover:text-purple-700 dark:hover:text-purple-400 transition-colors"
                       >
                         <Icon className="h-4 w-4 mt-0.5 text-purple-400 flex-shrink-0" />
                         <div>
@@ -186,7 +186,7 @@ const Footer: React.FC = () => {
 
             {/* Resources */}
             <div>
-              <h3 className="text-lg font-semibold mb-6 flex items-center">
+              <h3 className="text-lg font-semibold mb-6 flex items-center text-gray-900 dark:text-gray-100">
                 Resources
               </h3>
               <ul className="space-y-3">
@@ -194,7 +194,7 @@ const Footer: React.FC = () => {
                   <li key={link.name}>
                     <Link
                       to={link.href}
-                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors block py-1"
+                      className="text-sm text-gray-900 dark:text-gray-100 hover:text-purple-700 dark:hover:text-purple-400 transition-colors block py-1"
                     >
                       {link.name}
                     </Link>
@@ -204,13 +204,13 @@ const Footer: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
+              <h3 className="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100">Quick Links</h3>
               <ul className="space-y-3">
                 {footerLinks.quickLinks.map((link) => (
                   <li key={link.name}>
                     <Link
                       to={link.href}
-                      className="text-sm text-gray-300 hover:text-purple-400 transition-colors block py-1"
+                      className="text-sm text-gray-900 dark:text-gray-100 hover:text-purple-700 dark:hover:text-purple-400 transition-colors block py-1"
                     >
                       {link.name}
                     </Link>

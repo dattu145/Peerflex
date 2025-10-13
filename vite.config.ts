@@ -8,4 +8,9 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   assetsInclude: ['**/*.glb'],
+  build: {
+    rollupOptions: {
+      external: []
+    }
+  }
 });
