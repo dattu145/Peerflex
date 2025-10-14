@@ -26,12 +26,6 @@ const AboutPage: React.FC = () => {
 
     const features = [
         {
-            icon: Home,
-            title: 'Room & Food Finder',
-            description: 'Verified hostels, rooms, and local mess services tailored for students starting with Salem',
-            color: 'text-orange-600 dark:text-orange-400'
-        },
-        {
             icon: FileText,
             title: 'Resume & Portfolio Builder',
             description: 'AI-powered templates to build, preview, and share personalized resumes and digital portfolios',
@@ -73,7 +67,7 @@ const AboutPage: React.FC = () => {
         { value: 'All-in-One', label: 'Digital Ecosystem', icon: Rocket },
         { value: 'College', label: 'Students Focused', icon: Users },
         { value: 'Salem', label: 'Starting Location', icon: Target },
-        { value: '7', label: 'Core Features', icon: Lightbulb }
+        { value: '6', label: 'Core Features', icon: Lightbulb }
     ];
 
     const values = [

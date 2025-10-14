@@ -56,8 +56,8 @@ const Header: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="flex h-10 w-10 mr-1 items-center justify-center rounded-lg bg-purple-600">
-                <GraduationCap className="h-7 w-7 text-white" />
+              <div className="flex h-10 w-10 mr-1 items-center justify-center rounded-lg bg-white dark:bg-gray-900 border border-purple-600/40">
+                <img src='/logotransparent.png' className="h-7 w-7 text-white" />
               </div>
               <span className="text-xl font-bold bg-purple-600 bg-clip-text text-transparent">
                 Peerflex
