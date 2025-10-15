@@ -24,6 +24,7 @@ import ProjectsPage from './pages/projects/ProjectsPage';
 import AuthCallback from './pages/auth/AuthCallback';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
+import ScrollToTop from './components/ScrollToTop';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -63,6 +64,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Routes>
           {/* Public Routes */}
