@@ -45,10 +45,9 @@
 
 ---
 
+## About Peerflex
 
 [↑ Tables of Content](#Table-of-Contents)
-
-## About Peerflex
 
 <div align="center" style="fontFamily: Poppins, sans-serif;">
   
@@ -87,6 +86,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 ---
 
 ##  Key Features
+
+[↑ Tables of Content](#Table-of-Contents)
 
 ### 1. **Smart Authentication & User Management**
 - Secure authentication powered by **Supabase**
@@ -153,6 +154,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ## Target Audience
 
+[↑ Tables of Content](#Table-of-Contents)
+
 <table>
 <tr>
 <td align="center" width="25%">
@@ -182,6 +185,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 ---
 
 ## Tech Stack
+
+[↑ Tables of Content](#Table-of-Contents)
 
 <div align="center">
 
@@ -217,6 +222,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ## Project Architecture
 
+[↑ Tables of Content](#Table-of-Contents)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     PEERFLEX ARCHITECTURE                    │
@@ -246,6 +253,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 ```
 
 ### Core Modules
+
+[↑ Tables of Content](#Table-of-Contents)
 
 1. **Authentication Module** (`store/useAuthStore.ts`)
    - User registration and login
@@ -279,6 +288,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ##  Getting Started
 
+[↑ Tables of Content](#Table-of-Contents)
+
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -289,6 +300,8 @@ Before you begin, ensure you have the following installed:
 - A **Supabase** account - [Sign up](https://supabase.com/)
 
 ### Installation
+
+[↑ Tables of Content](#Table-of-Contents)
 
 #### 1️⃣ Clone the Repository
 
@@ -323,6 +336,8 @@ This will install all required packages including:
 
 ### Environment Setup
 
+[↑ Tables of Content](#Table-of-Contents)
+
 #### 3️⃣ Configure Environment Variables
 
 Create a `.env` file in the root directory by copying from `.env.example`:
@@ -346,6 +361,8 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 4. Copy the **Project URL** and **anon/public key**
 
 ### Running the App
+
+[↑ Tables of Content](#Table-of-Contents)
 
 #### 4️⃣ Start Development Server
 
@@ -385,6 +402,8 @@ npm run format
 ---
 
 ## Project Structure
+
+[↑ Tables of Content](#Table-of-Contents)
 
 ```
 Peerflex/
@@ -511,6 +530,8 @@ Peerflex/
 
 ## UI/UX Design Philosophy
 
+[↑ Tables of Content](#Table-of-Contents)
+
 ### Design Principles
 
 At Peerflex, we believe that great design is not just about aesthetics — it's about creating intuitive, accessible, and delightful experiences for our users.
@@ -558,6 +579,8 @@ If you believe Peerflex's design or user interface can be improved, we'd **love*
 ---
 
 ## Roadmap
+
+[↑ Tables of Content](#Table-of-Contents)
 
 ### Current Status: **Phase 1 - Foundation** ✅
 
@@ -707,6 +730,8 @@ Have an idea for Peerflex? We'd love to hear it! [Open a feature request](https:
 
 ## 🤝 Contributing
 
+[↑ Tables of Content](#Table-of-Contents)
+
 We **love** contributions! Peerflex is built by students, for students. Whether you're fixing a typo or adding a major feature, every contribution helps make Peerflex better.
 
 ### Ways to Contribute
@@ -801,6 +826,8 @@ New to open source? Look for issues labeled [`good first issue`](https://github.
 
 ## Community
 
+[↑ Tables of Content](#Table-of-Contents)
+
 Join the Peerflex community and connect with fellow contributors!
 
 ### Get in Touch
@@ -828,6 +855,8 @@ Contributors will be:
 ---
 
 ## License
+
+[↑ Tables of Content](#Table-of-Contents)
 
 Peerflex is **dual-licensed** to give you maximum flexibility:
 
@@ -876,6 +905,8 @@ For full license text, see the [LICENSE](LICENSE) file in the repository.
 ---
 
 ## 📞 Contact
+
+[↑ Tables of Content](#Table-of-Contents)
 
 <div align="center">
 
@@ -945,6 +976,8 @@ We'd love to hear your ideas! [Create a feature request](https://github.com/datt
 
 ## Acknowledgments
 
+[↑ Tables of Content](#Table-of-Contents)
+
 ### Special Thanks To
 
 - **[Supabase](https://supabase.com/)** - For providing an amazing backend-as-a-service platform
@@ -966,6 +999,7 @@ Proudly built in **Salem, Tamil Nadu, India** 🇮🇳 with the goal of empoweri
 ---
 
 ## Project Stats
+
 
 <div align="center">
 
@@ -1077,6 +1111,8 @@ Peerflex is designed to work as a Progressive Web App, providing:
 ---
 
 ## 🎯 Our Approach
+
+[↑ Tables of Content](#Table-of-Contents)
 
 ### Student-Centric Development
 
