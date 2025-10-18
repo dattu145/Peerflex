@@ -443,13 +443,6 @@ const AboutPage: React.FC = () => {
                                     </p>
                                 </div>
                                 <div className="text-center">
-                                    <Home className="h-8 w-8 text-purple-600 mx-auto mb-4" />
-                                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Hostel/PG Owners</h4>
-                                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                                        Accommodation and service providers
-                                    </p>
-                                </div>
-                                <div className="text-center">
                                     <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-4" />
                                     <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Campus Clubs</h4>
                                     <p className="text-gray-600 dark:text-gray-300 text-sm">
