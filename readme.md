@@ -1,12 +1,8 @@
 <div align="center">
 
-<!-- GSSoC 2025 Badge -->
-<a href="https://gssoc.girlscript.tech/">
-  <img src="https://avatars.githubusercontent.com/u/166525102?s=280&v=4" alt="GSSoC 2025" width="120" height="120"/>
-</a>
 
 <!-- Project Banner -->
-<img src="banner.png" alt="Peerflex Banner" width="100%" style="border-radius: 10px; margin: 20px 0;"/>
+<img src="public/gssocbanner.png" alt="Peerflex Banner" width="80%" style="border-radius: 10px; margin: 20px 0;"/>
 
 # ⚡ Peerflex
 
