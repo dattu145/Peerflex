@@ -45,7 +45,7 @@
 
 ---
 
-## 🌟 About Peerflex
+## About Peerflex
 
 <div align="center" style="fontFamily: Poppins, sans-serif;">
   
@@ -55,7 +55,7 @@
 
 **Peerflex** is not just another student platform — it's a comprehensive **AI-powered digital ecosystem** designed exclusively for college students. Built with modern web technologies and a student-first approach, Peerflex addresses the real challenges students face every day.
 
-### 🎓 Why Peerflex?
+###  Why Peerflex?
 
 In today's fast-paced academic environment, students juggle multiple platforms for different needs:
 - 📝 One app for notes
@@ -65,11 +65,11 @@ In today's fast-paced academic environment, students juggle multiple platforms f
 
 **Peerflex changes this.** We bring everything under one roof, creating a unified experience that saves time, reduces cognitive load, and enhances productivity.
 
-### 🌍 Our Vision
+###  Our Vision
 
 Starting from **Salem, Tamil Nadu**, we're building India's largest student lifestyle and career ecosystem. Our goal is to transform how students navigate their college journey — from first-year freshers to final-year graduates.
 
-### 💡 The Problem We Solve
+###  The Problem We Solve
 
 | **Challenge** | **Peerflex Solution** |
 |---------------|---------------------|
@@ -83,15 +83,15 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
-### 🔐 1. **Smart Authentication & User Management**
+### 1. **Smart Authentication & User Management**
 - Secure authentication powered by **Supabase**
 - Role-based access control
 - Profile customization and management
 - Real-time session handling
 
-### 📄 2. **AI-Powered Resume & Portfolio Builder**
+### 2. **AI-Powered Resume & Portfolio Builder**
 - Multiple professional templates
 - AI-driven content suggestions
 - Real-time preview and editing
@@ -99,7 +99,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Shareable digital portfolios
 - ATS-friendly formatting
 
-### 📚 3. **Notes & Study Sharing**
+### 3. **Notes & Study Sharing**
 - Subject-based organization
 - Collaborative note-taking
 - Resource sharing across campuses
@@ -107,7 +107,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Version control for documents
 - Markdown support
 
-### 💬 4. **Chat & Networking** *(In Development)*
+### 4. **Chat & Networking** *(In Development)*
 - Real-time messaging
 - Peer-to-peer connections
 - Group chat for projects
@@ -115,7 +115,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Reaction system
 - Typing indicators
 
-### 💼 5. **Job & Internship Hub**
+### 5. **Job & Internship Hub**
 - Curated student-friendly opportunities
 - Part-time job listings
 - Internship opportunities
@@ -123,7 +123,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Application tracking
 - Company profiles
 
-### 🎉 6. **Events & Hangouts**
+### 6. **Events & Hangouts**
 - Campus event discovery
 - Local meetup planning
 - Interactive event map
@@ -131,14 +131,14 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Event recommendations
 - Calendar integration
 
-### 🌐 7. **Open-Source Collaboration**
+### 7. **Open-Source Collaboration**
 - Discover beginner-friendly projects
 - Contribute with peers
 - Project showcase
 - Skill-based matching  
 - GitHub integration
 
-### ⚡ 8. **Advanced Features**
+### 8. **Advanced Features**
 - Real-time data synchronization
 - Responsive design across all devices
 - Dark mode support
@@ -148,7 +148,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
-## 🎯 Target Audience
+## Target Audience
 
 <table>
 <tr>
@@ -158,13 +158,6 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 <strong>College Students</strong>
 <br />
 <sub>From freshers to graduates</sub>
-</td>
-<td align="center" width="25%">
-<img src="https://img.icons8.com/fluency/96/hotel.png" width="64" alt="Accommodation"/>
-<br />
-<strong>Hostel/PG Owners</strong>
-<br />
-<sub>Accommodation providers</sub>
 </td>
 <td align="center" width="25%">
 <img src="https://img.icons8.com/fluency/96/groups.png" width="64" alt="Clubs"/>
@@ -185,7 +178,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 <div align="center">
 
@@ -219,7 +212,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -281,7 +274,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -373,7 +366,7 @@ npm run build
 npm run preview
 ```
 
-### 🔧 Additional Scripts
+### Additional Scripts
 
 ```bash
 # Type checking
@@ -388,7 +381,7 @@ npm run format
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 Peerflex/
@@ -513,13 +506,13 @@ Peerflex/
 
 ---
 
-## 🎨 UI/UX Design Philosophy
+## UI/UX Design Philosophy
 
-### 💡 Design Principles
+### Design Principles
 
 At Peerflex, we believe that great design is not just about aesthetics — it's about creating intuitive, accessible, and delightful experiences for our users.
 
-#### 🎯 Core Design Values
+#### Core Design Values
 
 1. **Student-Centric**: Every design decision is made with college students in mind
 2. **Minimalist Yet Functional**: Clean interfaces that don't overwhelm
@@ -527,7 +520,7 @@ At Peerflex, we believe that great design is not just about aesthetics — it's 
 4. **Responsive**: Seamless experience across all devices
 5. **Performance-First**: Fast loading times and smooth interactions
 
-### 🖌️ Visual Language
+### Visual Language
 
 - **Color Palette**: Purple and blue gradients representing innovation and trust
 - **Typography**: Poppins font family for modern, readable text
@@ -535,9 +528,9 @@ At Peerflex, we believe that great design is not just about aesthetics — it's 
 - **Animations**: Subtle micro-interactions for better UX
 - **Dark Mode**: Native support for reduced eye strain
 
-### 🚀 We Welcome Design Contributions!
+### We Welcome Design Contributions!
 
-**🎨 Calling all UI/UX Designers!**
+**Calling all UI/UX Designers!**
 
 If you believe Peerflex's design or user interface can be improved, we'd **love** to hear from you! We're actively looking for creative minds to help enhance our platform.
 
@@ -561,9 +554,9 @@ If you believe Peerflex's design or user interface can be improved, we'd **love*
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### 🎯 Current Status: **Phase 1 - Foundation** ✅
+### Current Status: **Phase 1 - Foundation** ✅
 
 <table>
 <tr>
@@ -703,7 +696,7 @@ If you believe Peerflex's design or user interface can be improved, we'd **love*
 </tr>
 </table>
 
-### 🌟 Feature Requests
+###  Feature Requests
 
 Have an idea for Peerflex? We'd love to hear it! [Open a feature request](https://github.com/dattu145/Peerflex/issues/new?labels=enhancement) and let's discuss.
 
@@ -713,17 +706,17 @@ Have an idea for Peerflex? We'd love to hear it! [Open a feature request](https:
 
 We **love** contributions! Peerflex is built by students, for students. Whether you're fixing a typo or adding a major feature, every contribution helps make Peerflex better.
 
-### 🌈 Ways to Contribute
+### Ways to Contribute
 
-- 🐛 **Report Bugs**: Found an issue? [Report it](https://github.com/dattu145/Peerflex/issues/new?labels=bug)
-- ✨ **Suggest Features**: Have ideas? [Share them](https://github.com/dattu145/Peerflex/issues/new?labels=enhancement)
-- 📝 **Improve Documentation**: Help others understand the project better
-- 🎨 **Enhance UI/UX**: Suggest design improvements
-- 💻 **Write Code**: Pick an issue and start coding
-- 🧪 **Add Tests**: Help improve code quality
-- 🌍 **Translate**: Make Peerflex accessible in more languages
+- **Report Bugs**: Found an issue? [Report it](https://github.com/dattu145/Peerflex/issues/new?labels=bug)
+- **Suggest Features**: Have ideas? [Share them](https://github.com/dattu145/Peerflex/issues/new?labels=enhancement)
+- **Improve Documentation**: Help others understand the project better
+- **Enhance UI/UX**: Suggest design improvements
+- **Write Code**: Pick an issue and start coding
+- **Add Tests**: Help improve code quality
+- **Translate**: Make Peerflex accessible in more languages
 
-### 📝 Contribution Workflow
+### Contribution Workflow
 
 #### 1️⃣ Fork the Repository
 
@@ -795,7 +788,7 @@ git push origin issue-42-making-homepage-responsive
 
 New to open source? Look for issues labeled [`good first issue`](https://github.com/dattu145/Peerflex/labels/good%20first%20issue) — they're perfect for beginners!
 
-### 📚 Development Resources
+### Development Resources
 
 - [Contributing Guide](CONTRIBUTING.md) - Detailed contribution guidelines
 - [Code of Conduct](CODE_OF_CONDUCT.md) - Community standards
@@ -803,17 +796,17 @@ New to open source? Look for issues labeled [`good first issue`](https://github.
 
 ---
 
-## 👥 Community
+## Community
 
 Join the Peerflex community and connect with fellow contributors!
 
-### 💬 Get in Touch
+### Get in Touch
 
-- 💡 **Discussions**: [GitHub Discussions](https://github.com/dattu145/Peerflex/discussions)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/dattu145/Peerflex/issues)
-- 📧 **Email**: [dattavignesh001@gmail.com](mailto:dattavignesh001@gmail.com)
+ **Discussions**: [GitHub Discussions](https://github.com/dattu145/Peerflex/discussions)
+ **Issues**: [GitHub Issues](https://github.com/dattu145/Peerflex/issues)
+ **Email**: [dattavignesh001@gmail.com](mailto:dattavignesh001@gmail.com)
 
-### 🌟 Contributors
+### Contributors
 
 <a href="https://github.com/dattu145/Peerflex/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=dattu145/Peerflex" />
@@ -821,7 +814,7 @@ Join the Peerflex community and connect with fellow contributors!
 
 *Thank you to all our amazing contributors!*
 
-### 🏆 Recognition
+### Recognition
 
 Contributors will be:
 - Listed in our README
@@ -831,11 +824,11 @@ Contributors will be:
 
 ---
 
-## 📜 License
+## License
 
 Peerflex is **dual-licensed** to give you maximum flexibility:
 
-### 📄 MIT License
+### MIT License
 
 ```
 Copyright (c) 2024 Datta Vignesh
@@ -855,7 +848,7 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 
-### 📄 Apache License 2.0
+### Apache License 2.0
 
 ```
 Copyright 2024 Datta Vignesh
@@ -941,15 +934,15 @@ Please [open an issue](https://github.com/dattu145/Peerflex/issues/new?labels=bu
 - Screenshots (if applicable)
 - Your environment (browser, OS, etc.)
 
-### 💡 Have a Feature Suggestion?
+### Have a Feature Suggestion?
 
 We'd love to hear your ideas! [Create a feature request](https://github.com/dattu145/Peerflex/issues/new?labels=enhancement) and tell us about it.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-### 🌟 Special Thanks To
+### Special Thanks To
 
 - **[Supabase](https://supabase.com/)** - For providing an amazing backend-as-a-service platform
 - **[React Team](https://react.dev/)** - For the incredible framework
@@ -959,17 +952,17 @@ We'd love to hear your ideas! [Create a feature request](https://github.com/datt
 - **[GirlScript Summer of Code](https://gssoc.girlscript.tech/)** - For fostering open-source culture
 - **All Contributors** - For their valuable contributions and feedback
 
-### 🎓 Inspiration
+### Inspiration
 
 Peerflex was born out of personal experiences navigating college life and recognizing the fragmentation in student tools. This project aims to solve real problems faced by students every day.
 
-### 🌍 Built in India
+### Built in India
 
 Proudly built in **Salem, Tamil Nadu, India** 🇮🇳 with the goal of empowering students across the nation and beyond.
 
 ---
 
-## 📊 Project Stats
+## Project Stats
 
 <div align="center">
 
@@ -983,11 +976,11 @@ Proudly built in **Salem, Tamil Nadu, India** 🇮🇳 with the goal of empoweri
 
 ---
 
-## 🔐 Security
+## Security
 
 Security is a top priority for Peerflex. We take the protection of user data seriously.
 
-### 🛡️ Reporting Security Vulnerabilities
+### Reporting Security Vulnerabilities
 
 If you discover a security vulnerability, please **DO NOT** open a public issue. Instead:
 
@@ -998,7 +991,7 @@ If you discover a security vulnerability, please **DO NOT** open a public issue.
 
 We'll respond within **48 hours** and work with you to resolve the issue promptly.
 
-### 🔒 Security Measures
+### Security Measures
 
 - **Authentication**: Secure authentication via Supabase
 - **Data Encryption**: All data transmitted over HTTPS
@@ -1010,20 +1003,20 @@ For more details, see our [SECURITY.md](SECURITY.md) file.
 
 ---
 
-## 📈 Performance
+## Performance
 
 Peerflex is built with performance in mind:
 
-- ⚡ **Fast Load Times**: Optimized bundle size with code splitting
-- 🎯 **Lighthouse Score**: 90+ across all metrics (target)
-- 📱 **Mobile Optimized**: Responsive design for all screen sizes
-- 🔄 **Real-time Updates**: Instant data synchronization
-- 💾 **Efficient Caching**: Smart caching strategies
-- 🚀 **CDN Delivery**: Assets served via CDN for faster loading
+-  **Fast Load Times**: Optimized bundle size with code splitting
+-  **Lighthouse Score**: 90+ across all metrics (target)
+-  **Mobile Optimized**: Responsive design for all screen sizes
+-  **Real-time Updates**: Instant data synchronization
+-  **Efficient Caching**: Smart caching strategies
+-  **CDN Delivery**: Assets served via CDN for faster loading
 
 ---
 
-## 🧪 Testing
+## Testing
 
 We're committed to maintaining high code quality through comprehensive testing.
 
@@ -1052,7 +1045,7 @@ npm run test:coverage
 
 ---
 
-## 🌐 Internationalization (i18n)
+## Internationalization (i18n)
 
 Planning to make Peerflex accessible to students worldwide:
 
@@ -1069,14 +1062,14 @@ Planning to make Peerflex accessible to students worldwide:
 
 ---
 
-## 📱 Progressive Web App (PWA)
+## Progressive Web App (PWA)
 
 Peerflex is designed to work as a Progressive Web App, providing:
 
-- 📲 **Install to Home Screen**: Add Peerflex to your mobile home screen
-- 🔄 **Offline Support**: Access core features without internet
-- 🔔 **Push Notifications**: Stay updated with important events
-- 🚀 **Fast Loading**: App-like performance on mobile devices
+-  **Install to Home Screen**: Add Peerflex to your mobile home screen
+-  **Offline Support**: Access core features without internet
+-  **Push Notifications**: Stay updated with important events
+-  **Fast Loading**: App-like performance on mobile devices
 
 ---
 
@@ -1106,7 +1099,7 @@ We don't build features just because we can. Every feature solves a real student
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 Peerflex is deployed on **[Render](https://render.com/)**, which provides:
 
@@ -1139,32 +1132,32 @@ Want to deploy your own version of Peerflex? Here's how:
 
 ---
 
-## 💻 Browser Support
+## Browser Support
 
 Peerflex works on all modern browsers:
 
 | Browser | Supported Versions |
 |---------|-------------------|
-| 🌐 Chrome | Last 2 versions |
-| 🦊 Firefox | Last 2 versions |
-| 🧭 Safari | Last 2 versions |
-| 🌊 Edge | Last 2 versions |
-| 🎭 Opera | Last 2 versions |
+|  Chrome | Last 2 versions |
+| Firefox | Last 2 versions |
+|  Safari | Last 2 versions |
+|  Edge   | Last 2 versions |
+|  Opera  | Last 2 versions |
 
 **Note**: Internet Explorer is not supported.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Quick Links
 
-- 📖 [Getting Started Guide](#-getting-started)
-- 🏗️ [Architecture Overview](#️-project-architecture)
-- 🤝 [Contributing Guidelines](CONTRIBUTING.md)
-- 📜 [Code of Conduct](CODE_OF_CONDUCT.md)
-- 🔐 [Security Policy](SECURITY.md)
-- 📋 [Changelog](CHANGELOG.md)
+-  [Getting Started Guide](#-getting-started)
+-  [Architecture Overview](#️-project-architecture)
+-  [Contributing Guidelines](CONTRIBUTING.md)
+-  [Code of Conduct](CODE_OF_CONDUCT.md)
+-  [Security Policy](SECURITY.md)
+-  [Changelog](CHANGELOG.md)
 
 ### API Documentation
 
