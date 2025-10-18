@@ -1,10 +1,23 @@
+<html>
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+    <style>
+    *{
+        font-family: "Poppins", sans-serif;
+    }
+  </style>
+<body>
+
 <div align="center">
 
 
 <!-- Project Banner -->
-<img src="public/gssocbanner.png" alt="Peerflex Banner" width="80%" style="border-radius: 10px; margin: 20px 0;"/>
+<img src="public/gssocbanner.png" alt="Peerflex Banner" width="100%" style="border-radius: 10px; margin: 20px 0;"/>
 
-# ⚡ Peerflex
+# Peerflex
 
 ### *AI-Powered Digital Ecosystem for College Students*
 
@@ -17,7 +30,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](LICENSE)
 
-[🚀 Live Demo](https://peerflex.onrender.com) • [📖 Documentation](#-documentation) • [🤝 Contributing](CONTRIBUTING.md) • [💬 Community](#-community)
+[🚀 Live Demo](https://peerflex.onrender.com) -- [📖 Documentation](#-documentation) -- [🤝 Contributing](CONTRIBUTING.md) -- [💬 Community](#-community)
 
 ---
 
@@ -25,8 +38,8 @@
 
 ## 📋 Table of Contents
 
-- [🌟 About Peerflex](#-about-peerflex)
-- [✨ Key Features](#-key-features)
+- <a href="#key-features">Key Features</a>
+- [Key Features](#key-features)
 - [🎯 Target Audience](#-target-audience)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Project Architecture](#️-project-architecture)
@@ -84,6 +97,8 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 
 ---
 
+<div id="key-features"></div>
+
 ## ✨ Key Features
 
 ### 🔐 1. **Smart Authentication & User Management**
@@ -136,7 +151,7 @@ Starting from **Salem, Tamil Nadu**, we're building India's largest student life
 - Discover beginner-friendly projects
 - Contribute with peers
 - Project showcase
-- Skill-based matching
+- Skill-based matching  
 - GitHub integration
 
 ### ⚡ 8. **Advanced Features**
@@ -1220,3 +1235,5 @@ Feel free to fork this repository and experiment with your own ideas. We'd love 
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12&height=100&section=footer)
 
 </div>
+</body>
+</html>
