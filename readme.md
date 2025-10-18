@@ -24,7 +24,7 @@
 
 ## Table of Contents
 
-- [About Peerflex](#-About-Peerflex)
+- [About Peerflex](#About-Peerflex)
 - [Key Features](#-key-features)
 - [Target Audience](#-target-audience)
 - [Tech Stack](#️-tech-stack)
