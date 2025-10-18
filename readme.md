@@ -25,25 +25,28 @@
 ## Table of Contents
 
 - [About Peerflex](#About-Peerflex)
-- [Key Features](#-key-features)
-- [Target Audience](#-target-audience)
-- [Tech Stack](#️-tech-stack)
-- [Project Architecture](#️-project-architecture)
-- [Getting Started](#-getting-started)
+- [Key Features](#key-features)
+- [Target Audience](#target-audience)
+- [Tech Stack](#tech-stack)
+- [Project Architecture](#project-architecture)
+- [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Environment Setup](#environment-setup)
   - [Running the App](#running-the-app)
-- [Project Structure](#-project-structure)
-- [UI/UX Design Philosophy](#-uiux-design-philosophy)
-- [Roadmap](#️-roadmap)
+- [Project Structure](#project-structure)
+- [UI/UX Design Philosophy](#uiux-design-philosophy)
+- [Roadmap](#roadmap)
 - [Contributing](#-contributing)
-- [Community](#-community)
-- [License](#-license)
+- [Community](#community)
+- [License](#license)
 - [Contact](#-contact)
-- [Acknowledgments](#-acknowledgments)
+- [Acknowledgments](#acknowledgments)
 
 ---
+
+
+[↑ Tables of Content](#Table-of-Contents)
 
 ## About Peerflex
 
