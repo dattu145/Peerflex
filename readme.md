@@ -13,10 +13,10 @@
 [![GitHub Issues](https://img.shields.io/github/issues/dattu145/Peerflex?style=for-the-badge&logo=github)](https://github.com/dattu145/Peerflex/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/dattu145/Peerflex?style=for-the-badge&logo=github)](https://github.com/dattu145/Peerflex/pulls)
 
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-red?style=for-the-badge)](LICENSE)
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](LICENSE)
 
-[🚀 Live Demo](https://peerflex.onrender.com) - [📖 Documentation](#-documentation) - [🤝 Contributing](CONTRIBUTING.md) - [💬 Community](#-community)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-0c4275?style=for-the-badge)](https://peerflex.onrender.com)  [![Documentation](https://img.shields.io/badge/Documentation-8A2BE2?style=for-the-badge)](#-documentation)  [![Contributions](https://img.shields.io/badge/Contributions-0c4275?style=for-the-badge)](CONTRIBUTING.md)  [![Community](https://img.shields.io/badge/Community-8A2BE2?style=for-the-badge)](#-community)
 
 ---
 
@@ -24,24 +24,24 @@
 
 ## Table of Contents
 
-- [Key Features](#-About-Peerflex)
+- [About Peerflex](#-About-Peerflex)
 - [Key Features](#-key-features)
-- [🎯 Target Audience](#-target-audience)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ Project Architecture](#️-project-architecture)
-- [🚀 Getting Started](#-getting-started)
+- [Target Audience](#-target-audience)
+- [Tech Stack](#️-tech-stack)
+- [Project Architecture](#️-project-architecture)
+- [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Environment Setup](#environment-setup)
   - [Running the App](#running-the-app)
-- [📂 Project Structure](#-project-structure)
-- [🎨 UI/UX Design Philosophy](#-uiux-design-philosophy)
-- [🗺️ Roadmap](#️-roadmap)
-- [🤝 Contributing](#-contributing)
-- [👥 Community](#-community)
-- [📜 License](#-license)
-- [📞 Contact](#-contact)
-- [🙏 Acknowledgments](#-acknowledgments)
+- [Project Structure](#-project-structure)
+- [UI/UX Design Philosophy](#-uiux-design-philosophy)
+- [Roadmap](#️-roadmap)
+- [Contributing](#-contributing)
+- [Community](#-community)
+- [License](#-license)
+- [Contact](#-contact)
+- [Acknowledgments](#-acknowledgments)
 
 ---
 
