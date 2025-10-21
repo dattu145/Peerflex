@@ -32,10 +32,12 @@ const HomePage: React.FC = () => {
 
   // AI-generated student lifestyle images (placeholder URLs - replace with actual AI images)
   const aiImages = [
-    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://plus.unsplash.com/premium_photo-1684444605542-93725082d214?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bm90ZSUyMHRha2luZ3xlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000',
     'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://github.blog/wp-content/uploads/2024/06/AI-DarkMode-4.png?resize=800%2C425',
+    'https://lp.simplified.com/siteimages/ai/copywriting/ai-resume-builder-4.png'
   ];
 
   const features = [
@@ -76,13 +78,16 @@ const HomePage: React.FC = () => {
       title: 'Open Source',
       description: 'Contribute to student-led open source projects',
       gradient: 'from-gray-700 to-gray-900',
-      link: '/projects'
+      link: '/projects',
+      image: aiImages[4]
     },
     {
       icon: FileText,
       title: 'Resume Builder',
       description: 'Create professional resumes with AI assistance',
-      gradient: 'from-indigo-500 to-purple-600'
+      gradient: 'from-indigo-500 to-purple-600',
+      image: aiImages[5]
+
     }
   ];
 
@@ -216,7 +221,8 @@ const HomePage: React.FC = () => {
                       )}
                       
                       {/* Icon */}
-                      <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} mb-4 ${!feature.image ? 'mt-2' : ''}`}>
+                      <div className='flex items-center justify-start gap-4'>
+                      <div className={`p-3 rounded-xl bg-gradient-to-r ${feature.gradient} mb-4 ${!feature.image ? 'mt-2' : ''}`}>
                         <feature.icon className="h-6 w-6 text-white" />
                       </div>
                       
@@ -224,6 +230,8 @@ const HomePage: React.FC = () => {
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                         {feature.title}
                       </h3>
+                      </div>
+
                       <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow line-clamp-3">
                         {feature.description}
                       </p>
@@ -245,18 +253,8 @@ const HomePage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-20 text-center"
+            className="mt-4 text-center"
           >
-            <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-3xl p-8 md:p-12 border border-purple-200/50 dark:border-purple-800/50">
-              <Sparkles className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Powered by Advanced AI
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-                Our platform uses cutting-edge AI to personalize your experience, 
-                suggest relevant content, and help you achieve your academic goals faster.
-              </p>
-            </div>
           </motion.div>
         </div>
       </section>
