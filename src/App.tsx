@@ -25,13 +25,16 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import ScrollToTop from './components/ScrollToTop';
 
-// Protected Route Component
+// Protected Route Component - MOVED OUTSIDE OF APP COMPONENT
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  // This component must directly subscribe to the auth store to re-render properly
   const { isAuthenticated, isLoading } = useAuthStore();
+  
+  console.log('🛡️ ProtectedRoute - Auth state:', { isAuthenticated, isLoading });
   
   if (isLoading) {
     return (
@@ -44,15 +47,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
   
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    console.log('🔒 Redirecting to login - not authenticated');
+    return <Navigate to="/login" replace />;
+  }
+  
+  console.log('✅ ProtectedRoute - Rendering children');
+  return <>{children}</>;
 };
 
 function App() {
   const { theme } = useAppStore();
-  const { initializeAuth } = useAuthStore();
+  const { initializeAuth, isAuthenticated, isLoading } = useAuthStore();
 
+  // Initialize auth only once on app mount
   useEffect(() => {
-    // Initialize auth on app load
+    console.log('🚀 App mounted - Initializing auth');
     initializeAuth();
   }, [initializeAuth]);
 
@@ -60,6 +70,11 @@ function App() {
     // Apply theme to document
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  // Debug auth state
+  useEffect(() => {
+    console.log('🔐 App - Auth state changed:', { isAuthenticated, isLoading });
+  }, [isAuthenticated, isLoading]);
 
   return (
     <Router>
@@ -94,6 +109,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Additional protected routes */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <div>Profile Page - TODO</div>
               </ProtectedRoute>
             }
           />

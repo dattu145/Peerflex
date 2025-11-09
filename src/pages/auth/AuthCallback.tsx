@@ -12,219 +12,223 @@ const AuthCallback: React.FC = () => {
   const { initializeAuth } = useAuthStore();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Completing authentication...');
+  const [hasProcessed, setHasProcessed] = useState(false);
 
   const type = searchParams.get('type');
   const code = searchParams.get('code');
-  const isRecovery = type === 'recovery' || code === 'reset';
+  const error = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
+
+  // Check for recovery in both query params and hash
+  const isRecovery = type === 'recovery' || window.location.hash.includes('type=recovery');
 
   useEffect(() => {
+    // Prevent double execution
+    if (hasProcessed) return;
+
     const handleAuthCallback = async () => {
       try {
-        // Check URL hash for OAuth tokens (Google/GitHub)
+        setHasProcessed(true);
+        console.log('Auth callback started:', {
+          hash: window.location.hash,
+          search: window.location.search,
+          isRecovery,
+          code: !!code,
+          hasHash: window.location.hash.length > 0
+        });
+
+        // Check for OAuth errors first
+        if (error) {
+          throw new Error(errorDescription || `OAuth error: ${error}`);
+        }
+
+        // Check URL hash for OAuth tokens or recovery tokens
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
-        const error = hashParams.get('error');
-        const errorDescription = hashParams.get('error_description');
+        const hashType = hashParams.get('type');
+        const hashError = hashParams.get('error');
+        const hashErrorDescription = hashParams.get('error_description');
 
-        // Check for errors in the URL
-        if (error) {
-          throw new Error(errorDescription || 'Authentication failed');
+        if (hashError) {
+          throw new Error(hashErrorDescription || 'Authentication failed');
         }
 
-        // Handle OAuth callback with hash parameters
-        if (accessToken && refreshToken) {
-          setMessage('Setting up your session...');
-          
+        // ✅ Handle password reset flow (recovery tokens in hash)
+        if (hashType === 'recovery' && accessToken && refreshToken) {
+          setMessage('Setting up password reset session...');
+
           const { error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
 
-          if (sessionError) {
-            throw sessionError;
-          }
+          if (sessionError) throw sessionError;
 
-          // Get user data
+          // Verify we have a valid session
           const { data: { user }, error: userError } = await supabase.auth.getUser();
-          
           if (userError) throw userError;
-          if (!user) throw new Error('No user found');
-
-          // Check if profile exists
-          const { data: existingProfile, error: checkError } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', user.id)
-            .maybeSingle();
-
-          if (checkError && checkError.code !== 'PGRST116') {
-            console.error('Error checking profile:', checkError);
-          }
-
-          // Create profile if it doesn't exist
-          if (!existingProfile) {
-            const userMetadata = user.user_metadata;
-            const { error: insertError } = await supabase.from('profiles').insert([
-              {
-                id: user.id,
-                username: user.email?.split('@')[0] || `user_${Date.now()}`,
-                full_name: userMetadata.full_name || userMetadata.name || 'User',
-                avatar_url: userMetadata.avatar_url || userMetadata.picture || null,
-                university: userMetadata.college || '',
-                major: '',
-                skills: [],
-                interests: [],
-                year_of_study: null,
-                bio: null,
-                current_location: null,
-                privacy_settings: {
-                  show_notes: true,
-                  show_location: true,
-                  show_online_status: true
-                }
-              }
-            ]);
-
-            if (insertError) {
-              console.error('Profile creation error:', insertError);
-              // Don't throw - continue even if profile creation fails
-            } else {
-              console.log('Profile created successfully for OAuth user');
-            }
-          }
-
-          await initializeAuth();
+          if (!user) throw new Error('No user found for password reset');
 
           setStatus('success');
-          setMessage('Successfully signed in!');
-
+          setMessage('Redirecting to password reset...');
+          
+          // Clear the URL hash and redirect to reset password page
+          window.history.replaceState(null, '', window.location.pathname);
           setTimeout(() => {
-            navigate('/dashboard', { replace: true });
+            navigate('/reset-password', { replace: true });
           }, 1500);
-        } 
-        // Handle email confirmation or password recovery
-        else {
-          setMessage('Verifying your email...');
+          return;
+        }
 
-          // Get the current session
+        // ✅ Handle OAuth callback with tokens in hash (Google/GitHub success)
+        if (accessToken && refreshToken) {
+          setMessage('Setting up your session...');
+
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (sessionError) throw sessionError;
+
+          await handleSuccessfulAuth();
+          return;
+        }
+
+        // ✅ Handle OAuth callback with code parameter (PKCE flow)
+        if (code && !window.location.hash) {
+          setMessage('Completing OAuth sign in...');
+          
+          // For OAuth with code, let Supabase handle the code exchange automatically
+          // The supabase client should automatically handle this via getSession()
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           
           if (sessionError) {
+            console.error('Session error after OAuth:', sessionError);
             throw sessionError;
           }
 
           if (!session) {
-            // Try to exchange the code for a session
-            const code = searchParams.get('code');
-            if (code) {
-              const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-              if (exchangeError) throw exchangeError;
-            } else {
-              throw new Error('No active session found. Please try logging in again.');
-            }
+            throw new Error('Failed to establish session after OAuth');
           }
 
-          // Re-check session after exchange
-          const { data: { session: newSession }, error: newSessionError } = await supabase.auth.getSession();
-          
-          if (newSessionError) throw newSessionError;
-          if (!newSession) {
-            throw new Error('Failed to establish session');
-          }
-
-          // Check if profile exists
-          const { data: existingProfile, error: checkError } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', newSession.user.id)
-            .maybeSingle();
-
-          if (checkError && checkError.code !== 'PGRST116') {
-            console.error('Error checking profile:', checkError);
-          }
-
-          // Create profile for email-confirmed users if it doesn't exist
-          if (!existingProfile) {
-            const userMetadata = newSession.user.user_metadata;
-            
-            const profileData = {
-              id: newSession.user.id,
-              username: newSession.user.email?.split('@')[0] || `user_${Date.now()}`,
-              full_name: userMetadata.full_name || userMetadata.name || 'User',
-              avatar_url: null,
-              university: userMetadata.college || '',
-              major: '',
-              skills: [],
-              interests: [],
-              year_of_study: null,
-              bio: null,
-              current_location: null,
-              privacy_settings: {
-                show_notes: true,
-                show_location: true,
-                show_online_status: true
-              }
-            };
-
-            console.log('Creating profile with data:', profileData);
-
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert([profileData]);
-
-            if (insertError) {
-              console.error('Profile creation error:', insertError);
-              // Don't throw - continue even if profile creation fails
-            } else {
-              console.log('Profile created successfully for email user');
-            }
-          }
-
-          await initializeAuth();
-
-          if (isRecovery) {
-            // Password reset flow
-            setStatus('success');
-            setMessage('Email verified! Set your new password...');
-            
-            setTimeout(() => {
-              navigate('/reset-password?code=reset', { replace: true });
-            }, 1500);
-          } else {
-            // Email confirmation flow
-            setStatus('success');
-            setMessage('Email confirmed! Redirecting to dashboard...');
-
-            setTimeout(() => {
-              navigate('/dashboard', { replace: true });
-            }, 2000);
-          }
+          await handleSuccessfulAuth();
+          return;
         }
+
+        // ✅ Handle email confirmation or recovery with code (non-OAuth email flows)
+        if (code && type && ['signup', 'recovery', 'invite'].includes(type)) {
+          setMessage('Verifying your email...');
+
+          // Exchange code for session
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            console.error('Code exchange error:', exchangeError);
+            throw exchangeError;
+          }
+
+          // Get the new session
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) throw sessionError;
+          if (!session) throw new Error('Failed to establish session');
+
+          await handleSuccessfulAuth(isRecovery);
+          return;
+        }
+
+        // If we get here, no valid authentication method was found
+        throw new Error('No valid authentication data found in URL');
+
       } catch (error: any) {
         console.error('Auth callback error:', error);
         setStatus('error');
-        
+
         let errorMessage = 'Authentication failed. Please try again.';
-        
         if (error.message.includes('already been confirmed')) {
           errorMessage = 'This email has already been confirmed. Please login.';
         } else if (error.message.includes('expired')) {
           errorMessage = 'This link has expired. Please request a new one.';
+        } else if (error.message.includes('invalid')) {
+          errorMessage = 'Invalid authentication link. Please request a new one.';
+        } else if (error.message.includes('code verifier')) {
+          errorMessage = 'Authentication session expired. Please try signing in again.';
         } else if (error.message) {
           errorMessage = error.message;
         }
-        
+
         setMessage(errorMessage);
-        
+        setTimeout(() => navigate('/login', { replace: true }), 3000);
+      }
+    };
+
+    const handleSuccessfulAuth = async (isRecoveryFlow = false) => {
+      // Get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) throw new Error('No user found');
+
+      // Check if profile exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking profile:', checkError);
+      }
+
+      // Create profile if missing
+      if (!existingProfile) {
+        const userMetadata = user.user_metadata;
+        const { error: insertError } = await supabase.from('profiles').insert([
+          {
+            id: user.id,
+            username: user.email?.split('@')[0] || `user_${Date.now()}`,
+            full_name: userMetadata.full_name || userMetadata.name || userMetadata.full_name || 'User',
+            avatar_url: userMetadata.avatar_url || userMetadata.picture || userMetadata.avatar_url || null,
+            university: userMetadata.college || userMetadata.university || '',
+            major: '',
+            skills: [],
+            interests: [],
+            year_of_study: null,
+            bio: null,
+            current_location: null,
+            privacy_settings: {
+              show_notes: true,
+              show_location: true,
+              show_online_status: true
+            }
+          }
+        ]);
+
+        if (insertError) {
+          console.error('Profile creation error:', insertError);
+          // Don't throw here - we can still proceed with auth
+        }
+      }
+
+      await initializeAuth();
+      setStatus('success');
+
+      if (isRecoveryFlow) {
+        setMessage('Email verified! Redirecting to reset password...');
+        // Clear the URL
+        window.history.replaceState(null, '', window.location.pathname);
         setTimeout(() => {
-          navigate('/login', { replace: true });
-        }, 3000);
+          navigate('/reset-password', { replace: true });
+        }, 1500);
+      } else {
+        setMessage('Successfully signed in!');
+        // Clear the URL
+        window.history.replaceState(null, '', window.location.pathname);
+        setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
       }
     };
 
     handleAuthCallback();
-  }, [navigate, initializeAuth, isRecovery, searchParams]);
+  }, [navigate, initializeAuth, isRecovery, code, type, error, errorDescription, hasProcessed]);
 
   return (
     <Layout>
@@ -245,15 +249,11 @@ const AuthCallback: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {message}
                 </h3>
-                {isRecovery ? (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Preparing password reset...
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Please wait while we verify your credentials...
-                  </p>
-                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {isRecovery
+                    ? 'Preparing password reset...'
+                    : 'Please wait while we verify your credentials...'}
+                </p>
               </div>
             )}
 
@@ -266,10 +266,9 @@ const AuthCallback: React.FC = () => {
                   {message}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {isRecovery 
-                    ? 'Redirecting to password reset...' 
-                    : 'You will be redirected shortly...'
-                  }
+                  {isRecovery
+                    ? 'Redirecting to password reset...'
+                    : 'You will be redirected shortly...'}
                 </p>
               </div>
             )}

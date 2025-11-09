@@ -88,13 +88,10 @@ const HomePage = () => {
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="inline-block mb-4"
             >
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 mb-8 rounded-full text-sm font-semibold">
-                ✨ AI-Powered Platform
-              </div>
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Everything You Need,{' '}
-              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-purple-500 bg-clip-text text-transparent">
                 One Place
               </span>
             </h2>

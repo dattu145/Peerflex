@@ -14,7 +14,6 @@ interface AppState {
   
   // Actions
   setTheme: (theme: Theme) => void;
-  setLanguage: (language: Language) => void;
   setMenuOpen: (isOpen: boolean) => void;
   addOrder: (order: Order) => void;
   updateOrder: (orderId: string, updates: Partial<Order>) => void;
@@ -36,10 +35,6 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme: Theme) => {
         set({ theme });
         document.documentElement.classList.toggle('dark', theme === 'dark');
-      },
-
-      setLanguage: (language: Language) => {
-        set({ language });
       },
 
       setMenuOpen: (isOpen: boolean) => {

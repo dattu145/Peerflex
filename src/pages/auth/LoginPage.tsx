@@ -16,6 +16,7 @@ import Card from '../../components/ui/Card';
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -26,19 +27,25 @@ const LoginPage: React.FC = () => {
   const { language } = useAppStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false,
+    },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       setLoginError('');
-      await login(data.email, data.password);
+      await login(data.email, data.password, data.rememberMe);
       navigate('/dashboard');
     } catch (error: any) {
       setLoginError(error.message || 'Invalid email or password. Please try again.');
@@ -48,7 +55,7 @@ const LoginPage: React.FC = () => {
   const handleGoogleLogin = async () => {
     try {
       setLoginError('');
-      await signInWithGoogle();
+      await signInWithGoogle(rememberMe);
     } catch (error: any) {
       setLoginError(error.message || 'Failed to sign in with Google.');
     }
@@ -57,10 +64,15 @@ const LoginPage: React.FC = () => {
   const handleGithubLogin = async () => {
     try {
       setLoginError('');
-      await signInWithGithub();
+      await signInWithGithub(rememberMe);
     } catch (error: any) {
       setLoginError(error.message || 'Failed to sign in with GitHub.');
     }
+  };
+
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    setValue('rememberMe', checked);
   };
 
   return (
@@ -161,9 +173,10 @@ const LoginPage: React.FC = () => {
                 <div className="flex items-center">
                   <input
                     id="remember-me"
-                    name="remember-me"
                     type="checkbox"
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-gray-600 rounded"
+                    {...register('rememberMe')}
+                    onChange={(e) => handleRememberMeChange(e.target.checked)}
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                     Remember me

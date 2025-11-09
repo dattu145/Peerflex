@@ -25,7 +25,25 @@ export interface Profile {
   updated_at?: string;
 }
 
-// Legacy User interface (kept for backward compatibility)
+import type { 
+  ConnectionRequest, 
+  UserConnection, 
+  ChatRoom, 
+  ChatMember, 
+  Message,
+  Conversation 
+} from './chat';
+
+export type { 
+  ConnectionRequest, 
+  UserConnection, 
+  ChatRoom, 
+  ChatMember, 
+  Message,
+  Conversation 
+};
+
+
 export interface User {
   _id: string;
   name: string;
@@ -109,20 +127,6 @@ export interface Note {
   updated_at: string;
 }
 
-export interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: 'full-time' | 'part-time' | 'internship' | 'freelance';
-  description: string;
-  requirements: string[];
-  salary_range?: string;
-  posted_date: string;
-  deadline?: string;
-  is_active: boolean;
-}
-
 export interface Event {
   id: string;
   title: string;
@@ -135,34 +139,6 @@ export interface Event {
   max_participants?: number;
   registered_count: number;
   image_url?: string;
-  created_at: string;
-}
-
-export interface Accommodation {
-  id: string;
-  title: string;
-  type: 'hostel' | 'pg' | 'room' | 'mess';
-  address: string;
-  city: string;
-  price: number;
-  amenities: string[];
-  available_from: string;
-  contact_name: string;
-  contact_phone: string;
-  images: string[];
-  verified: boolean;
-  created_at: string;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  tech_stack: string[];
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  github_url: string;
-  contributors: string[];
-  looking_for: string[];
   created_at: string;
 }
 
