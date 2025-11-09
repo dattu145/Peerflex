@@ -8,9 +8,9 @@ import {
   Calendar,
   MessageSquare,
   Users,
+  User,
   Code,
   BookOpen,
-  MapPin,
   TrendingUp,
   Award,
   Bell,
@@ -79,25 +79,11 @@ const DashboardPage: React.FC = () => {
       color: 'bg-blue-500'
     },
     {
-      icon: <Briefcase className="w-6 h-6" />,
-      title: 'Find Jobs',
-      description: 'Browse opportunities',
-      link: '/jobs',
-      color: 'bg-green-500'
-    },
-    {
       icon: <BookOpen className="w-6 h-6" />,
       title: 'Share Notes',
       description: 'Upload study materials',
       link: '/notes',
       color: 'bg-purple-500'
-    },
-    {
-      icon: <Home className="w-6 h-6" />,
-      title: 'Find Accommodation',
-      description: 'Rooms & PG nearby',
-      link: '/accommodation',
-      color: 'bg-orange-500'
     },
     {
       icon: <Calendar className="w-6 h-6" />,
@@ -106,13 +92,6 @@ const DashboardPage: React.FC = () => {
       link: '/events',
       color: 'bg-pink-500'
     },
-    {
-      icon: <Code className="w-6 h-6" />,
-      title: 'Open Source',
-      description: 'Contribute to projects',
-      link: '/projects',
-      color: 'bg-indigo-500'
-    }
   ];
 
   const stats: StatCard[] = [
@@ -153,13 +132,6 @@ const DashboardPage: React.FC = () => {
       description: 'Your resume "Software Dev" was updated',
       time: '2 hours ago',
       color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/20'
-    },
-    {
-      icon: <Briefcase className="w-4 h-4" />,
-      title: 'Job Application',
-      description: 'Applied to Frontend Developer at TechCorp',
-      time: '5 hours ago',
-      color: 'bg-green-100 text-green-600 dark:bg-green-900/20'
     },
     {
       icon: <BookOpen className="w-4 h-4" />,
@@ -221,7 +193,7 @@ const DashboardPage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white"
+              className="mb-6 bg-purple-600 rounded-2xl p-6 text-white"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -243,7 +215,7 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <div className="hidden sm:block">
                   <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                    <span className="text-2xl">🚀</span>
+                    <span className="text-2xl"><User /></span>
                   </div>
                 </div>
               </div>

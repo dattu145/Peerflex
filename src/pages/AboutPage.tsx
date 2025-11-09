@@ -44,22 +44,10 @@ const AboutPage: React.FC = () => {
             color: 'text-purple-600 dark:text-purple-400'
         },
         {
-            icon: Briefcase,
-            title: 'Job & Internship Hub',
-            description: 'Auto job-apply system using n8n + curated part-time/student-friendly opportunities',
-            color: 'text-indigo-600 dark:text-indigo-400'
-        },
-        {
             icon: Calendar,
             title: 'Events & Hangouts',
             description: 'Plan, discover, or join college events and local meetups across campuses',
             color: 'text-yellow-600 dark:text-yellow-400'
-        },
-        {
-            icon: GitBranch,
-            title: 'Open-Source Collaboration',
-            description: 'Discover and contribute to beginner-friendly open-source projects with peers',
-            color: 'text-gray-600 dark:text-gray-400'
         }
     ];
 
@@ -84,7 +72,7 @@ const AboutPage: React.FC = () => {
         {
             icon: Target,
             title: 'Problem Solving',
-            description: 'Solving real-world student problems from accommodation to career growth'
+            description: 'Solving real-world student problems and making their career growth easy'
         },
         {
             icon: Lightbulb,
@@ -248,13 +236,10 @@ const AboutPage: React.FC = () => {
                                     <motion.div
                                         key={index}
                                         variants={itemVariants}
-                                        whileHover={{ y: -5 }}
-                                        onHoverStart={() => setHoveredFeature(index)}
-                                        onHoverEnd={() => setHoveredFeature(null)}
                                         className="text-center"
                                     >
                                         <div className="flex justify-center mb-6">
-                                            <div className={`p-4 rounded-2xl bg-gray-100 dark:bg-gray-700 transition-colors ${hoveredFeature === index ? 'bg-purple-100 dark:bg-purple-900/30' : ''}`}>
+                                            <div className={`p-4 rounded-2xl bg-gray-100 dark:bg-gray-700 transition-colors`}>
                                                 <Icon className={`h-8 w-8 ${feature.color}`} />
                                             </div>
                                         </div>
@@ -434,7 +419,7 @@ const AboutPage: React.FC = () => {
                             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
                                 Target Audience
                             </h2>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+                            <div className="grid md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
                                 <div className="text-center">
                                     <Users className="h-8 w-8 text-purple-600 mx-auto mb-4" />
                                     <h4 className="font-semibold text-gray-900 dark:text-white mb-2">College Students</h4>

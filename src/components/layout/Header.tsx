@@ -32,9 +32,7 @@ const Header: React.FC = () => {
   const featuresMenu = [
     { name: 'Notes Sharing', href: '/notes' },
     { name: 'Student Chat', href: '/chat' },
-    { name: 'Job Listings', href: '/jobs' },
     { name: 'Events', href: '/events' },
-    { name: 'Open Source', href: '/projects' },
     { name: 'Resume Builder', href: '/resume-templates' },
   ];
 

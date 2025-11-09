@@ -18,7 +18,6 @@ import ServicePreviewPage from "./pages/ServicePreviewPage";
 import SoftwareProjectsPage from './pages/SoftwareProjectsPage';
 import NotesPage from './pages/notes/NotesPage';
 import ChatPage from './pages/chat/ChatPage';
-import JobsPage from './pages/jobs/JobsPage';
 import EventsPage from './pages/events/EventsPage';
 import ProjectsPage from './pages/projects/ProjectsPage';
 import AuthCallback from './pages/auth/AuthCallback';
@@ -79,7 +78,6 @@ function App() {
           <Route path="/service-preview/:serviceId" element={<ServicePreviewPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/about" element={<AboutPage />} />
