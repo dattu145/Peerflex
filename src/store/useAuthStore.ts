@@ -150,8 +150,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if this is a "user already exists" error
+        if (error.message?.includes('already registered') || 
+            error.message?.includes('already exists') ||
+            error.message?.includes('User already registered') ||
+            error.message?.includes('user_already_exists') ||
+            error.code === 'user_already_exists') {
+          throw new Error('email already exists try logging in');
+        }
+        throw error;
+      }
+      
       if (!authData.user) throw new Error("Signup failed.");
+
+      // ✅ CRITICAL FIX: Check if user already exists by looking at identities array
+      // If identities is empty, it means the user already exists but Supabase didn't create a new identity
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        throw new Error('email already exists try logging in');
+      }
 
       // Insert into profile table if signed in
       if (authData.session) {

@@ -66,11 +66,16 @@ const SignupPage: React.FC = () => {
       const { confirmPassword, ...signupData } = data;
       await signup(signupData);
       
-      // Show email confirmation message
+      // Show email confirmation message ONLY if no error was thrown
       setEmailSent(true);
     } catch (error: any) {
       console.error('Signup error:', error);
-      setSignupError(error.message || 'Failed to create account. Please try again.');
+      // Check if this is the "email already exists" error
+      if (error.message?.includes('email already exists try logging in')) {
+        setSignupError('Email already exists. Please try logging in.');
+      } else {
+        setSignupError(error.message || 'Failed to create account. Please try again.');
+      }
     }
   };
 
