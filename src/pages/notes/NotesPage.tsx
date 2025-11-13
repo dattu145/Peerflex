@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { Search, Plus, BookOpen, User } from 'lucide-react';
+import { Search, Plus, BookOpen, User, Filter } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { motion } from 'framer-motion';
 import { useNotes } from '../../hooks/useNotes';
@@ -12,6 +12,7 @@ const NotesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [showMyNotes, setShowMyNotes] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   
@@ -75,9 +76,7 @@ const NotesPage: React.FC = () => {
   };
 
   const handleEditNote = (noteId: string) => {
-    // For now, just log - you can implement edit functionality later
     console.log('Edit note:', noteId);
-    // navigate(`/notes/edit/${noteId}`);
   };
 
   const handleDeleteNote = async (noteId: string) => {
@@ -95,7 +94,13 @@ const NotesPage: React.FC = () => {
   };
 
   const toggleMyNotes = () => {
-    setShowMyNotes(!showMyNotes);
+    const newShowMyNotes = !showMyNotes;
+    setShowMyNotes(newShowMyNotes);
+    // Reset filters when switching to My Notes
+    if (newShowMyNotes) {
+      setSelectedSubject('all');
+      setSearchQuery('');
+    }
   };
 
   // Filter notes for "My Notes" view
@@ -129,27 +134,42 @@ const NotesPage: React.FC = () => {
               <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Notes Sharing Hub
+              {showMyNotes ? 'My Notes' : 'Notes Sharing Hub'}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Share knowledge, learn together, and access quality notes from students worldwide
+              {showMyNotes 
+                ? 'Manage and view all your shared notes' 
+                : 'Share knowledge, learn together, and access quality notes from students worldwide'}
             </p>
           </motion.div>
 
-          {/* Search and Filter Section */}
-          <div className="mb-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Search notes by title, subject, or tags..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+          {/* Header Section with Toggle */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={toggleMyNotes}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-semibold transition-all ${
+                    showMyNotes
+                      ? 'bg-purple-600 text-white shadow-lg border-2 border-purple-600'
+                      : 'bg-blue-600 text-white shadow-lg border-2 border-blue-600'
+                  }`}
+                >
+                  <User className="h-5 w-5" />
+                  {showMyNotes ? 'My Notes' : 'Community Notes'}
+                </button>
+                
+                {!showMyNotes && (
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:border-blue-400 transition-colors"
+                  >
+                    <Filter className="h-4 w-4" />
+                    Filters
+                  </button>
+                )}
               </div>
+
               <Button 
                 variant="primary" 
                 className="whitespace-nowrap"
@@ -160,9 +180,45 @@ const NotesPage: React.FC = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              {/* Subject Filters - Only show when not in "My Notes" mode */}
-              {!showMyNotes && (
+            {/* Search Bar - Always Visible */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder={
+                    showMyNotes 
+                      ? "Search your notes..." 
+                      : "Search notes by title, subject, or tags..."
+                  }
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* Search Button for Mobile */}
+              <div className="flex sm:hidden">
+                <Button 
+                  variant="secondary" 
+                  onClick={handleSearch}
+                  className="w-full"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Search
+                </Button>
+              </div>
+            </div>
+
+            {/* Subject Filters - Only show when not in "My Notes" mode and filters are open */}
+            {!showMyNotes && showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-6"
+              >
                 <div className="flex flex-wrap gap-2">
                   {subjects.map((subject) => (
                     <button
@@ -184,35 +240,8 @@ const NotesPage: React.FC = () => {
                     </button>
                   ))}
                 </div>
-              )}
-
-              {/* My Notes Toggle */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={toggleMyNotes}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    showMyNotes
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400'
-                  }`}
-                >
-                  <User className="h-4 w-4" />
-                  {showMyNotes ? 'All Notes' : 'My Notes'}
-                </button>
-              </div>
-            </div>
-
-            {/* Search Button for Mobile */}
-            <div className="flex sm:hidden justify-center">
-              <Button 
-                variant="secondary" 
-                onClick={handleSearch}
-                className="w-full"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                Search Notes
-              </Button>
-            </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Loading State */}
@@ -266,7 +295,7 @@ const NotesPage: React.FC = () => {
                     ? 'Try adjusting your search filters' 
                     : 'Be the first to share your notes with the community!'}
               </p>
-              <Button variant="primary" onClick={handleCreateNote}>
+              <Button variant="secondary" onClick={handleCreateNote}>
                 <Plus className="h-4 w-4 mr-2" />
                 {showMyNotes ? 'Create Your First Note' : 'Share Your First Note'}
               </Button>

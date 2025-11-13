@@ -167,7 +167,6 @@ export const noteService = {
     if (error) throw error;
   },
 
-  // Like/unlike note
   async toggleLike(noteId: string): Promise<{ liked: boolean; like_count: number }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -215,6 +214,7 @@ export const noteService = {
       like_count: note?.like_count || 0
     };
   },
+
 
   // Subscribe to notes changes for real-time updates
   subscribeToNotes(callback: (note: Note) => void) {

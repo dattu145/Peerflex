@@ -126,6 +126,7 @@ export interface Note {
   download_count: number;
   view_count: number;
   like_count: number;
+  comment_count: number;
   is_public: boolean;
   is_approved: boolean;
   ai_summary?: string;
@@ -133,8 +134,7 @@ export interface Note {
   rating: number;
   created_at: string;
   updated_at: string;
-  user?: Profile; // Joined profile data
-  // Add new fields
+  user?: Profile;
   allow_comments?: boolean;
   show_likes?: boolean;
 }
@@ -163,6 +163,16 @@ export interface Notification {
   created_at: string;
   updated_at: string;
   from_user?: Profile; // Joined profile data
+}
+
+export interface NoteComment {
+  id: string;
+  note_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  user?: Profile;
 }
 
 
