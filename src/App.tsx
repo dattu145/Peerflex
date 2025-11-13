@@ -24,6 +24,7 @@ import AuthCallback from './pages/auth/AuthCallback';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import ScrollToTop from './components/ScrollToTop';
+import CreateNotePage from './pages/notes/CreateNotePage';
 
 // Protected Route Component - MOVED OUTSIDE OF APP COMPONENT
 interface ProtectedRouteProps {
@@ -33,9 +34,9 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // This component must directly subscribe to the auth store to re-render properly
   const { isAuthenticated, isLoading } = useAuthStore();
-  
+
   console.log('🛡️ ProtectedRoute - Auth state:', { isAuthenticated, isLoading });
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -46,12 +47,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       </div>
     );
   }
-  
+
   if (!isAuthenticated) {
     console.log('🔒 Redirecting to login - not authenticated');
     return <Navigate to="/login" replace />;
   }
-  
+
   console.log('✅ ProtectedRoute - Rendering children');
   return <>{children}</>;
 };
@@ -97,7 +98,7 @@ function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          
+
           {/* Auth Routes */}
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -112,6 +113,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/notes/create" element={
+            <ProtectedRoute>
+              <CreateNotePage />
+            </ProtectedRoute>
+          } />
 
           {/* Additional protected routes */}
           <Route

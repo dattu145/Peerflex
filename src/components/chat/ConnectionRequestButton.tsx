@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useConnections } from '../../hooks/useConnections';
-import Button from '../../components/ui/Button';
+import Button from '../ui/Button';
 import { UserPlus, Check, Clock, X } from 'lucide-react';
 
 interface ConnectionRequestButtonProps {

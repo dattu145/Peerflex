@@ -1,19 +1,18 @@
 // src/types/index.ts
 
-// Profile type matching Supabase schema
 export interface Profile {
   id: string;
   username: string;
   full_name: string;
-  avatar_url?: string | null;
-  bio?: string | null;
-  major?: string | null;
-  university?: string | null;
-  year_of_study?: number | null;
-  skills?: string[] | null;
-  interests?: string[] | null;
-  current_location?: any | null; // PostGIS geography type
-  last_online?: string | null;
+  avatar_url?: string;
+  bio?: string;
+  major?: string;
+  university?: string;
+  year_of_study?: number;
+  skills?: string[];
+  interests?: string[];
+  current_location?: any;
+  last_online?: string;
   is_online?: boolean;
   privacy_settings?: {
     show_notes: boolean;
@@ -21,8 +20,9 @@ export interface Profile {
     show_online_status: boolean;
   };
   reputation_score?: number;
-  created_at?: string;
-  updated_at?: string;
+  notes_count: number; // Now this is a direct database field
+  created_at: string;
+  updated_at: string;
 }
 
 import type { 
@@ -112,20 +112,56 @@ export interface Testimonial {
   featured: boolean;
 }
 
-// Peerflex specific types
 export interface Note {
   id: string;
   user_id: string;
   title: string;
-  subject: string;
   content: string;
-  file_url?: string;
+  subject: string;
+  course_code?: string;
+  university?: string;
   tags: string[];
-  downloads: number;
+  file_url?: string;
+  file_size?: number;
+  download_count: number;
+  view_count: number;
+  like_count: number;
+  is_public: boolean;
+  is_approved: boolean;
+  ai_summary?: string;
+  difficulty_level?: number;
   rating: number;
   created_at: string;
   updated_at: string;
+  user?: Profile; // Joined profile data
 }
+
+export interface NoteReview {
+  id: string;
+  note_id: string;
+  user_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+  user?: Profile;
+  helpful_count?: number;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  from_user_id?: string;
+  type: 'friend_request' | 'note_shared' | 'connection_accepted' | 'message' | 'system';
+  title: string;
+  message: string;
+  data?: any; // JSON data for additional context
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+  from_user?: Profile; // Joined profile data
+}
+
 
 export interface Event {
   id: string;
