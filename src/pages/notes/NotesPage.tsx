@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import Layout from '../../components/layout/Layout';
-import { Search, Plus, BookOpen, Filter } from 'lucide-react';
-import Button from '../../components/ui/Button';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../../components/layout/Layout';
+import { Search, Plus, BookOpen, User } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import { motion } from 'framer-motion';
 import { useNotes } from '../../hooks/useNotes';
 import { NoteCard } from '../../components/notes/NoteCard';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const NotesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
+  const [showMyNotes, setShowMyNotes] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
   
   const { 
     notes, 
@@ -18,6 +21,8 @@ const NotesPage: React.FC = () => {
     error, 
     likeNote, 
     loadPublicNotes,
+    loadUserNotes,
+    deleteNote,
     refresh 
   } = useNotes();
 
@@ -27,11 +32,34 @@ const NotesPage: React.FC = () => {
     'Engineering', 'Business', 'Art', 'Music', 'Other'
   ];
 
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Load notes based on filter
+  useEffect(() => {
+    if (showMyNotes) {
+      loadUserNotes();
+    } else {
+      loadPublicNotes({
+        subject: selectedSubject !== 'all' ? selectedSubject : undefined,
+        search: searchQuery || undefined,
+      });
+    }
+  }, [showMyNotes, selectedSubject, searchQuery]);
+
   const handleSearch = () => {
-    loadPublicNotes({
-      subject: selectedSubject !== 'all' ? selectedSubject : undefined,
-      search: searchQuery || undefined,
-    });
+    if (showMyNotes) {
+      loadUserNotes();
+    } else {
+      loadPublicNotes({
+        subject: selectedSubject !== 'all' ? selectedSubject : undefined,
+        search: searchQuery || undefined,
+      });
+    }
   };
 
   const handleLike = async (noteId: string) => {
@@ -43,108 +71,50 @@ const NotesPage: React.FC = () => {
   };
 
   const handleViewNote = (noteId: string) => {
-    // Navigate to note detail page (to be implemented)
-    console.log('View note:', noteId);
-    // navigate(`/notes/${noteId}`);
+    navigate(`/notes/${noteId}`);
+  };
+
+  const handleEditNote = (noteId: string) => {
+    // For now, just log - you can implement edit functionality later
+    console.log('Edit note:', noteId);
+    // navigate(`/notes/edit/${noteId}`);
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      try {
+        await deleteNote(noteId);
+      } catch (error) {
+        console.error('Failed to delete note:', error);
+      }
+    }
   };
 
   const handleCreateNote = () => {
     navigate('/notes/create');
   };
 
-  // Apply client-side filtering for demo data or use real data
-  const filteredNotes = notes.length > 0 ? notes : [
-    {
-      id: '1',
-      title: 'Data Structures and Algorithms Cheat Sheet',
-      subject: 'Computer Science',
-      content: 'Complete guide to common data structures with time complexity analysis...',
-      user_id: '1',
-      user: {
-        id: '1',
-        full_name: 'John Doe',
-        username: 'johndoe',
-        notes_count: 5,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      course_code: 'CS201',
-      university: 'Tech University',
-      tags: ['DSA', 'Algorithms', 'Interview Prep'],
-      file_url: undefined,
-      file_size: undefined,
-      download_count: 0,
-      view_count: 892,
-      like_count: 145,
-      is_public: true,
-      is_approved: true,
-      ai_summary: 'Comprehensive guide to data structures',
-      difficulty_level: 3,
-      rating: 4.5,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      title: 'Calculus Integration Formulas',
-      subject: 'Mathematics',
-      content: 'Essential integration formulas and techniques for exam preparation...',
-      user_id: '2',
-      user: {
-        id: '2',
-        full_name: 'Sarah Smith',
-        username: 'sarahsmith',
-        notes_count: 8,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      course_code: 'MATH101',
-      university: 'Math College',
-      tags: ['Calculus', 'Integration', 'Formulas'],
-      file_url: undefined,
-      file_size: undefined,
-      download_count: 0,
-      view_count: 1245,
-      like_count: 203,
-      is_public: true,
-      is_approved: true,
-      ai_summary: 'Integration formulas and techniques',
-      difficulty_level: 2,
-      rating: 4.2,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      title: 'React Hooks Complete Guide',
-      subject: 'Computer Science',
-      content: 'Deep dive into React hooks with practical examples and best practices...',
-      user_id: '3',
-      user: {
-        id: '3',
-        full_name: 'Mike Johnson',
-        username: 'mikejohnson',
-        notes_count: 12,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      course_code: 'CS303',
-      university: 'Web Dev Institute',
-      tags: ['React', 'JavaScript', 'Web Dev'],
-      file_url: undefined,
-      file_size: undefined,
-      download_count: 0,
-      view_count: 967,
-      like_count: 178,
-      is_public: true,
-      is_approved: true,
-      ai_summary: 'React hooks guide with examples',
-      difficulty_level: 3,
-      rating: 4.7,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-  ];
+  const toggleMyNotes = () => {
+    setShowMyNotes(!showMyNotes);
+  };
+
+  // Filter notes for "My Notes" view
+  const filteredNotes = showMyNotes 
+    ? notes.filter(note => note.user_id === user?.id)
+    : notes;
+
+  if (!isAuthenticated) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -190,27 +160,46 @@ const NotesPage: React.FC = () => {
               </Button>
             </div>
 
-            {/* Subject Filters */}
-            <div className="flex flex-wrap gap-2">
-              {subjects.map((subject) => (
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              {/* Subject Filters - Only show when not in "My Notes" mode */}
+              {!showMyNotes && (
+                <div className="flex flex-wrap gap-2">
+                  {subjects.map((subject) => (
+                    <button
+                      key={subject}
+                      onClick={() => {
+                        setSelectedSubject(subject.toLowerCase());
+                        loadPublicNotes({
+                          subject: subject !== 'All' ? subject : undefined,
+                          search: searchQuery || undefined,
+                        });
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        selectedSubject === subject.toLowerCase()
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                      }`}
+                    >
+                      {subject}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* My Notes Toggle */}
+              <div className="flex items-center gap-2">
                 <button
-                  key={subject}
-                  onClick={() => {
-                    setSelectedSubject(subject.toLowerCase());
-                    loadPublicNotes({
-                      subject: subject !== 'All' ? subject : undefined,
-                      search: searchQuery || undefined,
-                    });
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedSubject === subject.toLowerCase()
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                  onClick={toggleMyNotes}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    showMyNotes
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400'
                   }`}
                 >
-                  {subject}
+                  <User className="h-4 w-4" />
+                  {showMyNotes ? 'All Notes' : 'My Notes'}
                 </button>
-              ))}
+              </div>
             </div>
 
             {/* Search Button for Mobile */}
@@ -247,14 +236,16 @@ const NotesPage: React.FC = () => {
           )}
 
           {/* Notes Grid */}
-          {!loading && !error && (
+          {!loading && !error && filteredNotes.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredNotes.map((note, index) => (
+              {filteredNotes.map((note) => (
                 <NoteCard
                   key={note.id}
                   note={note}
                   onLike={handleLike}
                   onView={handleViewNote}
+                  onEdit={handleEditNote}
+                  onDelete={handleDeleteNote}
                   showActions={true}
                 />
               ))}
@@ -266,16 +257,18 @@ const NotesPage: React.FC = () => {
             <div className="text-center py-12">
               <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No notes found
+                {showMyNotes ? 'You haven\'t created any notes yet' : 'No notes found'}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {searchQuery || selectedSubject !== 'all' 
-                  ? 'Try adjusting your search filters' 
-                  : 'Be the first to share your notes with the community!'}
+                {showMyNotes 
+                  ? 'Start sharing your knowledge with the community!' 
+                  : searchQuery || selectedSubject !== 'all' 
+                    ? 'Try adjusting your search filters' 
+                    : 'Be the first to share your notes with the community!'}
               </p>
               <Button variant="primary" onClick={handleCreateNote}>
                 <Plus className="h-4 w-4 mr-2" />
-                Share Your First Note
+                {showMyNotes ? 'Create Your First Note' : 'Share Your First Note'}
               </Button>
             </div>
           )}

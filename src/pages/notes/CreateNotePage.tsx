@@ -4,7 +4,7 @@ import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
-import { ArrowLeft, Upload, Tag, BookOpen, Globe, Lock } from 'lucide-react';
+import { ArrowLeft, Tag, BookOpen, Globe, Lock, MessageCircle, Heart } from 'lucide-react';
 import { useNotes } from '../../hooks/useNotes';
 import { motion } from 'framer-motion';
 
@@ -20,11 +20,11 @@ const CreateNotePage: React.FC = () => {
     university: '',
     tags: [] as string[],
     is_public: true,
-    difficulty_level: 3,
+    allow_comments: true,
+    show_likes: true,
   });
   
   const [tagInput, setTagInput] = useState('');
-  const [file, setFile] = useState<File | null>(null);
 
   const subjects = [
     'Mathematics', 'Computer Science', 'Physics', 'Chemistry', 
@@ -38,8 +38,6 @@ const CreateNotePage: React.FC = () => {
       await createNote({
         ...formData,
         tags: formData.tags,
-        file_url: file ? URL.createObjectURL(file) : undefined,
-        file_size: file?.size,
       });
       navigate('/notes');
     } catch (error) {
@@ -74,7 +72,7 @@ const CreateNotePage: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -93,11 +91,11 @@ const CreateNotePage: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Share Your Notes
+                Create Notes
               </h1>
             </div>
             <p className="text-gray-600 dark:text-gray-300">
-              Share your knowledge with the Peerflex community. Help others learn and grow together.
+              Create and share your knowledge with the Peerflex community.
             </p>
           </motion.div>
 
@@ -173,13 +171,13 @@ const CreateNotePage: React.FC = () => {
                 <textarea
                   value={formData.content}
                   onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Write your notes here... You can use markdown formatting for better organization."
+                  placeholder="Write your notes here... You can write thousands of lines, formatting will be preserved."
                   required
-                  rows={12}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                  rows={20}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-mono text-sm whitespace-pre-wrap"
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Supports markdown formatting for headings, lists, code blocks, etc.
+                  Formatting and line breaks will be preserved exactly as you type.
                 </p>
               </div>
 
@@ -223,31 +221,8 @@ const CreateNotePage: React.FC = () => {
                 )}
               </div>
 
-              {/* File Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Attach File (Optional)
-                </label>
-                <div className="flex items-center gap-4">
-                  <label className="flex-1 cursor-pointer">
-                    <input
-                      type="file"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                      className="hidden"
-                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                    />
-                    <div className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-400 transition-colors">
-                      <Upload className="h-5 w-5 text-gray-400" />
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {file ? file.name : 'Choose file (PDF, DOC, Images)'}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Privacy and Difficulty */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Privacy and Interaction Settings */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Visibility
@@ -261,7 +236,7 @@ const CreateNotePage: React.FC = () => {
                         className="text-blue-600 focus:ring-blue-500"
                       />
                       <Globe className="h-4 w-4 text-green-600" />
-                      <span className="text-gray-700 dark:text-gray-300">Public - Share with everyone</span>
+                      <span className="text-gray-700 dark:text-gray-300">Public</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -271,26 +246,65 @@ const CreateNotePage: React.FC = () => {
                         className="text-blue-600 focus:ring-blue-500"
                       />
                       <Lock className="h-4 w-4 text-gray-600" />
-                      <span className="text-gray-700 dark:text-gray-300">Private - Only you can see</span>
+                      <span className="text-gray-700 dark:text-gray-300">Private</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Difficulty Level
+                    Comments
                   </label>
-                  <select
-                    value={formData.difficulty_level}
-                    onChange={(e) => setFormData(prev => ({ ...prev, difficulty_level: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value={1}>Beginner</option>
-                    <option value={2}>Easy</option>
-                    <option value={3}>Intermediate</option>
-                    <option value={4}>Advanced</option>
-                    <option value={5}>Expert</option>
-                  </select>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={formData.allow_comments}
+                        onChange={() => setFormData(prev => ({ ...prev, allow_comments: true }))}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <MessageCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-gray-700 dark:text-gray-300">Allow</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={!formData.allow_comments}
+                        onChange={() => setFormData(prev => ({ ...prev, allow_comments: false }))}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <MessageCircle className="h-4 w-4 text-gray-600" />
+                      <span className="text-gray-700 dark:text-gray-300">Disable</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Likes Visibility
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={formData.show_likes}
+                        onChange={() => setFormData(prev => ({ ...prev, show_likes: true }))}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <Heart className="h-4 w-4 text-green-600" />
+                      <span className="text-gray-700 dark:text-gray-300">Show</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={!formData.show_likes}
+                        onChange={() => setFormData(prev => ({ ...prev, show_likes: false }))}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <Heart className="h-4 w-4 text-gray-600" />
+                      <span className="text-gray-700 dark:text-gray-300">Hide</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 

@@ -134,6 +134,9 @@ export interface Note {
   created_at: string;
   updated_at: string;
   user?: Profile; // Joined profile data
+  // Add new fields
+  allow_comments?: boolean;
+  show_likes?: boolean;
 }
 
 export interface NoteReview {

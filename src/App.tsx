@@ -25,6 +25,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import ScrollToTop from './components/ScrollToTop';
 import CreateNotePage from './pages/notes/CreateNotePage';
+import NoteDetailPage from './pages/notes/NoteDetailPage';
 
 // Protected Route Component - MOVED OUTSIDE OF APP COMPONENT
 interface ProtectedRouteProps {
@@ -92,10 +93,6 @@ function App() {
           <Route path="/portfolio-templates" element={<PortfolioTemplatesPage />} />
           <Route path="/software-projects" element={<SoftwareProjectsPage />} />
           <Route path="/service-preview/:serviceId" element={<ServicePreviewPage />} />
-          <Route path="/notes" element={<NotesPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
 
@@ -114,9 +111,39 @@ function App() {
             }
           />
 
+          <Route path="/notes" element={
+            <ProtectedRoute>
+              <NotesPage />
+            </ProtectedRoute>
+          } />
+
           <Route path="/notes/create" element={
             <ProtectedRoute>
               <CreateNotePage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/notes/:noteId" element={
+            <ProtectedRoute>
+              <NoteDetailPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/events" element={
+            <ProtectedRoute>
+              <EventsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/projects" element={
+            <ProtectedRoute>
+              <ProjectsPage />
             </ProtectedRoute>
           } />
 

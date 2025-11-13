@@ -24,6 +24,29 @@ export const useNotes = () => {
     }
   }, []);
 
+  // Add real-time subscription
+  useEffect(() => {
+    const subscription = noteService.subscribeToNotes((newNote) => {
+      setNotes(prev => {
+        // Check if note already exists
+        const exists = prev.find(n => n.id === newNote.id);
+        if (exists) {
+          // Update existing note
+          return prev.map(n => n.id === newNote.id ? newNote : n);
+        } else {
+          // Add new note
+          return [newNote, ...prev];
+        }
+      });
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, []);
+
   const loadUserNotes = useCallback(async () => {
     try {
       setLoading(true);
@@ -47,10 +70,15 @@ export const useNotes = () => {
     file_url?: string;
     file_size?: number;
     is_public?: boolean;
-    difficulty_level?: number;
+    allow_comments?: boolean;
+    show_likes?: boolean;
   }) => {
     try {
-      const newNote = await noteService.createNote(noteData);
+      const newNote = await noteService.createNote({
+        ...noteData,
+        allow_comments: noteData.allow_comments ?? true,
+        show_likes: noteData.show_likes ?? true,
+      });
       setNotes(prev => [newNote, ...prev]);
       return newNote;
     } catch (err) {
@@ -109,6 +137,15 @@ export const useNotes = () => {
       console.error('Failed to increment view count:', err);
     }
   }, []);
+
+  // Auto-refresh notes every 30 seconds for additional real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadPublicNotes();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [loadPublicNotes]);
 
   // Load public notes by default
   useEffect(() => {

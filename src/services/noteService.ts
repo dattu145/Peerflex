@@ -87,7 +87,8 @@ export const noteService = {
     file_url?: string;
     file_size?: number;
     is_public?: boolean;
-    difficulty_level?: number;
+    allow_comments?: boolean;
+    show_likes?: boolean;
   }): Promise<Note> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -98,7 +99,9 @@ export const noteService = {
         ...noteData,
         user_id: user.id,
         is_public: noteData.is_public ?? true,
-        is_approved: true // Auto-approve for now, can add moderation later
+        is_approved: true, // Auto-approve for now, can add moderation later
+        allow_comments: noteData.allow_comments ?? true,
+        show_likes: noteData.show_likes ?? true,
       })
       .select()
       .single();
@@ -183,7 +186,7 @@ export const noteService = {
         .from('note_reviews')
         .delete()
         .eq('id', existingReview.id);
-      
+
       // Decrement like count
       await supabase.rpc('decrement_note_likes', { note_id: noteId });
     } else {
@@ -195,7 +198,7 @@ export const noteService = {
           user_id: user.id,
           rating: 5
         });
-      
+
       // Increment like count
       await supabase.rpc('increment_note_likes', { note_id: noteId });
     }
@@ -211,5 +214,40 @@ export const noteService = {
       liked: !existingReview,
       like_count: note?.like_count || 0
     };
+  },
+
+  // Subscribe to notes changes for real-time updates
+  subscribeToNotes(callback: (note: Note) => void) {
+    const subscription = supabase
+      .channel('public:notes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notes',
+          filter: 'is_public=eq.true'
+        },
+        async (payload) => {
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            // Fetch the complete note with user data
+            const { data } = await supabase
+              .from('notes')
+              .select(`
+                *,
+                user:profiles(*)
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (data) {
+              callback(data);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return subscription;
   }
 };

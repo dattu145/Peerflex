@@ -1,15 +1,18 @@
-import React from 'react';
-import { Heart, Eye, MoreVertical, MessageCircle, Share2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Heart, Eye, MoreVertical, MessageCircle, Trash2, Edit3 } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { motion } from 'framer-motion';
 import type { Note } from '../../types';
 import { ConnectionRequestButton } from '../chat/ConnectionRequestButton';
+import { useAuthStore } from '../../store/useAuthStore';
 
 interface NoteCardProps {
   note: Note;
   onLike?: (noteId: string) => void;
   onView?: (noteId: string) => void;
+  onEdit?: (noteId: string) => void;
+  onDelete?: (noteId: string) => void;
   showActions?: boolean;
 }
 
@@ -17,11 +20,27 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   note, 
   onLike, 
   onView,
+  onEdit,
+  onDelete,
   showActions = true 
 }) => {
-  const handleLike = () => {
-    if (onLike) {
-      onLike(note.id);
+  const { user } = useAuthStore();
+  const [showMenu, setShowMenu] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const isOwner = user?.id === note.user_id;
+
+  const handleLike = async () => {
+    if (isLiking || !onLike) return;
+    
+    setIsLiking(true);
+    try {
+      await onLike(note.id);
+    } catch (error) {
+      console.error('Failed to like note:', error);
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -31,26 +50,35 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     }
   };
 
-  const getDifficultyColor = (level?: number) => {
-    switch (level) {
-      case 1: return 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300';
-      case 2: return 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-300';
-      case 3: return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300';
-      case 4: return 'text-orange-600 bg-orange-100 dark:bg-orange-900 dark:text-orange-300';
-      case 5: return 'text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300';
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(note.id);
+      setShowMenu(false);
     }
   };
 
-  const getDifficultyText = (level?: number) => {
-    switch (level) {
-      case 1: return 'Beginner';
-      case 2: return 'Easy';
-      case 3: return 'Intermediate';
-      case 4: return 'Advanced';
-      case 5: return 'Expert';
-      default: return 'Not Rated';
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(note.id);
+      setShowMenu(false);
     }
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Format content to preserve line breaks
+  const formatContent = (content: string) => {
+    return content.split('\n').slice(0, 4).join('\n');
   };
 
   return (
@@ -59,41 +87,69 @@ export const NoteCard: React.FC<NoteCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
+      className="h-full"
     >
-      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
-        <div className="p-6">
+      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col min-h-[350px]">
+        <div className="p-6 flex-1 flex flex-col">
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(note.difficulty_level)}`}>
-                {getDifficultyText(note.difficulty_level)}
-              </span>
               <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
                 {note.subject}
               </span>
             </div>
             
-            {showActions && (
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" className="p-1">
+            {/* Only show three dots menu for owner */}
+            {showActions && isOwner && (
+              <div className="relative" ref={menuRef}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-1"
+                  onClick={() => setShowMenu(!showMenu)}
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
+                
+                {showMenu && (
+                  <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-32">
+                    <button
+                      onClick={handleEdit}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Title */}
           <h3 
-            className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2"
+            className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1"
             onClick={handleView}
           >
             {note.title}
           </h3>
 
           {/* Content Preview */}
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-            {note.content.substring(0, 150)}...
-          </p>
+          <div 
+            className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-1 overflow-hidden"
+            onClick={handleView}
+          >
+            <pre className="font-sans whitespace-pre-wrap break-words line-clamp-4">
+              {formatContent(note.content)}
+            </pre>
+          </div>
 
           {/* Tags */}
           {note.tags && note.tags.length > 0 && (
@@ -115,7 +171,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold">
@@ -130,13 +186,18 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             <div className="flex items-center gap-4">
               {/* Stats */}
               <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                <button 
-                  onClick={handleLike}
-                  className="flex items-center gap-1 hover:text-red-500 transition-colors"
-                >
-                  <Heart className="h-4 w-4" />
-                  {note.like_count}
-                </button>
+                {note.show_likes !== false && (
+                  <button 
+                    onClick={handleLike}
+                    disabled={isLiking}
+                    className={`flex items-center gap-1 transition-colors ${
+                      isLiking ? 'opacity-50' : 'hover:text-red-500'
+                    }`}
+                  >
+                    <Heart className="h-4 w-4" />
+                    {note.like_count}
+                  </button>
+                )}
                 <span className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
                   {note.view_count}
@@ -144,7 +205,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
               </div>
 
               {/* Action Buttons */}
-              {showActions && note.user && (
+              {showActions && note.user && !isOwner && (
                 <div className="flex items-center gap-1">
                   <ConnectionRequestButton 
                     targetUserId={note.user.id}
@@ -152,12 +213,11 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     variant="ghost"
                     className="p-1"
                   />
-                  <Button variant="ghost" size="sm" className="p-1">
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-1">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+                  {note.allow_comments !== false && (
+                    <Button variant="ghost" size="sm" className="p-1">
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
