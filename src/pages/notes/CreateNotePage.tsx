@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
 import { ArrowLeft, Tag, BookOpen, Globe, Lock, MessageCircle, Heart } from 'lucide-react';
 import { useNotes } from '../../hooks/useNotes';
+import { useNote } from '../../hooks/useNote';
 import { motion } from 'framer-motion';
 
 const CreateNotePage: React.FC = () => {
   const navigate = useNavigate();
-  const { createNote, loading } = useNotes();
+  const { noteId } = useParams<{ noteId: string }>();
+  const { createNote, updateNote, loading } = useNotes();
+  const { note: existingNote, loading: noteLoading } = useNote(noteId);
+  
+  const isEditMode = Boolean(noteId);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -32,16 +37,40 @@ const CreateNotePage: React.FC = () => {
     'Engineering', 'Business', 'Art', 'Music', 'Other'
   ];
 
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (isEditMode && existingNote) {
+      setFormData({
+        title: existingNote.title || '',
+        content: existingNote.content || '',
+        subject: existingNote.subject || '',
+        course_code: existingNote.course_code || '',
+        university: existingNote.university || '',
+        tags: existingNote.tags || [],
+        is_public: existingNote.is_public ?? true,
+        allow_comments: existingNote.allow_comments ?? true,
+        show_likes: existingNote.show_likes ?? true,
+      });
+    }
+  }, [isEditMode, existingNote]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createNote({
-        ...formData,
-        tags: formData.tags,
-      });
+      if (isEditMode && noteId) {
+        await updateNote(noteId, {
+          ...formData,
+          tags: formData.tags,
+        });
+      } else {
+        await createNote({
+          ...formData,
+          tags: formData.tags,
+        });
+      }
       navigate('/notes');
     } catch (error) {
-      console.error('Failed to create note:', error);
+      console.error(`Failed to ${isEditMode ? 'update' : 'create'} note:`, error);
     }
   };
 
@@ -69,6 +98,21 @@ const CreateNotePage: React.FC = () => {
     }
   };
 
+  if (isEditMode && noteLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading note...</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
@@ -91,11 +135,14 @@ const CreateNotePage: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Create Notes
+                {isEditMode ? 'Edit Note' : 'Create Notes'}
               </h1>
             </div>
             <p className="text-gray-600 dark:text-gray-300">
-              Create and share your knowledge with the Peerflex community.
+              {isEditMode 
+                ? 'Update your note and share it with the Peerflex community.'
+                : 'Create and share your knowledge with the Peerflex community.'
+              }
             </p>
           </motion.div>
 
@@ -153,7 +200,7 @@ const CreateNotePage: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   University/Institution
-                </label>
+                  </label>
                 <Input
                   type="text"
                   value={formData.university}
@@ -322,7 +369,10 @@ const CreateNotePage: React.FC = () => {
                   variant="primary"
                   disabled={loading || !formData.title || !formData.content || !formData.subject}
                 >
-                  {loading ? 'Publishing...' : 'Publish Notes'}
+                  {loading 
+                    ? (isEditMode ? 'Updating...' : 'Publishing...') 
+                    : (isEditMode ? 'Update Note' : 'Publish Notes')
+                  }
                 </Button>
               </div>
             </form>

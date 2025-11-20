@@ -129,6 +129,13 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/notes/edit/:noteId" element={
+            <ProtectedRoute>
+              <CreateNotePage />
+            </ProtectedRoute>
+          } />
+
+
           <Route path="/chat" element={
             <ProtectedRoute>
               <ChatPage />
@@ -157,7 +164,6 @@ function App() {
             }
           />
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

@@ -21,6 +21,7 @@ const NotesPage: React.FC = () => {
     loading, 
     error, 
     likeNote, 
+    incrementViewCount,
     loadPublicNotes,
     loadUserNotes,
     deleteNote,
@@ -71,12 +72,20 @@ const NotesPage: React.FC = () => {
     }
   };
 
-  const handleViewNote = (noteId: string) => {
-    navigate(`/notes/${noteId}`);
+  const handleViewNote = async (noteId: string) => {
+    try {
+      // Only increment view count for non-owners
+      const note = notes.find(n => n.id === noteId);
+      if (note && note.user_id !== user?.id) {
+        await incrementViewCount(noteId);
+      }
+    } catch (error) {
+      console.error('Failed to increment view count:', error);
+    }
   };
 
   const handleEditNote = (noteId: string) => {
-    console.log('Edit note:', noteId);
+    navigate(`/notes/edit/${noteId}`);
   };
 
   const handleDeleteNote = async (noteId: string) => {

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Heart, Eye, MoreVertical, MessageCircle, Trash2, Edit3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { motion } from 'framer-motion';
 import type { Note } from '../../types';
-import { ConnectionRequestButton } from '../chat/ConnectionRequestButton';
 import { useAuthStore } from '../../store/useAuthStore';
 import { CommentsModal } from './CommentsModal';
 
@@ -25,10 +25,12 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   onDelete,
   showActions = true 
 }) => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [hasViewed, setHasViewed] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user?.id === note.user_id;
@@ -48,16 +50,24 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   };
 
   const handleView = () => {
-    if (onView) {
+    // Only increment view count if user hasn't viewed this note in current session
+    // and it's not their own note
+    if (!hasViewed && !isOwner && onView) {
       onView(note.id);
+      setHasViewed(true);
     }
+    // Always navigate to detail page
+    navigate(`/notes/${note.id}`);
   };
 
   const handleEdit = () => {
     if (onEdit) {
       onEdit(note.id);
-      setShowMenu(false);
+    } else {
+      // Fallback: navigate to edit page directly
+      navigate(`/notes/edit/${note.id}`);
     }
+    setShowMenu(false);
   };
 
   const handleDelete = () => {
@@ -143,7 +153,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
             {/* Title */}
             <h3 
-              className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1"
+              className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 cursor-pointer"
               onClick={handleView}
             >
               {note.title}
@@ -151,7 +161,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
             {/* Content Preview */}
             <div 
-              className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-1 overflow-hidden"
+              className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-1 overflow-hidden cursor-pointer"
               onClick={handleView}
             >
               <pre className="font-sans whitespace-pre-wrap break-words line-clamp-4">
@@ -215,14 +225,6 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 {/* Action Buttons */}
                 {showActions && note.user && (
                   <div className="flex items-center gap-1">
-                    {!isOwner && (
-                      <ConnectionRequestButton 
-                        targetUserId={note.user.id}
-                        size="sm"
-                        variant="ghost"
-                        className="p-1"
-                      />
-                    )}
                     {allowComments && (
                       <Button 
                         variant="ghost" 
