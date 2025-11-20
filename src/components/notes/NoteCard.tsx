@@ -11,7 +11,6 @@ import { CommentsModal } from './CommentsModal';
 interface NoteCardProps {
   note: Note;
   onLike?: (noteId: string) => void;
-  onView?: (noteId: string) => void;
   onEdit?: (noteId: string) => void;
   onDelete?: (noteId: string) => void;
   showActions?: boolean;
@@ -20,7 +19,6 @@ interface NoteCardProps {
 export const NoteCard: React.FC<NoteCardProps> = ({ 
   note, 
   onLike, 
-  onView,
   onEdit,
   onDelete,
   showActions = true 
@@ -30,7 +28,6 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  const [hasViewed, setHasViewed] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user?.id === note.user_id;
@@ -50,13 +47,8 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   };
 
   const handleView = () => {
-    // Only increment view count if user hasn't viewed this note in current session
-    // and it's not their own note
-    if (!hasViewed && !isOwner && onView) {
-      onView(note.id);
-      setHasViewed(true);
-    }
-    // Always navigate to detail page
+    // REMOVED: Don't increment view count here - only navigate to detail page
+    // View count will be handled in NoteDetailPage
     navigate(`/notes/${note.id}`);
   };
 

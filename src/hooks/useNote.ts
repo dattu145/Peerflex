@@ -14,10 +14,7 @@ export const useNote = (noteId?: string) => {
       setNote(noteData);
       setError(null);
       
-      // Increment view count when note is loaded
-      if (noteData) {
-        await noteService.incrementViewCount(id);
-      }
+      // REMOVED: Don't increment view count here - let NoteDetailPage handle it
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load note');
     } finally {

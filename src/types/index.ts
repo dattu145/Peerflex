@@ -175,6 +175,14 @@ export interface NoteComment {
   user?: Profile;
 }
 
+export interface NoteView {
+  id: string;
+  note_id: string;
+  user_id: string;
+  viewed_at: string;
+  user?: Profile;
+}
+
 
 export interface Event {
   id: string;

@@ -43,6 +43,92 @@ export const noteService = {
     return data || [];
   },
 
+  async toggleLike(noteId: string): Promise<{ liked: boolean; like_count: number }> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    try {
+      // Check if already liked
+      const { data: existingReview, error: checkError } = await supabase
+        .from('note_reviews')
+        .select('id, rating')
+        .eq('note_id', noteId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing review:', checkError);
+        throw checkError;
+      }
+
+      if (existingReview) {
+        // Unlike - delete the review
+        const { error: deleteError } = await supabase
+          .from('note_reviews')
+          .delete()
+          .eq('id', existingReview.id);
+
+        if (deleteError) {
+          console.error('Error deleting review:', deleteError);
+          throw deleteError;
+        }
+
+        // Decrement like count
+        const { error: decrementError } = await supabase.rpc('decrement_note_likes', { note_id: noteId });
+        if (decrementError) {
+          console.error('Error decrementing like count:', decrementError);
+          throw decrementError;
+        }
+
+        console.log(`User ${user.id} unliked note ${noteId}`);
+      } else {
+        // Like - create review with rating 5 (like)
+        const { error: insertError } = await supabase
+          .from('note_reviews')
+          .insert({
+            note_id: noteId,
+            user_id: user.id,
+            rating: 5
+          });
+
+        if (insertError) {
+          console.error('Error inserting review:', insertError);
+          throw insertError;
+        }
+
+        // Increment like count
+        const { error: incrementError } = await supabase.rpc('increment_note_likes', { note_id: noteId });
+        if (incrementError) {
+          console.error('Error incrementing like count:', incrementError);
+          throw incrementError;
+        }
+
+        console.log(`User ${user.id} liked note ${noteId}`);
+      }
+
+      // Get updated like count
+      const { data: note, error: fetchError } = await supabase
+        .from('notes')
+        .select('like_count')
+        .eq('id', noteId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching updated like count:', fetchError);
+        throw fetchError;
+      }
+
+      return {
+        liked: !existingReview,
+        like_count: note?.like_count || 0
+      };
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+      throw error;
+    }
+  },
+
+
   // Get notes by current user
   async getUserNotes(): Promise<Note[]> {
     const { data: { user } } = await supabase.auth.getUser();
@@ -161,58 +247,54 @@ export const noteService = {
     if (error) throw error;
   },
 
-  // Increment view count
   async incrementViewCount(noteId: string): Promise<void> {
-    const { error } = await supabase.rpc('increment_note_views', { note_id: noteId });
-    if (error) throw error;
-  },
-
-  async toggleLike(noteId: string): Promise<{ liked: boolean; like_count: number }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    // Check if already liked
-    const { data: existingReview } = await supabase
-      .from('note_reviews')
-      .select('id, rating')
-      .eq('note_id', noteId)
-      .eq('user_id', user.id)
-      .single();
+    try {
+      // Check if user has already viewed this note using the new note_views table
+      const { data: existingView, error: checkError } = await supabase
+        .from('note_views')
+        .select('id')
+        .eq('note_id', noteId)
+        .eq('user_id', user.id)
+        .single();
 
-    if (existingReview) {
-      // Unlike - delete the review
-      await supabase
-        .from('note_reviews')
-        .delete()
-        .eq('id', existingReview.id);
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing view:', checkError);
+        throw checkError;
+      }
 
-      // Decrement like count
-      await supabase.rpc('decrement_note_likes', { note_id: noteId });
-    } else {
-      // Like - create review with rating 5 (like)
-      await supabase
-        .from('note_reviews')
-        .insert({
-          note_id: noteId,
-          user_id: user.id,
-          rating: 5
-        });
+      // If user hasn't viewed this note before, increment count
+      if (!existingView) {
+        // Record the view in note_views table
+        const { error: viewError } = await supabase
+          .from('note_views')
+          .insert({
+            note_id: noteId,
+            user_id: user.id,
+          });
 
-      // Increment like count
-      await supabase.rpc('increment_note_likes', { note_id: noteId });
+        if (viewError) {
+          console.error('Error inserting view:', viewError);
+          throw viewError;
+        }
+
+        // Increment the view count in notes table
+        const { error: countError } = await supabase.rpc('increment_note_views', { note_id: noteId });
+        if (countError) {
+          console.error('Error incrementing view count:', countError);
+          throw countError;
+        }
+
+        console.log(`View count incremented for note ${noteId} by user ${user.id}`);
+      } else {
+        console.log(`User ${user.id} already viewed note ${noteId}`);
+      }
+    } catch (error) {
+      console.error('Failed to increment view count:', error);
+      throw error;
     }
-
-    // Get updated like count
-    const { data: note } = await supabase
-      .from('notes')
-      .select('like_count')
-      .eq('id', noteId)
-      .single();
-
-    return {
-      liked: !existingReview,
-      like_count: note?.like_count || 0
-    };
   },
 
 

@@ -5,18 +5,33 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { ArrowLeft, Heart, Eye, Calendar, User } from 'lucide-react';
 import { useNote } from '../../hooks/useNote';
+import { useNotes } from '../../hooks/useNotes';
 import { motion } from 'framer-motion';
 
 const NoteDetailPage: React.FC = () => {
   const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const { note, loading, error, likeNote } = useNote(noteId);
+  const { incrementViewCount } = useNotes();
 
   useEffect(() => {
     if (note) {
       document.title = `${note.title} - Peerflex Notes`;
+
+      // Increment view count when note is loaded (only once per user)
+      const trackView = async () => {
+        try {
+          console.log(`Tracking view for note ${note.id} by current user`);
+          await incrementViewCount(note.id);
+        } catch (error) {
+          console.error('Failed to track view:', error);
+          // Don't throw here - we don't want to break the page if view tracking fails
+        }
+      };
+
+      trackView();
     }
-  }, [note]);
+  }, [note, incrementViewCount]);
 
   const handleLike = async () => {
     if (!note) return;
@@ -97,7 +112,7 @@ const NoteDetailPage: React.FC = () => {
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                     {note.title}
                   </h1>
-                  
+
                   <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
@@ -129,7 +144,7 @@ const NoteDetailPage: React.FC = () => {
                 {/* Stats */}
                 <div className="flex items-center gap-6">
                   {note.show_likes !== false && (
-                    <button 
+                    <button
                       onClick={handleLike}
                       className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                     >
