@@ -98,6 +98,16 @@ const CreateNotePage: React.FC = () => {
     }
   };
 
+  // Textarea auto-resize function
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, content: e.target.value }));
+    
+    // Auto-resize
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 800) + 'px'; // Max height 800px
+  };
+
   if (isEditMode && noteLoading) {
     return (
       <Layout>
@@ -159,7 +169,7 @@ const CreateNotePage: React.FC = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter a descriptive title for your notes..."
                   required
-                  className="w-full"
+                  className="w-full font-poppins"
                 />
               </div>
 
@@ -173,7 +183,7 @@ const CreateNotePage: React.FC = () => {
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent font-poppins"
                   >
                     <option value="">Select a subject</option>
                     {subjects.map(subject => (
@@ -191,7 +201,7 @@ const CreateNotePage: React.FC = () => {
                     value={formData.course_code}
                     onChange={(e) => setFormData(prev => ({ ...prev, course_code: e.target.value }))}
                     placeholder="e.g., CS101, MATH202"
-                    className="w-full"
+                    className="w-full font-poppins"
                   />
                 </div>
               </div>
@@ -206,26 +216,38 @@ const CreateNotePage: React.FC = () => {
                   value={formData.university}
                   onChange={(e) => setFormData(prev => ({ ...prev, university: e.target.value }))}
                   placeholder="Your university or institution name"
-                  className="w-full"
+                  className="w-full font-poppins"
                 />
               </div>
 
-              {/* Content */}
+              {/* Content - IMPROVED TEXT EDITOR */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Note Content *
                 </label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Write your notes here... You can write thousands of lines, formatting will be preserved."
-                  required
-                  rows={20}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-mono text-sm whitespace-pre-wrap"
-                />
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Formatting and line breaks will be preserved exactly as you type.
-                </p>
+                <div className="relative">
+                  <textarea
+                    value={formData.content}
+                    onChange={handleContentChange}
+                    placeholder="Write your notes here... You can write thousands of lines, formatting will be preserved.
+
+• Use bullet points for lists
+• Use numbers for step-by-step instructions  
+• Use **bold** for important concepts
+• Use headings to organize sections
+
+Start typing your amazing notes..."
+                    required
+                    rows={15}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-poppins text-base leading-relaxed whitespace-pre-wrap transition-all duration-200"
+                    style={{ minHeight: '300px', maxHeight: '800px' }}
+                  />
+                  
+                  {/* Character count */}
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded">
+                    {formData.content.length} characters
+                  </div>
+                </div>
               </div>
 
               {/* Tags */}
@@ -240,7 +262,7 @@ const CreateNotePage: React.FC = () => {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={handleTagKeyPress}
                     placeholder="Add tags to help others find your notes..."
-                    className="flex-1"
+                    className="flex-1 font-poppins"
                   />
                   <Button type="button" onClick={addTag} variant="secondary">
                     <Tag className="h-4 w-4" />
@@ -252,13 +274,13 @@ const CreateNotePage: React.FC = () => {
                     {formData.tags.map(tag => (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-poppins"
                       >
                         #{tag}
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="hover:text-blue-900 dark:hover:text-blue-100"
+                          className="hover:text-blue-900 dark:hover:text-blue-100 text-xs"
                         >
                           ×
                         </button>
@@ -271,11 +293,11 @@ const CreateNotePage: React.FC = () => {
               {/* Privacy and Interaction Settings */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                     Visibility
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={formData.is_public}
@@ -285,7 +307,7 @@ const CreateNotePage: React.FC = () => {
                       <Globe className="h-4 w-4 text-green-600" />
                       <span className="text-gray-700 dark:text-gray-300">Public</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={!formData.is_public}
@@ -299,11 +321,11 @@ const CreateNotePage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                     Comments
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={formData.allow_comments}
@@ -313,7 +335,7 @@ const CreateNotePage: React.FC = () => {
                       <MessageCircle className="h-4 w-4 text-green-600" />
                       <span className="text-gray-700 dark:text-gray-300">Allow</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={!formData.allow_comments}
@@ -327,11 +349,11 @@ const CreateNotePage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                     Likes Visibility
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={formData.show_likes}
@@ -341,7 +363,7 @@ const CreateNotePage: React.FC = () => {
                       <Heart className="h-4 w-4 text-green-600" />
                       <span className="text-gray-700 dark:text-gray-300">Show</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-3 cursor-pointer font-poppins">
                       <input
                         type="radio"
                         checked={!formData.show_likes}
@@ -361,6 +383,7 @@ const CreateNotePage: React.FC = () => {
                   type="button"
                   variant="ghost"
                   onClick={() => navigate('/notes')}
+                  className="font-poppins"
                 >
                   Cancel
                 </Button>
@@ -368,6 +391,7 @@ const CreateNotePage: React.FC = () => {
                   type="submit"
                   variant="primary"
                   disabled={loading || !formData.title || !formData.content || !formData.subject}
+                  className="font-poppins"
                 >
                   {loading 
                     ? (isEditMode ? 'Updating...' : 'Publishing...') 

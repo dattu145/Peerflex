@@ -43,6 +43,8 @@ export const noteService = {
     return data || [];
   },
 
+
+
   async toggleLike(noteId: string): Promise<{ liked: boolean; like_count: number }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -247,6 +249,7 @@ export const noteService = {
     if (error) throw error;
   },
 
+
   async incrementViewCount(noteId: string): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -295,6 +298,30 @@ export const noteService = {
       console.error('Failed to increment view count:', error);
       throw error;
     }
+  },
+
+  async getUserLikedNotes(): Promise<Note[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    // Get notes that user has liked (rated 5)
+    const { data, error } = await supabase
+      .from('note_reviews')
+      .select(`
+        note:notes(
+          *,
+          user:profiles(*)
+        )
+      `)
+      .eq('user_id', user.id)
+      .eq('rating', 5)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Extract notes from the joined data with proper type assertion
+    const likedNotes = data?.map(item => item.note).filter((note): note is Note => note !== null) || [];
+    return likedNotes;
   },
 
 

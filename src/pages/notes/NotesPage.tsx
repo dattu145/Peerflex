@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { Search, Plus, BookOpen, User, Filter } from 'lucide-react';
+import { Search, Plus, BookOpen, User, Filter, Heart } from 'lucide-react'; // Added Heart icon
 import Button from '../../components/ui/Button';
 import { motion } from 'framer-motion';
 import { useNotes } from '../../hooks/useNotes';
@@ -11,7 +11,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 const NotesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
-  const [showMyNotes, setShowMyNotes] = useState(false);
+  const [viewMode, setViewMode] = useState<'community' | 'my' | 'favorites'>('community'); // Added favorites
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
@@ -23,7 +23,9 @@ const NotesPage: React.FC = () => {
     likeNote, 
     loadPublicNotes,
     loadUserNotes,
+    loadFavoriteNotes, // Added this
     deleteNote,
+    userLikedNotes, // Added this
     refresh 
   } = useNotes();
 
@@ -40,21 +42,25 @@ const NotesPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Load notes based on filter
+  // Load notes based on view mode
   useEffect(() => {
-    if (showMyNotes) {
+    if (viewMode === 'my') {
       loadUserNotes();
+    } else if (viewMode === 'favorites') {
+      loadFavoriteNotes();
     } else {
       loadPublicNotes({
         subject: selectedSubject !== 'all' ? selectedSubject : undefined,
         search: searchQuery || undefined,
       });
     }
-  }, [showMyNotes, selectedSubject, searchQuery]);
+  }, [viewMode, selectedSubject, searchQuery]);
 
   const handleSearch = () => {
-    if (showMyNotes) {
+    if (viewMode === 'my') {
       loadUserNotes();
+    } else if (viewMode === 'favorites') {
+      loadFavoriteNotes();
     } else {
       loadPublicNotes({
         subject: selectedSubject !== 'all' ? selectedSubject : undefined,
@@ -70,8 +76,6 @@ const NotesPage: React.FC = () => {
       console.error('Failed to like note:', error);
     }
   };
-
-  // REMOVED: handleViewNote function - view count is now handled in NoteDetailPage
 
   const handleEditNote = (noteId: string) => {
     navigate(`/notes/edit/${noteId}`);
@@ -91,18 +95,30 @@ const NotesPage: React.FC = () => {
     navigate('/notes/create');
   };
 
-  const toggleMyNotes = () => {
-    const newShowMyNotes = !showMyNotes;
-    setShowMyNotes(newShowMyNotes);
-    // Reset filters when switching to My Notes
-    if (newShowMyNotes) {
-      setSelectedSubject('all');
-      setSearchQuery('');
+  const getViewModeTitle = () => {
+    switch (viewMode) {
+      case 'my':
+        return 'My Notes';
+      case 'favorites':
+        return 'My Favorites';
+      default:
+        return 'Notes Sharing Hub';
     }
   };
 
-  // Filter notes for "My Notes" view
-  const filteredNotes = showMyNotes 
+  const getViewModeDescription = () => {
+    switch (viewMode) {
+      case 'my':
+        return 'Manage and view all your shared notes';
+      case 'favorites':
+        return 'Your favorite notes from the community';
+      default:
+        return 'Share knowledge, learn together, and access quality notes from students worldwide';
+    }
+  };
+
+  // Filter notes based on view mode
+  const filteredNotes = viewMode === 'my' 
     ? notes.filter(note => note.user_id === user?.id)
     : notes;
 
@@ -132,12 +148,10 @@ const NotesPage: React.FC = () => {
               <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {showMyNotes ? 'My Notes' : 'Notes Sharing Hub'}
+              {getViewModeTitle()}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              {showMyNotes 
-                ? 'Manage and view all your shared notes' 
-                : 'Share knowledge, learn together, and access quality notes from students worldwide'}
+              {getViewModeDescription()}
             </p>
           </motion.div>
 
@@ -145,19 +159,45 @@ const NotesPage: React.FC = () => {
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={toggleMyNotes}
-                  className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-semibold transition-all ${
-                    showMyNotes
-                      ? 'bg-purple-600 text-white shadow-lg border-2 border-purple-600'
-                      : 'bg-blue-600 text-white shadow-lg border-2 border-blue-600'
-                  }`}
-                >
-                  <User className="h-5 w-5" />
-                  {showMyNotes ? 'My Notes' : 'Community Notes'}
-                </button>
+                {/* View Mode Toggle Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setViewMode('community')}
+                    className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-semibold transition-all ${
+                      viewMode === 'community'
+                        ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-600'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                    }`}
+                  >
+                    <BookOpen className="h-5 w-5" />
+                    Community
+                  </button>
+                  <button
+                    onClick={() => setViewMode('my')}
+                    className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-semibold transition-all ${
+                      viewMode === 'my'
+                        ? 'bg-purple-600 text-white shadow-lg border-2 border-purple-600'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 hover:border-purple-400'
+                    }`}
+                  >
+                    <User className="h-5 w-5" />
+                    My Notes
+                  </button>
+                  <button
+                    onClick={() => setViewMode('favorites')}
+                    className={`flex items-center gap-3 px-6 py-3 rounded-xl text-base font-semibold transition-all ${
+                      viewMode === 'favorites'
+                        ? 'bg-red-600 text-white shadow-lg border-2 border-red-600'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 hover:border-red-400'
+                    }`}
+                  >
+                    <Heart className="h-5 w-5" />
+                    Favorites
+                  </button>
+                </div>
                 
-                {!showMyNotes && (
+                {/* Filters button - only show for community view */}
+                {viewMode === 'community' && (
                   <button
                     onClick={() => setShowFilters(!showFilters)}
                     className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:border-blue-400 transition-colors"
@@ -185,8 +225,10 @@ const NotesPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder={
-                    showMyNotes 
+                    viewMode === 'my' 
                       ? "Search your notes..." 
+                      : viewMode === 'favorites'
+                      ? "Search your favorite notes..."
                       : "Search notes by title, subject, or tags..."
                   }
                   value={searchQuery}
@@ -209,8 +251,8 @@ const NotesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Subject Filters - Only show when not in "My Notes" mode and filters are open */}
-            {!showMyNotes && showFilters && (
+            {/* Subject Filters - Only show when in community mode and filters are open */}
+            {viewMode === 'community' && showFilters && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -273,6 +315,7 @@ const NotesPage: React.FC = () => {
                   onEdit={handleEditNote}
                   onDelete={handleDeleteNote}
                   showActions={true}
+                  isLiked={userLikedNotes.has(note.id)} // Pass liked status
                 />
               ))}
             </div>
@@ -283,18 +326,35 @@ const NotesPage: React.FC = () => {
             <div className="text-center py-12">
               <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                {showMyNotes ? 'You haven\'t created any notes yet' : 'No notes found'}
+                {viewMode === 'my' 
+                  ? 'You haven\'t created any notes yet' 
+                  : viewMode === 'favorites'
+                  ? 'You haven\'t liked any notes yet'
+                  : 'No notes found'
+                }
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {showMyNotes 
+                {viewMode === 'my' 
                   ? 'Start sharing your knowledge with the community!' 
+                  : viewMode === 'favorites'
+                  ? 'Like some notes to see them here!'
                   : searchQuery || selectedSubject !== 'all' 
                     ? 'Try adjusting your search filters' 
-                    : 'Be the first to share your notes with the community!'}
+                    : 'Be the first to share your notes with the community!'
+                }
               </p>
-              <Button variant="secondary" onClick={handleCreateNote}>
+              <Button variant="secondary" onClick={
+                viewMode === 'favorites' 
+                  ? () => setViewMode('community')
+                  : handleCreateNote
+              }>
                 <Plus className="h-4 w-4 mr-2" />
-                {showMyNotes ? 'Create Your First Note' : 'Share Your First Note'}
+                {viewMode === 'my' 
+                  ? 'Create Your First Note' 
+                  : viewMode === 'favorites'
+                  ? 'Browse Community Notes'
+                  : 'Share Your First Note'
+                }
               </Button>
             </div>
           )}

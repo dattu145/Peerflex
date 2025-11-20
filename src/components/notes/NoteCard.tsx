@@ -14,6 +14,7 @@ interface NoteCardProps {
   onEdit?: (noteId: string) => void;
   onDelete?: (noteId: string) => void;
   showActions?: boolean;
+  isLiked?: boolean; // Add this prop
 }
 
 export const NoteCard: React.FC<NoteCardProps> = ({ 
@@ -21,17 +22,24 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   onLike, 
   onEdit,
   onDelete,
-  showActions = true 
+  showActions = true,
+  isLiked = false // Default to false
 }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [liked, setLiked] = useState(isLiked); // Track liked state
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user?.id === note.user_id;
   const allowComments = note.allow_comments !== false;
+
+  // Update liked state when isLiked prop changes
+  useEffect(() => {
+    setLiked(isLiked);
+  }, [isLiked]);
 
   const handleLike = async () => {
     if (isLiking || !onLike) return;
@@ -39,6 +47,8 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     setIsLiking(true);
     try {
       await onLike(note.id);
+      // Toggle the liked state locally for immediate feedback
+      setLiked(!liked);
     } catch (error) {
       console.error('Failed to like note:', error);
     } finally {
@@ -47,8 +57,6 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   };
 
   const handleView = () => {
-    // REMOVED: Don't increment view count here - only navigate to detail page
-    // View count will be handled in NoteDetailPage
     navigate(`/notes/${note.id}`);
   };
 
@@ -56,7 +64,6 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     if (onEdit) {
       onEdit(note.id);
     } else {
-      // Fallback: navigate to edit page directly
       navigate(`/notes/edit/${note.id}`);
     }
     setShowMenu(false);
@@ -202,9 +209,11 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                       disabled={isLiking}
                       className={`flex items-center gap-1 transition-colors ${
                         isLiking ? 'opacity-50' : 'hover:text-red-500'
-                      }`}
+                      } ${liked ? 'text-red-500' : ''}`}
                     >
-                      <Heart className="h-4 w-4" />
+                      <Heart 
+                        className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} 
+                      />
                       {note.like_count}
                     </button>
                   )}
