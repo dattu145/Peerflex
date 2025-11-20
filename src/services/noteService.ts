@@ -13,15 +13,16 @@ export const noteService = {
     let query = supabase
       .from('notes')
       .select(`
-        *,
-        user:profiles(*)
-      `)
+      *,
+      user:profiles(*)
+    `)
       .eq('is_public', true)
       .eq('is_approved', true)
       .order('created_at', { ascending: false });
 
+    // FIX: Handle subject filtering with case insensitivity
     if (filters?.subject && filters.subject !== 'all') {
-      query = query.eq('subject', filters.subject);
+      query = query.ilike('subject', `%${filters.subject}%`);
     }
 
     if (filters?.search) {
@@ -39,10 +40,14 @@ export const noteService = {
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching public notes:', error);
+      throw error;
+    }
+
+    console.log(`Loaded ${data?.length || 0} notes with filters:`, filters);
     return data || [];
   },
-
 
 
   async toggleLike(noteId: string): Promise<{ liked: boolean; like_count: number }> {
@@ -325,8 +330,7 @@ export const noteService = {
   },
 
 
-  // Subscribe to notes changes for real-time updates
-  subscribeToNotes(callback: (note: Note) => void) {
+  subscribeToNotes(callback: (payload: { event: 'INSERT' | 'UPDATE' | 'DELETE', note: Note | { id: string } }) => void) {
     const subscription = supabase
       .channel('public:notes')
       .on(
@@ -335,7 +339,7 @@ export const noteService = {
           event: '*',
           schema: 'public',
           table: 'notes',
-          filter: 'is_public=eq.true'
+          // Remove the filter from here - handle filtering in the UI logic instead
         },
         async (payload) => {
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
@@ -343,15 +347,18 @@ export const noteService = {
             const { data } = await supabase
               .from('notes')
               .select(`
-                *,
-                user:profiles(*)
-              `)
+              *,
+              user:profiles(*)
+            `)
               .eq('id', payload.new.id)
               .single();
 
             if (data) {
-              callback(data);
+              callback({ event: payload.eventType, note: data });
             }
+          } else if (payload.eventType === 'DELETE') {
+            // Handle delete
+            callback({ event: 'DELETE', note: { id: payload.old.id } });
           }
         }
       )

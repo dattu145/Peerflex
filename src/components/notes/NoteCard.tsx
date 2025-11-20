@@ -14,7 +14,7 @@ interface NoteCardProps {
   onEdit?: (noteId: string) => void;
   onDelete?: (noteId: string) => void;
   showActions?: boolean;
-  isLiked?: boolean; // Add this prop
+  isLiked?: boolean;
 }
 
 export const NoteCard: React.FC<NoteCardProps> = ({ 
@@ -23,14 +23,14 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   onEdit,
   onDelete,
   showActions = true,
-  isLiked = false // Default to false
+  isLiked = false
 }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  const [liked, setLiked] = useState(isLiked); // Track liked state
+  const [liked, setLiked] = useState(isLiked);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user?.id === note.user_id;
@@ -47,7 +47,6 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     setIsLiking(true);
     try {
       await onLike(note.id);
-      // Toggle the liked state locally for immediate feedback
       setLiked(!liked);
     } catch (error) {
       console.error('Failed to like note:', error);
@@ -106,12 +105,12 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         transition={{ duration: 0.2 }}
         className="h-full"
       >
-        <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col min-h-[350px]">
-          <div className="p-6 flex-1 flex flex-col">
+        <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col min-h-[280px] xs:min-h-[320px] sm:min-h-[350px]">
+          <div className="p-4 xs:p-5 sm:p-6 flex-1 flex flex-col">
             {/* Header */}
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
+            <div className="flex items-start justify-between mb-2 xs:mb-3">
+              <div className="flex items-center gap-1 xs:gap-2">
+                <span className="px-2 xs:px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium truncate max-w-[120px] xs:max-w-none">
                   {note.subject}
                 </span>
               </div>
@@ -125,24 +124,24 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     className="p-1"
                     onClick={() => setShowMenu(!showMenu)}
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <MoreVertical className="h-5 w-5 xs:h-4 xs:w-4" />
                   </Button>
                   
                   {showMenu && (
-                    <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-32">
+                    <div className="absolute right-0 top-6 xs:top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-28 xs:min-w-32">
                       <button
                         onClick={handleEdit}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 xs:px-4 py-1 xs:py-2 text-left text-sm xs:text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-1 xs:gap-2"
                       >
-                        <Edit3 className="h-4 w-4" />
-                        Edit
+                        <Edit3 className="h-3 w-3 xs:h-4 xs:w-4 flex-shrink-0" />
+                        <span>Edit</span>
                       </button>
                       <button
                         onClick={handleDelete}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 xs:px-4 py-1 xs:py-2 text-left text-sm xs:text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-1 xs:gap-2"
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Delete
+                        <Trash2 className="h-3 w-3 xs:h-4 xs:w-4 flex-shrink-0" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   )}
@@ -152,7 +151,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
             {/* Title */}
             <h3 
-              className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 cursor-pointer"
+              className="text-lg xs:text-xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 cursor-pointer"
               onClick={handleView}
             >
               {note.title}
@@ -160,49 +159,51 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
             {/* Content Preview */}
             <div 
-              className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-1 overflow-hidden cursor-pointer"
+              className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm mb-3 xs:mb-4 flex-1 overflow-hidden cursor-pointer"
               onClick={handleView}
             >
-              <pre className="font-sans whitespace-pre-wrap break-words line-clamp-4">
+              <pre className="font-sans whitespace-pre-wrap break-words line-clamp-3 xs:line-clamp-4 text-xs xs:text-sm leading-relaxed">
                 {formatContent(note.content)}
               </pre>
             </div>
 
             {/* Tags */}
             {note.tags && note.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1 xs:gap-2 mb-3 xs:mb-4">
                 {note.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs"
+                    className="px-1 xs:px-2 py-0.5 xs:py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs truncate max-w-[80px] xs:max-w-none"
                   >
                     #{tag}
                   </span>
                 ))}
                 {note.tags.length > 3 && (
-                  <span className="px-2 py-1 text-gray-500 dark:text-gray-400 text-xs">
-                    +{note.tags.length - 3} more
+                  <span className="px-1 xs:px-2 py-0.5 xs:py-1 text-gray-500 dark:text-gray-400 text-xs">
+                    +{note.tags.length - 3}
                   </span>
                 )}
               </div>
             )}
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold">
+            <div className="flex items-center justify-between pt-3 xs:pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+              {/* User Info */}
+              <div className="flex items-center gap-2 xs:gap-3 min-w-0 flex-1">
+                <div className="flex items-center gap-1 xs:gap-2 min-w-0 flex-1">
+                  <div className="w-6 h-6 xs:w-8 xs:h-8 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                     {note.user?.full_name?.substring(0, 2) || 'UU'}
                   </div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-xs xs:text-sm text-gray-600 dark:text-gray-400 truncate">
                     {note.user?.full_name || 'Unknown User'}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              {/* Stats and Actions */}
+              <div className="flex items-center gap-2 xs:gap-4 flex-shrink-0 ml-2">
                 {/* Stats */}
-                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-2 xs:gap-4 text-xs xs:text-sm text-gray-500 dark:text-gray-400">
                   {note.show_likes !== false && (
                     <button 
                       onClick={handleLike}
@@ -212,20 +213,22 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                       } ${liked ? 'text-red-500' : ''}`}
                     >
                       <Heart 
-                        className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} 
+                        className={`h-3 w-3 xs:h-4 xs:w-4 ${liked ? 'fill-current' : ''}`} 
                       />
-                      {note.like_count}
+                      <span className="hidden xs:inline">{note.like_count}</span>
+                      <span className="xs:hidden text-xs">{note.like_count}</span>
                     </button>
                   )}
                   <span className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    {note.view_count}
+                    <Eye className="h-3 w-3 xs:h-4 xs:w-4" />
+                    <span className="hidden xs:inline">{note.view_count}</span>
+                    <span className="xs:hidden text-xs">{note.view_count}</span>
                   </span>
                 </div>
 
                 {/* Action Buttons */}
                 {showActions && note.user && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0 xs:gap-1">
                     {allowComments && (
                       <Button 
                         variant="ghost" 
@@ -233,7 +236,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                         className="p-1"
                         onClick={handleComments}
                       >
-                        <MessageCircle className="h-4 w-4" />
+                        <MessageCircle className="h-3 w-3 xs:h-4 xs:w-4" />
                       </Button>
                     )}
                   </div>
