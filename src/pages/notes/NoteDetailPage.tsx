@@ -1,19 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { ArrowLeft, Heart, Eye, Calendar, User } from 'lucide-react';
+import { ArrowLeft, Heart, Eye, Calendar, User, MessageCircle, X } from 'lucide-react';
 import { useNote } from '../../hooks/useNote';
 import { useNotes } from '../../hooks/useNotes';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { formatMarkdown } from '../../utils/markdownFormatter';
+import { Comments } from '../../components/notes/Comments';
 
 const NoteDetailPage: React.FC = () => {
   const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const { note, loading, error, likeNote } = useNote(noteId);
   const { incrementViewCount } = useNotes();
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
     if (note) {
@@ -89,7 +91,8 @@ const NoteDetailPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 relative">
+        {/* Main Content */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -97,14 +100,31 @@ const NoteDetailPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/notes')}
-              className="mb-6 flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Notes
-            </Button>
+            <div className="flex items-center justify-between mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/notes')}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Notes
+              </Button>
+
+              {/* Comments Toggle Button */}
+              <Button
+                variant="primary"
+                onClick={() => setShowComments(!showComments)}
+                className="flex items-center gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Comments</span>
+                {note.comment_count > 0 && (
+                  <span className="bg-white text-blue-600 rounded-full text-xs px-2 py-1 min-w-[1.5rem] text-center">
+                    {note.comment_count}
+                  </span>
+                )}
+              </Button>
+            </div>
 
             {/* Note Header */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg mb-6">
@@ -147,7 +167,7 @@ const NoteDetailPage: React.FC = () => {
                   {note.show_likes !== false && (
                     <button
                       onClick={handleLike}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                     >
                       <Heart className="h-5 w-5" />
                       <span className="font-semibold">{note.like_count}</span>
@@ -178,12 +198,26 @@ const NoteDetailPage: React.FC = () => {
 
           {/* Note Content with Markdown Support */}
           <Card className="p-8">
-            <div 
+            <div
               className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-3 prose-ol:my-3 prose-li:my-1 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:dark:bg-blue-900/20 prose-pre:bg-gray-100 prose-pre:dark:bg-gray-800 prose-code:bg-gray-100 prose-code:dark:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-a:text-blue-600 prose-a:dark:text-blue-400 prose-a:no-underline hover:prose-a:underline"
               dangerouslySetInnerHTML={{ __html: formatMarkdown(note.content) }}
             />
           </Card>
         </div>
+
+        {/* Comments Panel */}
+        <AnimatePresence>
+          {showComments && (
+            <Comments
+              isOpen={showComments}
+              onClose={() => setShowComments(false)}
+              noteId={note.id}
+              noteTitle={note.title}
+              allowComments={note.allow_comments !== false}
+              mode="panel" // Set panel mode
+            />
+          )}
+        </AnimatePresence>
       </div>
     </Layout>
   );

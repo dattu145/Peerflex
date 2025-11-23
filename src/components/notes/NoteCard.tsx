@@ -6,7 +6,7 @@ import Button from '../ui/Button';
 import { motion } from 'framer-motion';
 import type { Note } from '../../types';
 import { useAuthStore } from '../../store/useAuthStore';
-import { CommentsModal } from './CommentsModal';
+import { Comments } from './Comments';
 import { formatMarkdownPreview } from '../../utils/markdownFormatter';
 
 interface NoteCardProps {
@@ -170,7 +170,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
               className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm mb-3 xs:mb-4 flex-1 overflow-hidden cursor-pointer"
               onClick={handleView}
             >
-              <div 
+              <div
                 className="font-sans whitespace-pre-wrap break-words line-clamp-3 xs:line-clamp-4 text-xs xs:text-sm leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: formatContent(note.content) }}
               />
@@ -263,7 +263,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         </Card>
       </motion.div>
 
-      <CommentsModal
+      <Comments
         isOpen={showComments}
         onClose={() => setShowComments(false)}
         noteId={note.id}
@@ -271,6 +271,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         allowComments={allowComments}
         onCommentAdded={() => setCommentCount(prev => prev + 1)}
         onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
+        mode="modal" // Explicitly set modal mode
       />
     </>
   );
