@@ -46,9 +46,8 @@ export const formatMarkdown = (text: string): string => {
     formatted = formatted.replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-blue-500 pl-4 py-1 my-3 bg-blue-50 dark:bg-blue-900/20 italic">$1</blockquote>');
 
     // Code blocks
-    formatted = formatted.replace(/```([\\s\\S]*?)```/g, '<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-3 overflow-x-auto"><code class="text-sm">$1</code></pre>');
-    formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
-
+    formatted = formatted.replace(/```([\s\S]*?)```/g, '<pre class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg my-3 overflow-x-auto border border-gray-200 dark:border-gray-600"><code class="text-sm text-gray-900 dark:text-white">$1</code></pre>');
+formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm font-mono border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">$1</code>');
     formatted = formatted.replace(/\[([^\[]+)\]\(([^)]+)\)/g, (match, text, url) => {
         // If URL doesn't start with http://, https://, or /, add https://
         let finalUrl = url;
