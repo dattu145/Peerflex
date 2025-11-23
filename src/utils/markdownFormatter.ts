@@ -67,7 +67,7 @@ export const formatMarkdown = (text: string): string => {
         }
         return `<img src="${finalSrc}" alt="${alt}" class="rounded-lg max-w-full h-auto my-3" />`;
     });
-    
+
     // Line breaks
     formatted = formatted.replace(/\\n/g, '<br>');
 
@@ -80,32 +80,57 @@ export const formatMarkdown = (text: string): string => {
     return formatted;
 };
 
-/**
- * Format text for preview (limited formatting for cards)
- */
 export const formatMarkdownPreview = (text: string, maxLines: number = 4): string => {
     if (!text) return '';
 
-    let formatted = text;
+    let formatted = text.trim();
 
-    // Remove headers for preview
-    formatted = formatted.replace(/^#{1,6}\s.*$/gim, '');
+    // If empty after trimming, return empty string
+    if (!formatted) return '';
 
-    // Simple bold/italic for preview
+    // Convert headers to plain text (remove # but keep the text)
+    formatted = formatted.replace(/^#{1,6}\s+(.*)$/gim, '$1');
+
+    // Simple bold/italic for preview (keep the content)
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-    // Remove code blocks and images for preview
-    formatted = formatted.replace(/```([\\s\\S]*?)```/g, '');
+    // Handle underline and strikethrough
+    formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>');
+    formatted = formatted.replace(/~~(.*?)~~/g, '<s>$1</s>');
+
+    // Remove code blocks but show the content
+    formatted = formatted.replace(/```([\s\S]*?)```/g, '$1');
     formatted = formatted.replace(/`(.*?)`/g, '$1');
-    formatted = formatted.replace(/!\[([^\\[]+)\]\(([^)]+)\)/g, '');
 
-    // Limit lines
-    const lines = formatted.split('\n').slice(0, maxLines);
-    formatted = lines.join('\n');
+    // Remove images but keep alt text
+    formatted = formatted.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1');
 
-    // Convert line breaks
-    formatted = formatted.replace(/\\n/g, '<br>');
+    // Remove links but keep link text
+    formatted = formatted.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+    // Remove horizontal rules
+    formatted = formatted.replace(/^---$/gim, '');
+
+    // Handle lists - convert to plain text with bullets
+    formatted = formatted.replace(/^[-*+]\s+(.*)$/gim, '• $1');
+    formatted = formatted.replace(/^\d+\.\s+(.*)$/gim, '$1');
+
+    // Handle blockquotes
+    formatted = formatted.replace(/^>\s+(.*)$/gim, '$1');
+
+    // Split into lines and filter out empty lines
+    const lines = formatted.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .slice(0, maxLines);
+
+    // If all content was stripped (e.g., only markdown syntax), show a fallback message
+    if (lines.length === 0) {
+        return '<em class="text-gray-400">Formatted content</em>';
+    }
+
+    formatted = lines.join('<br>');
 
     return formatted;
 };

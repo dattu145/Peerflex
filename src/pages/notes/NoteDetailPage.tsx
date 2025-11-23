@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Layout from '../../components/layout/Layout';
+import Header from '../../components/layout/Header';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { ArrowLeft, Heart, Eye, Calendar, User, MessageCircle, X } from 'lucide-react';
@@ -57,7 +57,8 @@ const NoteDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout>
+      <>
+        <Header />
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
@@ -66,13 +67,14 @@ const NoteDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (error || !note) {
     return (
-      <Layout>
+      <>
+        <Header />
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-12">
@@ -85,12 +87,13 @@ const NoteDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
+    <>
+      <Header />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 relative">
         {/* Main Content */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,14 +104,13 @@ const NoteDetailPage: React.FC = () => {
             className="mb-8"
           >
             <div className="flex items-center justify-between mb-6">
-              <Button
-                variant="ghost"
+              <div
                 onClick={() => navigate('/notes')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 cursor-pointer hover:text-purple-700 dark:text-gray-300 dark:hover:text-purple-400"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Notes
-              </Button>
+              </div>
 
               {/* Comments Toggle Button */}
               <Button
@@ -219,7 +221,7 @@ const NoteDetailPage: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
-    </Layout>
+    </>
   );
 };
 

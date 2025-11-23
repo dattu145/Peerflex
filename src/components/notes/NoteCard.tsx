@@ -100,8 +100,12 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
   // Format content with markdown support for preview
   const formatContent = (content: string) => {
-    const formatted = formatMarkdownPreview(content, 4);
-    return formatted || content.split('\n').slice(0, 4).join('\n');
+    const formatted = formatMarkdownPreview(content, 5); // Increased to 5 lines
+    // If formatted content is empty or just the fallback, show a default message
+    if (!formatted || formatted === '<em class="text-gray-400">No content</em>') {
+      return '<em class="text-gray-400">Click to view content</em>';
+    }
+    return formatted;
   };
 
   return (
@@ -113,10 +117,10 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         transition={{ duration: 0.2 }}
         className="h-full"
       >
-        <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col min-h-[280px] xs:min-h-[320px] sm:min-h-[350px]">
+        <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col min-h-[260px] xs:min-h-[280px] sm:min-h-[300px]"> {/* Reduced min height */}
           <div className="p-4 xs:p-5 sm:p-6 flex-1 flex flex-col">
             {/* Header */}
-            <div className="flex items-start justify-between mb-2 xs:mb-3">
+            <div className="flex items-start justify-between mb-1 xs:mb-2"> {/* Reduced margin */}
               <div className="flex items-center gap-1 xs:gap-2">
                 <span className="px-2 xs:px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium truncate max-w-[120px] xs:max-w-none">
                   {note.subject}
@@ -157,28 +161,28 @@ export const NoteCard: React.FC<NoteCardProps> = ({
               )}
             </div>
 
-            {/* Title */}
+            {/* Title - REMOVED flex-1 to prevent taking extra space */}
             <h3
-              className="text-lg xs:text-xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 cursor-pointer"
+              className="text-lg xs:text-xl font-bold text-gray-900 dark:text-white mb-1 xs:mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 cursor-pointer"
               onClick={handleView}
             >
               {note.title}
             </h3>
 
-            {/* Content Preview with Markdown Support */}
+            {/* Content Preview with Markdown Support - Improved spacing */}
             <div
-              className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm mb-3 xs:mb-4 flex-1 overflow-hidden cursor-pointer"
+              className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm mb-2 xs:mb-3 flex-1 overflow-hidden cursor-pointer min-h-[60px]"
               onClick={handleView}
             >
               <div
-                className="font-sans whitespace-pre-wrap break-words line-clamp-3 xs:line-clamp-4 text-xs xs:text-sm leading-relaxed"
+                className="font-sans whitespace-pre-wrap break-words line-clamp-4 xs:line-clamp-5 text-xs xs:text-sm leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: formatContent(note.content) }}
               />
             </div>
 
             {/* Tags */}
             {note.tags && note.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 xs:gap-2 mb-3 xs:mb-4">
+              <div className="flex flex-wrap gap-1 xs:gap-2 mb-2 xs:mb-3"> 
                 {note.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
@@ -196,7 +200,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             )}
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-3 xs:pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+            <div className="flex items-center justify-between pt-2 xs:pt-3 border-t border-gray-200 dark:border-gray-700 mt-auto"> {/* Reduced padding */}
               {/* User Info */}
               <div className="flex items-center gap-2 xs:gap-3 min-w-0 flex-1">
                 <div className="flex items-center gap-1 xs:gap-2 min-w-0 flex-1">

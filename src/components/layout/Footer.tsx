@@ -1,6 +1,6 @@
 // src/components/layout/Footer.tsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   GraduationCap,
   Mail,
@@ -23,10 +23,23 @@ import Button from '../ui/Button';
 
 const Footer: React.FC = () => {
   const { language } = useAppStore();
+  const location = useLocation();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Define pages where back-to-top button should be hidden
+  const hideBackToTopPages = [
+    '/notes/', // Note detail pages (pattern match)
+    '/chat',   // Chat page
+    // Add other pages where you don't want the back-to-top button
+  ];
+
+  // Check if current page should hide back-to-top button
+  const shouldShowBackToTop = !hideBackToTopPages.some(path =>
+    location.pathname.startsWith(path)
+  );
 
   const footerLinks = {
     services: [
@@ -247,16 +260,18 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Back to Top Button */}
-      <Button
-        variant="primary"
-        size="sm"
-        onClick={scrollToTop}
-        className="fixed bottom-8 right-8 z-50 rounded-full p-3 shadow-lg"
-        aria-label="Back to top"
-      >
-        <ArrowUp className="h-5 w-5" />
-      </Button>
+      {/* Back to Top Button - Conditionally Rendered */}
+      {shouldShowBackToTop && (
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 rounded-full p-3 shadow-lg"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
     </footer>
   );
 };
