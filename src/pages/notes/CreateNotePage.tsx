@@ -14,9 +14,9 @@ const CreateNotePage: React.FC = () => {
   const { noteId } = useParams<{ noteId: string }>();
   const { createNote, updateNote, loading } = useNotes();
   const { note: existingNote, loading: noteLoading } = useNote(noteId);
-  
+
   const isEditMode = Boolean(noteId);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -28,11 +28,11 @@ const CreateNotePage: React.FC = () => {
     allow_comments: true,
     show_likes: true,
   });
-  
+
   const [tagInput, setTagInput] = useState('');
 
   const subjects = [
-    'Mathematics', 'Computer Science', 'Physics', 'Chemistry', 
+    'Mathematics', 'Computer Science', 'Physics', 'Chemistry',
     'Biology', 'Literature', 'History', 'Economics', 'Psychology',
     'Engineering', 'Business', 'Art', 'Music', 'Other'
   ];
@@ -101,7 +101,7 @@ const CreateNotePage: React.FC = () => {
   // Textarea auto-resize function
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, content: e.target.value }));
-    
+
     // Auto-resize
     const textarea = e.target;
     textarea.style.height = 'auto';
@@ -141,7 +141,7 @@ const CreateNotePage: React.FC = () => {
               <ArrowLeft className="h-4 w-4" />
               Back to Notes
             </Button>
-            
+
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -149,7 +149,7 @@ const CreateNotePage: React.FC = () => {
               </h1>
             </div>
             <p className="text-gray-600 dark:text-gray-300">
-              {isEditMode 
+              {isEditMode
                 ? 'Update your note and share it with the Peerflex community.'
                 : 'Create and share your knowledge with the Peerflex community.'
               }
@@ -210,7 +210,7 @@ const CreateNotePage: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   University/Institution
-                  </label>
+                </label>
                 <Input
                   type="text"
                   value={formData.university}
@@ -229,20 +229,13 @@ const CreateNotePage: React.FC = () => {
                   <textarea
                     value={formData.content}
                     onChange={handleContentChange}
-                    placeholder="Write your notes here... You can write thousands of lines, formatting will be preserved.
-
-• Use bullet points for lists
-• Use numbers for step-by-step instructions  
-• Use **bold** for important concepts
-• Use headings to organize sections
-
-Start typing your amazing notes..."
+                    placeholder="Write your Note content here, Markdown formatting allowed"
                     required
                     rows={15}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-poppins text-base leading-relaxed whitespace-pre-wrap transition-all duration-200"
                     style={{ minHeight: '300px', maxHeight: '800px' }}
                   />
-                  
+
                   {/* Character count */}
                   <div className="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded">
                     {formData.content.length} characters
@@ -268,7 +261,7 @@ Start typing your amazing notes..."
                     <Tag className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map(tag => (
@@ -393,8 +386,8 @@ Start typing your amazing notes..."
                   disabled={loading || !formData.title || !formData.content || !formData.subject}
                   className="font-poppins"
                 >
-                  {loading 
-                    ? (isEditMode ? 'Updating...' : 'Publishing...') 
+                  {loading
+                    ? (isEditMode ? 'Updating...' : 'Publishing...')
                     : (isEditMode ? 'Update Note' : 'Publish Notes')
                   }
                 </Button>

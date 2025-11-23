@@ -7,6 +7,7 @@ import { ArrowLeft, Heart, Eye, Calendar, User } from 'lucide-react';
 import { useNote } from '../../hooks/useNote';
 import { useNotes } from '../../hooks/useNotes';
 import { motion } from 'framer-motion';
+import { formatMarkdown } from '../../utils/markdownFormatter';
 
 const NoteDetailPage: React.FC = () => {
   const { noteId } = useParams<{ noteId: string }>();
@@ -146,13 +147,13 @@ const NoteDetailPage: React.FC = () => {
                   {note.show_likes !== false && (
                     <button
                       onClick={handleLike}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                     >
                       <Heart className="h-5 w-5" />
                       <span className="font-semibold">{note.like_count}</span>
                     </button>
                   )}
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg">
                     <Eye className="h-5 w-5" />
                     <span className="font-semibold">{note.view_count}</span>
                   </div>
@@ -175,13 +176,12 @@ const NoteDetailPage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Note Content */}
+          {/* Note Content with Markdown Support */}
           <Card className="p-8">
-            <div className="prose prose-lg max-w-none dark:prose-invert">
-              <pre className="font-sans whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100 leading-relaxed text-base">
-                {note.content}
-              </pre>
-            </div>
+            <div 
+              className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-3 prose-ol:my-3 prose-li:my-1 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:dark:bg-blue-900/20 prose-pre:bg-gray-100 prose-pre:dark:bg-gray-800 prose-code:bg-gray-100 prose-code:dark:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-a:text-blue-600 prose-a:dark:text-blue-400 prose-a:no-underline hover:prose-a:underline"
+              dangerouslySetInnerHTML={{ __html: formatMarkdown(note.content) }}
+            />
           </Card>
         </div>
       </div>

@@ -139,6 +139,7 @@ export interface Note {
   show_likes?: boolean;
 }
 
+
 export interface NoteReview {
   id: string;
   note_id: string;

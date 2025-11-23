@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import type { Note } from '../../types';
 import { useAuthStore } from '../../store/useAuthStore';
 import { CommentsModal } from './CommentsModal';
+import { formatMarkdownPreview } from '../../utils/markdownFormatter';
 
 interface NoteCardProps {
   note: Note;
@@ -17,9 +18,9 @@ interface NoteCardProps {
   isLiked?: boolean;
 }
 
-export const NoteCard: React.FC<NoteCardProps> = ({ 
-  note, 
-  onLike, 
+export const NoteCard: React.FC<NoteCardProps> = ({
+  note,
+  onLike,
   onEdit,
   onDelete,
   showActions = true,
@@ -31,6 +32,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [liked, setLiked] = useState(isLiked);
+  const [commentCount, setCommentCount] = useState(note.comment_count || 0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user?.id === note.user_id;
@@ -41,9 +43,14 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     setLiked(isLiked);
   }, [isLiked]);
 
+  // Update comment count when note prop changes
+  useEffect(() => {
+    setCommentCount(note.comment_count || 0);
+  }, [note.comment_count]);
+
   const handleLike = async () => {
     if (isLiking || !onLike) return;
-    
+
     setIsLiking(true);
     try {
       await onLike(note.id);
@@ -91,9 +98,10 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Format content to preserve line breaks
+  // Format content with markdown support for preview
   const formatContent = (content: string) => {
-    return content.split('\n').slice(0, 4).join('\n');
+    const formatted = formatMarkdownPreview(content, 4);
+    return formatted || content.split('\n').slice(0, 4).join('\n');
   };
 
   return (
@@ -114,19 +122,19 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                   {note.subject}
                 </span>
               </div>
-              
+
               {/* Only show three dots menu for owner */}
               {showActions && isOwner && (
                 <div className="relative" ref={menuRef}>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="p-1"
                     onClick={() => setShowMenu(!showMenu)}
                   >
                     <MoreVertical className="h-5 w-5 xs:h-4 xs:w-4" />
                   </Button>
-                  
+
                   {showMenu && (
                     <div className="absolute right-0 top-6 xs:top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-28 xs:min-w-32">
                       <button
@@ -150,21 +158,22 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             </div>
 
             {/* Title */}
-            <h3 
+            <h3
               className="text-lg xs:text-xl font-bold text-gray-900 dark:text-white mb-2 xs:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 cursor-pointer"
               onClick={handleView}
             >
               {note.title}
             </h3>
 
-            {/* Content Preview */}
-            <div 
+            {/* Content Preview with Markdown Support */}
+            <div
               className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm mb-3 xs:mb-4 flex-1 overflow-hidden cursor-pointer"
               onClick={handleView}
             >
-              <pre className="font-sans whitespace-pre-wrap break-words line-clamp-3 xs:line-clamp-4 text-xs xs:text-sm leading-relaxed">
-                {formatContent(note.content)}
-              </pre>
+              <div 
+                className="font-sans whitespace-pre-wrap break-words line-clamp-3 xs:line-clamp-4 text-xs xs:text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: formatContent(note.content) }}
+              />
             </div>
 
             {/* Tags */}
@@ -205,15 +214,14 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 {/* Stats */}
                 <div className="flex items-center gap-2 xs:gap-4 text-xs xs:text-sm text-gray-500 dark:text-gray-400">
                   {note.show_likes !== false && (
-                    <button 
+                    <button
                       onClick={handleLike}
                       disabled={isLiking}
-                      className={`flex items-center gap-1 transition-colors ${
-                        isLiking ? 'opacity-50' : 'hover:text-red-500'
-                      } ${liked ? 'text-red-500' : ''}`}
+                      className={`flex items-center gap-1 transition-colors ${isLiking ? 'opacity-50' : 'hover:text-red-500'
+                        } ${liked ? 'text-red-500' : ''}`}
                     >
-                      <Heart 
-                        className={`h-3 w-3 xs:h-4 xs:w-4 ${liked ? 'fill-current' : ''}`} 
+                      <Heart
+                        className={`h-3 w-3 xs:h-4 xs:w-4 ${liked ? 'fill-current' : ''}`}
                       />
                       <span className="hidden xs:inline">{note.like_count}</span>
                       <span className="xs:hidden text-xs">{note.like_count}</span>
@@ -230,13 +238,21 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                 {showActions && note.user && (
                   <div className="flex items-center gap-0 xs:gap-1">
                     {allowComments && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="p-1"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700"
                         onClick={handleComments}
                       >
-                        <MessageCircle className="h-3 w-3 xs:h-4 xs:w-4" />
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          <MessageCircle className="text-gray-400 h-3 w-3 xs:h-4 xs:w-4" />
+                          <span className="text-gray-400 hidden xs:inline">
+                            {commentCount}
+                          </span>
+                          <span className="text-gray-400 xs:hidden text-xs">
+                            {commentCount}
+                          </span>
+                        </div>
                       </Button>
                     )}
                   </div>
@@ -253,6 +269,8 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         noteId={note.id}
         noteTitle={note.title}
         allowComments={allowComments}
+        onCommentAdded={() => setCommentCount(prev => prev + 1)}
+        onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
       />
     </>
   );

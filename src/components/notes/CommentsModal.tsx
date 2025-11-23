@@ -13,6 +13,8 @@ interface CommentsModalProps {
   noteId: string;
   noteTitle: string;
   allowComments: boolean;
+  onCommentAdded?: () => void;
+  onCommentDeleted?: () => void;
 }
 
 export const CommentsModal: React.FC<CommentsModalProps> = ({
@@ -20,7 +22,9 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
   onClose,
   noteId,
   noteTitle,
-  allowComments
+  allowComments,
+  onCommentAdded,
+  onCommentDeleted
 }) => {
   const [comments, setComments] = useState<NoteComment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -49,6 +53,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
       const comment = await commentService.addComment(noteId, newComment.trim());
       setComments(prev => [...prev, comment]);
       setNewComment('');
+      // Notify parent component about new comment
+      onCommentAdded?.();
     } catch (error) {
       console.error('Failed to add comment:', error);
       alert('Failed to add comment. Please try again.');
@@ -63,6 +69,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
     try {
       await commentService.deleteComment(commentId);
       setComments(prev => prev.filter(comment => comment.id !== commentId));
+      // Notify parent component about deleted comment
+      onCommentDeleted?.();
     } catch (error) {
       console.error('Failed to delete comment:', error);
       alert('Failed to delete comment. Please try again.');
@@ -81,6 +89,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
           if (exists) {
             return prev.map(c => c.id === newComment.id ? newComment : c);
           } else {
+            // New comment added
+            onCommentAdded?.();
             return [...prev, newComment];
           }
         });
@@ -97,33 +107,45 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
-      <div className="p-6">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" showCloseButton={false}>
+      <div className="p-4 min-[400px]:p-5 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Comments
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-start justify-between mb-4 min-[400px]:mb-5 sm:mb-6 gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-lg min-[400px]:text-xl font-bold text-gray-900 dark:text-white truncate">
+                Comments
+              </h2>
+              <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full min-w-[2rem]">
+                {comments.length}
+              </span>
+            </div>
+            <p className="text-xs min-[400px]:text-sm text-gray-600 dark:text-gray-400 truncate">
               {noteTitle}
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-5 w-5" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="flex-shrink-0 p-1.5 min-[400px]:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+          >
+            <X className="h-4 w-4 min-[400px]:h-5 min-[400px]:w-5" />
           </Button>
         </div>
 
         {/* Comments List */}
-        <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+        <div className="space-y-3 min-[400px]:space-y-4 mb-4 min-[400px]:mb-5 sm:mb-6 max-h-60 min-[350px]:max-h-72 min-[400px]:max-h-80 sm:max-h-96 overflow-y-auto">
           {commentsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">Loading comments...</p>
+            <div className="text-center py-6 min-[400px]:py-8">
+              <div className="animate-spin rounded-full h-6 w-6 min-[400px]:h-8 min-[400px]:w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-xs min-[400px]:text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Loading comments...
+              </p>
             </div>
           ) : comments.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">
+            <div className="text-center py-6 min-[400px]:py-8">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 No comments yet. Be the first to comment!
               </p>
             </div>
@@ -131,33 +153,37 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
             comments.map((comment) => (
               <div
                 key={comment.id}
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
+                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 min-[400px]:p-4"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold">
-                      {comment.user?.full_name?.substring(0, 2) || 'UU'}
+                <div className="flex items-start justify-between mb-2 gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="w-5 h-5 min-[400px]:w-6 min-[400px]:h-6 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                      {comment.user?.full_name?.charAt(0) || 'U'}
                     </div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {comment.user?.full_name || 'Unknown User'}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(comment.created_at).toLocaleDateString()}
-                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs min-[400px]:text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {comment.user?.full_name || 'Unknown User'}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                          {new Date(comment.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   
                   {canDeleteComment(comment) && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="p-1 text-red-600 hover:text-red-700"
+                      className="flex-shrink-0 p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       onClick={() => handleDeleteComment(comment.id)}
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3 w-3 min-[400px]:h-3.5 min-[400px]:w-3.5" />
                     </Button>
                   )}
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 text-sm">
+                <p className="text-xs min-[400px]:text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words">
                   {comment.content}
                 </p>
               </div>
@@ -167,7 +193,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
 
         {/* Add Comment Form */}
         {allowComments ? (
-          <form onSubmit={handleAddComment} className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <form onSubmit={handleAddComment} className="border-t border-gray-200 dark:border-gray-700 pt-3 min-[400px]:pt-4">
             <div className="flex gap-2">
               <Input
                 type="text"
@@ -175,21 +201,21 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
                 disabled={loading}
-                className="flex-1"
+                className="flex-1 text-xs min-[400px]:text-sm"
               />
               <Button
                 type="submit"
                 variant="primary"
                 disabled={loading || !newComment.trim()}
-                className="whitespace-nowrap"
+                className="flex-shrink-0 px-3 min-[400px]:px-4 whitespace-nowrap"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-3 w-3 min-[400px]:h-4 min-[400px]:w-4" />
               </Button>
             </div>
           </form>
         ) : (
-          <div className="text-center py-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+          <div className="text-center py-3 min-[400px]:py-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-xs min-[400px]:text-sm text-gray-500 dark:text-gray-400">
               Comments are disabled for this note
             </p>
           </div>
