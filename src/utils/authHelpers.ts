@@ -45,15 +45,15 @@ export const truncateText = (text: string, maxLength: number): string => {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
-export const debounce = <T extends (...args: any[]) => void>(
+export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number
-): T => {
+): ((...args: Parameters<T>) => void) => {
   let timeout: NodeJS.Timeout;
-  return ((...args: any[]) => {
+  return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
-  }) as T;
+  };
 };
 
 export const validateEmail = (email: string): boolean => {

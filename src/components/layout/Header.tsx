@@ -9,7 +9,9 @@ import {
   User,
   LogOut,
   Settings,
-  GraduationCap
+  GraduationCap,
+  Calendar,
+  MapPin
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAppStore } from '../../store/useAppStore';
@@ -31,8 +33,8 @@ const Header: React.FC = () => {
   const featuresMenu = [
     { name: 'Notes Sharing', href: '/notes' },
     { name: 'Student Chat', href: '/chat' },
-    { name: 'Events', href: '/events' },
-    { name: 'Resume Builder', href: '/resume-templates' },
+    { name: 'Events', href: '/events', icon: Calendar },
+    { name: 'Hangout Spots', href: '/hangouts', icon: MapPin },
   ];
 
   const toggleTheme = () => {
@@ -76,15 +78,19 @@ const Header: React.FC = () => {
                       {item.name}
                     </button>
                     <div className="absolute left-0 mt-2 w-48 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      {featuresMenu.map((feature) => (
-                        <Link
-                          key={feature.name}
-                          to={feature.href}
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          {feature.name}
-                        </Link>
-                      ))}
+                      {featuresMenu.map((feature) => {
+                        const IconComponent = feature.icon;
+                        return (
+                          <Link
+                            key={feature.name}
+                            to={feature.href}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            {IconComponent && <IconComponent className="h-4 w-4" />}
+                            <span>{feature.name}</span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
@@ -136,6 +142,20 @@ const Header: React.FC = () => {
                   >
                     <Settings className="h-4 w-4" />
                     <span>Dashboard</span>
+                  </Link>
+                  <Link
+                    to="/events"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    <span>Events</span>
+                  </Link>
+                  <Link
+                    to="/hangouts"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span>Hangouts</span>
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -192,16 +212,20 @@ const Header: React.FC = () => {
                   <div className="px-3 py-2 text-base font-medium text-gray-500 dark:text-gray-400">
                     {item.name}
                   </div>
-                  {featuresMenu.map((feature) => (
-                    <Link
-                      key={feature.name}
-                      to={feature.href}
-                      className="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {feature.name}
-                    </Link>
-                  ))}
+                  {featuresMenu.map((feature) => {
+                    const IconComponent = feature.icon;
+                    return (
+                      <Link
+                        key={feature.name}
+                        to={feature.href}
+                        className="flex items-center space-x-2 pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {IconComponent && <IconComponent className="h-4 w-4" />}
+                        <span>{feature.name}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               ) : (
                 <Link
@@ -233,6 +257,22 @@ const Header: React.FC = () => {
             )}
             {isAuthenticated && (
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                <Link
+                  to="/events"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>Events</span>
+                </Link>
+                <Link
+                  to="/hangouts"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>Hangouts</span>
+                </Link>
                 <button
                   onClick={() => {
                     handleLogout();

@@ -62,7 +62,7 @@ export interface Service {
   name: string;
   description: string;
   basePrice: number;
-  category: 'resume' | 'portfolio' | 'linkedin' | 'github' | 'package';
+  category: 'portfolio' | 'linkedin' | 'github' | 'package';
   templates: ServiceTemplate[];
   features: string[];
 }
@@ -185,20 +185,134 @@ export interface NoteView {
 }
 
 
+// Event and Hangouts types,
+
 export interface Event {
   id: string;
   title: string;
   description: string;
-  location: string;
-  event_date: string;
-  event_time: string;
-  organizer: string;
-  category: 'workshop' | 'seminar' | 'hackathon' | 'social' | 'other';
-  max_participants?: number;
-  registered_count: number;
-  image_url?: string;
+  event_type: 'workshop' | 'study_group' | 'social' | 'hackathon' | 'career' | 'sports';
+  location: any; // PostGIS geography type
+  address: string;
+  venue_name: string;
+  start_time: string;
+  end_time: string;
+  max_attendees: number;
+  is_public: boolean;
+  is_virtual: boolean;
+  meeting_url: string;
+  cover_image_url: string;
+  tags: string[];
+  created_by: string;
+  created_at: string;
+  organizer_name?: string;
+  organizer_avatar_url?: string;
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  price: number;
+  currency: string;
+  registration_deadline: string;
+  is_cancelled: boolean;
+  cancellation_reason?: string;
+  user?: Profile; // Joined profile data
+  attendees_count?: number;
+  current_user_attendance?: EventAttendance;
+}
+
+export interface EventAttendance {
+  id: string;
+  event_id: string;
+  user_id: string;
+  status: 'registered' | 'attended' | 'cancelled';
+  registered_at: string;
+  joined_at?: string;
+  left_at?: string;
+  attendance_duration?: number;
+  user?: Profile;
+}
+
+
+export interface EventCategory {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  icon: string;
+  is_active: boolean;
   created_at: string;
 }
+
+export interface HangoutSpot {
+  id: string;
+  name: string;
+  description: string;
+  location: any; // PostGIS geography type
+  address: string;
+  spot_type: 'cafe' | 'library' | 'park' | 'study_room' | 'food' | 'social' | 'sports' | 'other';
+  capacity: number;
+  current_occupancy: number;
+  amenities: string[];
+  is_verified: boolean;
+  created_by: string;
+  created_at: string;
+  operating_hours?: {
+    open: string;
+    close: string;
+    days: number[];
+  };
+  contact_info?: {
+    phone?: string;
+    email?: string;
+    website?: string;
+  };
+  rating: number;
+  review_count: number;
+  images: string[];
+  is_active: boolean;
+  verification_status: 'pending' | 'verified' | 'rejected' | 'suspended';
+  user?: Profile; // Joined profile data
+  distance?: number; // Calculated distance in meters
+  user_checkin?: HangoutCheckin; // Current user's checkin
+}
+
+export interface HangoutCheckin {
+  id: string;
+  hangout_spot_id: string;
+  user_id: string;
+  checkin_time: string;
+  checkout_time?: string;
+  is_current: boolean;
+  user?: Profile;
+  hangout_spot?: HangoutSpot;
+}
+
+export interface HangoutSpotReview {
+  id: string;
+  hangout_spot_id: string;
+  user_id: string;
+  rating: number;
+  comment?: string;
+  images: string[];
+  created_at: string;
+  updated_at: string;
+  user?: Profile;
+  hangout_spot?: HangoutSpot;
+}
+
+
+export interface Location {
+  latitude: number;
+  longitude: number;
+  address?: string;
+  accuracy?: number; 
+}
+
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
 
 export type Language = 'en' | 'ta' | 'te' | 'hi';
 export type Theme = 'light' | 'dark';

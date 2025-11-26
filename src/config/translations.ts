@@ -14,7 +14,7 @@ export const TRANSLATIONS = {
     
     // Hero Section
     heroTitle: 'Build Your Professional Future with AI',
-    heroSubtitle: 'Get ATS-friendly resumes, stunning portfolios, and optimized profiles that land you your dream job',
+    heroSubtitle: 'Get ATS-friendly portfolios, and optimized profiles that land you your dream job',
     getStarted: 'Get Started',
     
     // Services

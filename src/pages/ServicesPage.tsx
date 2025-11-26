@@ -33,7 +33,6 @@ const ServicesPage: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
   const serviceIcons = {
-    resume: FileText,
     portfolio: Globe,
     linkedin: Linkedin,
     github: Github,
@@ -43,7 +42,6 @@ const ServicesPage: React.FC = () => {
 
   const categories = [
     { id: 'all', name: 'All Services' },
-    { id: 'resume', name: 'Resume Services' },
     { id: 'portfolio', name: 'Portfolio Services' },
     { id: 'linkedin', name: 'LinkedIn Services' },
     { id: 'github', name: 'GitHub Services' },
@@ -54,9 +52,6 @@ const ServicesPage: React.FC = () => {
   // Handle service selection with proper routing
   const handleServiceSelect = (serviceId: string) => {
     switch (serviceId) {
-      case 'resume-templates':
-        navigate('/resume-templates');
-        break;
       case 'portfolio-building':
         navigate('/portfolio-templates');
         break;
@@ -72,11 +67,6 @@ const ServicesPage: React.FC = () => {
   // Handle template preview
   const handleTemplatePreview = (serviceId: string) => {
     switch (serviceId) {
-      case 'resume-templates':
-        // Store the service ID for the resume builder page
-        localStorage.setItem('selectedService', serviceId);
-        navigate('/resume-templates');
-        break;
       case 'portfolio-building':
         localStorage.setItem('selectedService', serviceId);
         navigate('/portfolio-templates');
@@ -203,7 +193,7 @@ const ServicesPage: React.FC = () => {
                     const Icon = serviceIcons[service.category as keyof typeof serviceIcons];
                     const isPopular = service.id === 'complete-package';
                     const isExpanded = expandedService === service.id;
-                    const hasTemplates = ['resume-templates', 'portfolio-building'].includes(service.id);
+                    const hasTemplates = ['portfolio-building'].includes(service.id);
                     
                     return (
                       <motion.div 

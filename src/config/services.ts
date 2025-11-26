@@ -3,43 +3,6 @@ import { Service } from '../types';
 
 export const SERVICES: Service[] = [
   {
-    id: 'resume-templates',
-    name: 'Professional Resume Templates',
-    description: 'ATS-friendly resume templates designed for modern job markets',
-    basePrice: 299,
-    category: 'resume',
-    features: [
-      'ATS-Optimized Format',
-      '5+ Professional Templates',
-      'AI-Assisted Content Writing',
-      'Industry-Specific Customization',
-      'PDF & Word Format'
-    ],
-    templates: [
-      {
-        id: 'modern-minimalist',
-        name: 'Modern Minimalist',
-        description: 'Clean, contemporary design perfect for tech roles',
-        previewImage: 'https://images.pexels.com/photos/7688460/pexels-photo-7688460.jpeg?auto=compress&cs=tinysrgb&w=400',
-        difficulty: 'basic'
-      },
-      {
-        id: 'executive-professional',
-        name: 'Executive Professional',
-        description: 'Sophisticated layout for senior positions',
-        previewImage: 'https://images.pexels.com/photos/7688336/pexels-photo-7688336.jpeg?auto=compress&cs=tinysrgb&w=400',
-        difficulty: 'advanced'
-      },
-      {
-        id: 'creative-portfolio',
-        name: 'Creative Portfolio',
-        description: 'Visually striking design for creative professionals',
-        previewImage: 'https://images.pexels.com/photos/7688640/pexels-photo-7688640.jpeg?auto=compress&cs=tinysrgb&w=400',
-        difficulty: 'premium'
-      }
-    ]
-  },
-  {
     id: 'portfolio-building',
     name: 'Custom Portfolio Development',
     description: 'Professional portfolio websites deployed on modern platforms',
@@ -179,11 +142,10 @@ export const SERVICES: Service[] = [
   {
     id: 'complete-package',
     name: 'Complete Professional Package',
-    description: 'All-in-one solution including resume, portfolio, profile optimizations, and software projects',
+    description: 'All-in-one solution including portfolio, profile optimizations, and software projects',
     basePrice: 1999,
     category: 'package',
     features: [
-      'Professional Resume',
       'Custom Portfolio Website',
       'LinkedIn Optimization',
       'GitHub Enhancement',

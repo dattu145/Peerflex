@@ -26,12 +26,6 @@ const AboutPage: React.FC = () => {
 
     const features = [
         {
-            icon: FileText,
-            title: 'Resume & Portfolio Builder',
-            description: 'AI-powered templates to build, preview, and share personalized resumes and digital portfolios',
-            color: 'text-blue-600 dark:text-blue-400'
-        },
-        {
             icon: BookOpen,
             title: 'Notes & Study Sharing',
             description: 'Subject-based repository where students share notes, guides, and resources collaboratively',

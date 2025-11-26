@@ -44,11 +44,6 @@ const Footer: React.FC = () => {
   const footerLinks = {
     services: [
       {
-        name: 'Resume Templates',
-        href: '/resume-templates',
-        icon: FileText,
-      },
-      {
         name: 'Portfolio Building',
         href: '/portfolio-templates',
         icon: Globe,
@@ -71,7 +66,6 @@ const Footer: React.FC = () => {
       { name: 'Terms of Service', href: '/terms' },
     ],
     resources: [
-      { name: 'Resume Builder', href: '/resume-builder' },
       { name: 'Portfolio Templates', href: '/portfolio-templates' },
       { name: 'Career Tips', href: '/tips' },
       { name: 'Support Center', href: '/support' },
@@ -123,7 +117,7 @@ const Footer: React.FC = () => {
               </div>
               <p className="text-gray-900 dark:text-gray-100 mb-6 text-sm leading-relaxed">
                 Empowering students and professionals with AI-driven career tools.
-                Build your future with professional resumes, portfolios, and optimized profiles.
+                Build your future with professional portfolios, and optimized profiles.
                 Choose from multiple templates with AI-powered customization.
               </p>
 

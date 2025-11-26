@@ -11,8 +11,6 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import SignupPage from './pages/auth/SignupPage';
 import ServicesPage from './pages/ServicesPage';
-import ResumeTemplatesPage from './pages/ResumeTemplatesPage';
-import ResumeBuilderPage from './pages/ResumeBuilderPage';
 import PortfolioTemplatesPage from './pages/PortfolioTemplatesPage';
 import ServicePreviewPage from "./pages/ServicePreviewPage";
 import SoftwareProjectsPage from './pages/SoftwareProjectsPage';
@@ -23,17 +21,20 @@ import ProjectsPage from './pages/projects/ProjectsPage';
 import AuthCallback from './pages/auth/AuthCallback';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
+import HangoutSpotsPage from './pages/hangouts/HangoutSpotsPage';
+import CreateHangoutSpotPage from './pages/hangouts/CreateHangoutSpotPage';
+import HangoutSpotDetailPage from './pages/hangouts/HangoutSpotDetailPage';
+import EventDetailPage from './pages/events/EventDetailPage';
 import ScrollToTop from './components/ScrollToTop';
 import CreateNotePage from './pages/notes/CreateNotePage';
 import NoteDetailPage from './pages/notes/NoteDetailPage';
 
-// Protected Route Component - MOVED OUTSIDE OF APP COMPONENT
+// Protected Route Component
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // This component must directly subscribe to the auth store to re-render properly
   const { isAuthenticated, isLoading } = useAuthStore();
 
   console.log('🛡️ ProtectedRoute - Auth state:', { isAuthenticated, isLoading });
@@ -88,8 +89,6 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/services" element={<ServicesPage />} />
-          <Route path="/resume-templates" element={<ResumeTemplatesPage />} />
-          <Route path="/resume-builder" element={<ResumeBuilderPage />} />
           <Route path="/portfolio-templates" element={<PortfolioTemplatesPage />} />
           <Route path="/software-projects" element={<SoftwareProjectsPage />} />
           <Route path="/service-preview/:serviceId" element={<ServicePreviewPage />} />
@@ -135,7 +134,6 @@ function App() {
             </ProtectedRoute>
           } />
 
-
           <Route path="/chat" element={
             <ProtectedRoute>
               <ChatPage />
@@ -154,7 +152,44 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Additional protected routes */}
+          {/* Events Routes */}
+          <Route path="/events" element={
+            <ProtectedRoute>
+              <EventsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/events/:eventId" element={
+            <ProtectedRoute>
+              <EventDetailPage />
+            </ProtectedRoute>
+          } />
+
+
+          <Route path="/hangouts" element={
+            <ProtectedRoute>
+              <HangoutSpotsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/hangouts/create" element={
+            <ProtectedRoute>
+              <CreateHangoutSpotPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/hangouts/:spotId" element={
+            <ProtectedRoute>
+              <HangoutSpotDetailPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/hangouts/edit/:spotId" element={
+            <ProtectedRoute>
+              <CreateHangoutSpotPage />
+            </ProtectedRoute>
+          } />
+
           <Route
             path="/profile"
             element={

@@ -28,7 +28,6 @@ const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
   const serviceIcons = {
-    resume: FileText,
     portfolio: Globe,
     linkedin: Linkedin,
     github: Github,
@@ -39,9 +38,6 @@ const ServicesSection: React.FC = () => {
   // Handle service selection with proper routing
   const handleServiceSelect = (serviceId: string) => {
     switch (serviceId) {
-      case 'resume-templates':
-        navigate('/resume-templates');
-        break;
       case 'portfolio-building':
         navigate('/portfolio-templates');
         break;
@@ -57,9 +53,6 @@ const ServicesSection: React.FC = () => {
   // Handle template preview
   const handleTemplatePreview = (serviceId: string) => {
     switch (serviceId) {
-      case 'resume-templates':
-        navigate('/resume-templates');
-        break;
       case 'portfolio-building':
         navigate('/portfolio-templates');
         break;
@@ -86,7 +79,7 @@ const ServicesSection: React.FC = () => {
 
   // Check if service has templates
   const hasTemplates = (serviceId: string) => {
-    return ['resume-templates', 'portfolio-building'].includes(serviceId);
+    return ['portfolio-building'].includes(serviceId);
   };
 
   return (

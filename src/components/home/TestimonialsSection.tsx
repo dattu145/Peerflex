@@ -25,7 +25,7 @@ const TestimonialsSection: React.FC = () => {
       userName: 'Rajesh Kumar',
       userRole: 'Software Developer',
       rating: 5,
-      comment: 'The resume optimization service was incredible. My LinkedIn profile views increased by 300% and I got multiple job offers within a month.',
+      comment: 'The portfolio service was incredible. My LinkedIn profile views increased by 300% and I got multiple job offers within a month.',
       createdAt: '2024-01-10',
       featured: true
     },

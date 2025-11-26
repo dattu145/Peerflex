@@ -26,7 +26,6 @@ const HomePage = () => {
     'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     'https://github.blog/wp-content/uploads/2024/06/AI-DarkMode-4.png?resize=800%2C425',
-    'https://lp.simplified.com/siteimages/ai/copywriting/ai-resume-builder-4.png',
   ];
 
   const features = [
@@ -53,14 +52,6 @@ const HomePage = () => {
       gradient: 'bg-orange-600',
       link: '/events',
       image: aiImages[3],
-    },
-    {
-      icon: FileText,
-      title: 'Resume Builder',
-      description: 'Create professional resumes with AI assistance',
-      gradient: 'bg-green-500',
-      link: '/resume-templates',
-      image: aiImages[5],
     },
   ];
 
@@ -90,7 +81,7 @@ const HomePage = () => {
             >
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Everything You Need,{' '}
+              Organize and Collaborate,{' '}
               <span className="bg-purple-500 bg-clip-text text-transparent">
                 One Place
               </span>

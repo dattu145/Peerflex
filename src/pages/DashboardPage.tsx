@@ -72,13 +72,6 @@ const DashboardPage: React.FC = () => {
 
   const quickActions: QuickAction[] = [
     {
-      icon: <FileText className="w-6 h-6" />,
-      title: 'Build Resume',
-      description: 'Create professional resume',
-      link: '/resume-builder',
-      color: 'bg-blue-500'
-    },
-    {
       icon: <BookOpen className="w-6 h-6" />,
       title: 'Share Notes',
       description: 'Upload study materials',
@@ -126,13 +119,6 @@ const DashboardPage: React.FC = () => {
   ];
 
   const recentActivities: RecentActivity[] = [
-    {
-      icon: <FileText className="w-4 h-4" />,
-      title: 'Resume Updated',
-      description: 'Your resume "Software Dev" was updated',
-      time: '2 hours ago',
-      color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/20'
-    },
     {
       icon: <BookOpen className="w-4 h-4" />,
       title: 'Notes Shared',
