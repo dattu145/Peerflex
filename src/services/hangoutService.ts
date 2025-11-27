@@ -200,8 +200,9 @@ export const hangoutService = {
     let locationData = null;
     if (spotData.location && spotData.location.coordinates) {
       const [lng, lat] = spotData.location.coordinates;
-      // Use proper PostGIS geography format
-      locationData = `SRID=4326;POINT(${lng} ${lat})`;
+      // Use proper PostGIS POINT format (longitude, latitude)
+      locationData = `POINT(${lng} ${lat})`;
+      console.log('📍 Setting location data:', { lng, lat, locationData });
     }
 
     console.log('Creating spot with location:', locationData);
@@ -380,8 +381,9 @@ export const hangoutService = {
     let locationData = null;
     if (spotData.location && spotData.location.coordinates) {
       const [lng, lat] = spotData.location.coordinates;
-      // Use proper PostGIS geography format
-      locationData = `SRID=4326;POINT(${lng} ${lat})`;
+      // Use proper PostGIS POINT format (longitude, latitude)
+      locationData = `POINT(${lng} ${lat})`;
+      console.log('📍 Setting location data:', { lng, lat, locationData });
     }
 
     const { data, error } = await supabase
@@ -420,11 +422,49 @@ export const hangoutService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    const { error } = await supabase.rpc('soft_delete_hangout_spot', {
-      spot_id: spotId
-    });
+    console.log('Deleting hangout spot:', spotId);
 
-    if (error) throw error;
+    try {
+      // First check if user owns the spot
+      const { data: spot, error: checkError } = await supabase
+        .from('hangout_spots')
+        .select('created_by')
+        .eq('id', spotId)
+        .single();
+
+      if (checkError) {
+        console.error('Error checking spot ownership:', checkError);
+        throw new Error('Failed to verify spot ownership');
+      }
+
+      if (!spot) {
+        throw new Error('Hangout spot not found');
+      }
+
+      if (spot.created_by !== user.id) {
+        throw new Error('You can only delete your own hangout spots');
+      }
+
+      // Use direct update instead of RPC function
+      const { error: deleteError } = await supabase
+        .from('hangout_spots')
+        .update({
+          is_active: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', spotId)
+        .eq('created_by', user.id);
+
+      if (deleteError) {
+        console.error('Error deleting hangout spot:', deleteError);
+        throw new Error(deleteError.message || 'Failed to delete hangout spot');
+      }
+
+      console.log('✅ Hangout spot deleted successfully');
+    } catch (error) {
+      console.error('Error in deleteHangoutSpot:', error);
+      throw error;
+    }
   },
 
   async getMyHangoutSpots(): Promise<HangoutSpot[]> {

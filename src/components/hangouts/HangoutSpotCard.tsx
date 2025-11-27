@@ -76,7 +76,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
   };
 
   const handleDelete = () => {
-    if (onDelete) {
+    if (onDelete && window.confirm('Are you sure you want to delete this hangout spot? This action cannot be undone.')) {
       onDelete(spot.id);
       setShowMenu(false);
     }
@@ -105,7 +105,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
       <Card className="h-full hover:shadow-xl transition-all duration-300 group flex flex-col min-h-[320px] xs:min-h-[340px]">
         {/* Spot Type Header */}
         <div className={`h-1.5 xs:h-2 bg-gradient-to-r ${spotIcon.color}`} />
-        
+
         <div className="p-3 xs:p-4 sm:p-6 flex-1 flex flex-col">
           {/* Header */}
           <div className="flex items-start justify-between mb-2 xs:mb-3 sm:mb-4">
@@ -120,7 +120,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
                   </h3>
                 </div>
               </div>
-              
+
               {/* Badges */}
               <div className="flex flex-wrap gap-1 xs:gap-2 mb-2 xs:mb-3">
                 {spot.is_verified && (
@@ -134,14 +134,14 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
                   </span>
                 )}
               </div>
-              
+
               {/* Description */}
-              <p className="text-xs xs:text-sm text-gray-600 dark:text-gray-300 mb-2 xs:mb-3 overflow-hidden break-words" 
-                 style={{
-                   display: '-webkit-box',
-                   WebkitLineClamp: 2,
-                   WebkitBoxOrient: 'vertical'
-                 }}>
+              <p className="text-xs xs:text-sm text-gray-600 dark:text-gray-300 mb-2 xs:mb-3 overflow-hidden break-words"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical'
+                }}>
                 {spot.description}
               </p>
             </div>
@@ -186,7 +186,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
               <MapPin className="h-3 w-3 xs:h-4 xs:w-4 flex-shrink-0" />
               <span className="text-xs xs:text-sm truncate">{spot.address}</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 xs:gap-2 text-gray-600 dark:text-gray-300">
                 <Users className="h-3 w-3 xs:h-4 xs:w-4 flex-shrink-0" />
@@ -253,7 +253,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
               <div className="text-xs xs:text-sm text-gray-600 dark:text-gray-400 truncate">
                 {spot.spot_type.replace('_', ' ').toUpperCase()}
               </div>
-              
+
               <div className="flex gap-1 xs:gap-2">
                 <Button
                   variant="outline"
@@ -263,11 +263,11 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
                 >
                   Details
                 </Button>
-                
+
                 {isCheckedIn ? (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="border-green-200 text-green-700 text-xs px-2 xs:px-3"
                   >
                     Checked In ✓
@@ -281,8 +281,8 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
                     className="text-xs px-2 xs:px-3"
                     title={
                       isFull ? 'This spot is full' :
-                      isCheckedIn ? 'Already checked in' :
-                      'Check in to this spot'
+                        isCheckedIn ? 'Already checked in' :
+                          'Check in to this spot'
                     }
                   >
                     {isFull ? 'Full' : 'Check In'}

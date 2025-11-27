@@ -1,53 +1,45 @@
 // src/config/map.ts
 import L from 'leaflet';
 
+// Fix Leaflet default icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 export const MAP_CONFIG = {
-  // Enhanced tile layer providers
   tileLayers: {
     osm: {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    },
-    cartoVoyager: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    },
-    cartoDark: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }
   },
 
-  // Default map settings
+  // Better default center (India)
   defaultCenter: {
-    lat: 20.5937, // Center of India
+    lat: 20.5937,
     lng: 78.9629
   },
   defaultZoom: 5,
   maxZoom: 19,
   minZoom: 2,
 
-  // Remove bounds for worldwide coverage
-  maxBounds: undefined,
-
-  // Search provider configuration (worldwide)
-  searchProvider: {
-    provider: 'openstreetmap',
-    params: {
-      countrycodes: '', // Empty for worldwide
-      limit: 10,
-      addressdetails: 1
-    }
-  }
+  // Worldwide bounds
+  maxBounds: [
+    [-90, -180], // Southwest
+    [90, 180]    // Northeast
+  ] as L.LatLngBoundsLiteral
 };
 
-// Enhanced custom icon creation with better visuals
+// Enhanced custom icon creation
 export const createCustomIcon = (type: 'event' | 'hangout' | 'user' | 'current') => {
   const colors = {
-    event: 'bg-red-500 border-red-600',
-    hangout: 'bg-purple-500 border-purple-600',
-    user: 'bg-blue-500 border-blue-600',
-    current: 'bg-green-500 border-green-600 shadow-lg'
+    event: '#ef4444',
+    hangout: '#8b5cf6', 
+    user: '#3b82f6',
+    current: '#10b981'
   };
 
   const icons = {
@@ -58,17 +50,27 @@ export const createCustomIcon = (type: 'event' | 'hangout' | 'user' | 'current')
   };
 
   return L.divIcon({
-    className: `custom-marker custom-marker-${type} animate-bounce`,
+    className: `custom-marker-${type}`,
     html: `
-      <div class="relative">
-        <div class="w-8 h-8 ${colors[type]} rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-sm transform hover:scale-110 transition-transform">
-          ${icons[type]}
-        </div>
-        <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 ${colors[type]} rounded-full"></div>
+      <div style="
+        background-color: ${colors[type]};
+        border: 3px solid white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        transform: translate(-50%, -50%);
+      ">
+        ${icons[type]}
       </div>
     `,
     iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -36]
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16]
   });
 };

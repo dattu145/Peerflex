@@ -537,7 +537,7 @@ const HangoutSpotDetailPage: React.FC = () => {
             <Button
               variant="primary"
               onClick={handleDelete}
-              loading={deleting}
+              isLoading={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
               Delete

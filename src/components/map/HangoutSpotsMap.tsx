@@ -13,6 +13,7 @@ interface HangoutSpotsMapProps {
   onSpotClick?: (spot: HangoutSpot) => void;
   onCheckIn?: (spotId: string) => void;
   className?: string;
+  singleSpotMode?: boolean;
 }
 
 export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
@@ -20,38 +21,55 @@ export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
   currentLocation,
   onSpotClick,
   onCheckIn,
-  className = ''
+  className = '',
+  singleSpotMode = false
 }) => {
   const getMapCenter = (): [number, number] => {
     if (spots.length === 0) {
       return currentLocation 
         ? [currentLocation.latitude, currentLocation.longitude]
-        : [12.9716, 77.5946];
+        : [20.5937, 78.9629]; // India center
     }
 
     const firstSpot = spots[0];
-    if (firstSpot.location) {
-      try {
-        const coords = firstSpot.location.coordinates || [77.5946, 12.9716];
-        return [coords[1], coords[0]];
-      } catch {
-        return [12.9716, 77.5946];
-      }
-    }
-
-    return [12.9716, 77.5946];
+    const coordinates = getSpotCoordinates(firstSpot);
+    return coordinates;
   };
 
   const getSpotCoordinates = (spot: HangoutSpot): [number, number] => {
     if (spot.location) {
       try {
-        const coords = spot.location.coordinates || [77.5946, 12.9716];
+        let coords: [number, number] = [78.9629, 20.5937]; // Default to India center
+        
+        if (typeof spot.location === 'string') {
+          // Parse PostGIS POINT string: "POINT(lng lat)" or "SRID=4326;POINT(lng lat)"
+          const match = spot.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
+          if (match) {
+            coords = [parseFloat(match[1]), parseFloat(match[2])];
+          }
+        } else if (spot.location.coordinates && Array.isArray(spot.location.coordinates)) {
+          // Handle object format: { coordinates: [lng, lat] }
+          coords = spot.location.coordinates;
+        }
+        
+        console.log('📍 Spot coordinates:', {
+          spotId: spot.id,
+          spotName: spot.name,
+          rawLocation: spot.location,
+          parsedCoords: coords,
+          leafletCoords: [coords[1], coords[0]] // Convert to [lat, lng] for Leaflet
+        });
+        
+        // Return as [lat, lng] for Leaflet
         return [coords[1], coords[0]];
-      } catch {
-        return [12.9716, 77.5946];
+      } catch (error) {
+        console.warn('❌ Error parsing spot coordinates:', error, spot);
+        return [20.5937, 78.9629];
       }
     }
-    return [12.9716, 77.5946];
+    
+    console.warn('❌ No location data for spot:', spot.id, spot.name);
+    return [20.5937, 78.9629];
   };
 
   const getSpotIcon = (spotType: string) => {
@@ -77,7 +95,11 @@ export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
 
   return (
     <div className={className}>
-      <BaseMap center={getMapCenter()} className="h-96 md:h-[500px]">
+      <BaseMap 
+        center={getMapCenter()} 
+        zoom={singleSpotMode ? 15 : 12}
+        className="h-96 md:h-[500px]"
+      >
         {/* Current Location Marker */}
         {currentLocation && (
           <Marker
@@ -96,6 +118,12 @@ export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
         {/* Hangout Spot Markers */}
         {spots.map((spot) => {
           const coordinates = getSpotCoordinates(spot);
+          
+          console.log('🎯 Rendering marker for spot:', {
+            spotId: spot.id,
+            spotName: spot.name,
+            coordinates: coordinates
+          });
           
           return (
             <Marker
@@ -151,7 +179,7 @@ export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
                         {spot.amenities.slice(0, 3).map((amenity, index) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
+                            className="px-2 py-1 bg-blue-100 dark:blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
                           >
                             {amenity}
                           </span>
@@ -195,16 +223,12 @@ export const HangoutSpotsMap: React.FC<HangoutSpotsMapProps> = ({
       {/* Map Legend */}
       <div className="flex flex-wrap gap-4 mt-4 text-xs text-gray-600 dark:text-gray-400">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           <span>Your Location</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
           <span>Hangout Spots</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span>Events</span>
         </div>
       </div>
     </div>

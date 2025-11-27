@@ -18,16 +18,14 @@ export interface SearchResult {
   };
 }
 
-// CORS proxy URLs - we'll try multiple in case one fails
+// More reliable CORS proxy URLs
 const CORS_PROXIES = [
-  'https://api.allorigins.win/raw?url=',
-  'https://corsproxy.io/?',
-  'https://cors-anywhere.herokuapp.com/'
+  'https://corsproxy.io/?', // Most reliable
+  'https://api.allorigins.win/raw?url=', // Good fallback
+  'https://cors-anywhere.herokuapp.com/' // Last resort
 ];
 
 class LocationService {
-  private currentProxyIndex = 0;
-
   // Enhanced current location with better accuracy
   async getCurrentLocation(): Promise<Location> {
     return new Promise((resolve, reject) => {
@@ -46,7 +44,8 @@ class LocationService {
         (position) => {
           resolve({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
           });
         },
         (error) => {
@@ -71,15 +70,23 @@ class LocationService {
     });
   }
 
-  private async fetchWithTimeout(url: string, timeout = 10000): Promise<Response> {
+  private async fetchWithTimeout(url: string, timeout = 8000): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
       const response = await fetch(url, {
-        signal: controller.signal
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'PeerFlexApp/1.0'
+        }
       });
       clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
@@ -90,23 +97,25 @@ class LocationService {
   // Get approximate location from IP as fallback
   async getApproximateLocation(): Promise<Location> {
     try {
-      const response = await fetch('https://ipapi.co/json/');
+      const response = await this.fetchWithTimeout('https://ipapi.co/json/');
       const data = await response.json();
 
       return {
         latitude: data.latitude,
-        longitude: data.longitude
+        longitude: data.longitude,
+        accuracy: 50000
       };
     } catch (error) {
-      // Fallback to default location
+      // Fallback to default location (India center)
       return {
-        latitude: 12.9716,
-        longitude: 77.5946
+        latitude: 20.5937,
+        longitude: 78.9629,
+        accuracy: 100000
       };
     }
   }
 
-  // Enhanced search with proxy fallback
+  // Enhanced search with better proxy handling
   async searchLocations(query: string, limit: number = 8): Promise<SearchResult[]> {
     if (!query.trim() || query.length < 2) {
       return [];
@@ -114,32 +123,34 @@ class LocationService {
 
     const targetUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=${limit}&addressdetails=1`;
 
-    // In development, skip direct API calls to avoid CORS errors in console
-    const attempts = import.meta.env.DEV 
-      ? CORS_PROXIES.map(proxy => ({ url: proxy + encodeURIComponent(targetUrl), type: 'proxy' }))
-      : [
-          { url: targetUrl, type: 'direct' },
-          ...CORS_PROXIES.map(proxy => ({ url: proxy + encodeURIComponent(targetUrl), type: 'proxy' }))
-        ];
+    // Try direct call first, then proxies
+    const attempts = [
+      { url: targetUrl, type: 'direct' },
+      ...CORS_PROXIES.map(proxy => ({ 
+        url: proxy + encodeURIComponent(targetUrl), 
+        type: 'proxy' 
+      }))
+    ];
 
     for (let i = 0; i < attempts.length; i++) {
       try {
         console.log(`🔍 Search attempt ${i + 1}: ${attempts[i].type}`);
 
-        const response = await this.fetchWithTimeout(attempts[i].url, 10000);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+        const response = await this.fetchWithTimeout(attempts[i].url);
 
         const text = await response.text();
-        let data;
+        
+        // Handle empty responses
+        if (!text.trim()) {
+          throw new Error('Empty response');
+        }
 
+        let data;
         try {
           data = JSON.parse(text);
         } catch (parseError) {
           console.warn('Failed to parse response as JSON:', text.substring(0, 200));
-          throw new Error('Invalid JSON response');
+          continue; // Try next proxy
         }
 
         if (!Array.isArray(data)) {
@@ -158,7 +169,7 @@ class LocationService {
       } catch (error) {
         console.warn(`❌ Search attempt ${i + 1} failed:`, error);
         if (i < attempts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
     }
@@ -167,36 +178,36 @@ class LocationService {
     return [];
   }
 
-  // Enhanced reverse geocoding with proxy fallback
+  // Enhanced reverse geocoding with better error handling
   async getAddressFromCoords(location: Location): Promise<string> {
     const targetUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}&zoom=18&addressdetails=1`;
 
-    // In development, skip direct API calls to avoid CORS errors in console
-    const attempts = import.meta.env.DEV 
-      ? CORS_PROXIES.map(proxy => ({ url: proxy + encodeURIComponent(targetUrl), type: 'proxy' }))
-      : [
-          { url: targetUrl, type: 'direct' },
-          ...CORS_PROXIES.map(proxy => ({ url: proxy + encodeURIComponent(targetUrl), type: 'proxy' }))
-        ];
+    const attempts = [
+      { url: targetUrl, type: 'direct' },
+      ...CORS_PROXIES.map(proxy => ({ 
+        url: proxy + encodeURIComponent(targetUrl), 
+        type: 'proxy' 
+      }))
+    ];
 
     for (let i = 0; i < attempts.length; i++) {
       try {
         console.log(`📍 Reverse geocode attempt ${i + 1}: ${attempts[i].type}`);
 
-        const response = await this.fetchWithTimeout(attempts[i].url, 10000);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+        const response = await this.fetchWithTimeout(attempts[i].url);
 
         const text = await response.text();
-        let data;
+        
+        if (!text.trim()) {
+          throw new Error('Empty response');
+        }
 
+        let data;
         try {
           data = JSON.parse(text);
         } catch (parseError) {
           console.warn('Failed to parse reverse geocode response:', text.substring(0, 200));
-          throw new Error('Invalid JSON response');
+          continue;
         }
 
         if (data.error) {
@@ -209,7 +220,7 @@ class LocationService {
       } catch (error) {
         console.warn(`❌ Reverse geocode attempt ${i + 1} failed:`, error);
         if (i < attempts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
     }
@@ -230,7 +241,8 @@ class LocationService {
       if (results.length > 0) {
         return {
           latitude: parseFloat(results[0].lat),
-          longitude: parseFloat(results[0].lon)
+          longitude: parseFloat(results[0].lon),
+          accuracy: 100
         };
       }
 
