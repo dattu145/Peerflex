@@ -85,8 +85,6 @@ export const hangoutService = {
     }
   },
 
-
-
   // Basic query without location filtering
   async getHangoutSpotsBasic(filters?: {
     spotType?: string;
@@ -322,11 +320,10 @@ export const hangoutService = {
         .select('*')
         .eq('user_id', user.id)
         .eq('is_current', true)
-        .maybeSingle(); // Use maybeSingle instead of single
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching current checkin:', error);
-        // Don't throw, just return null
         return null;
       }
 
@@ -346,7 +343,6 @@ export const hangoutService = {
 
       if (spotError) {
         console.error('Error fetching hangout spot:', spotError);
-        // Return checkin without spot details
         return {
           ...checkin,
           hangout_spot: null
@@ -381,7 +377,6 @@ export const hangoutService = {
     let locationData = null;
     if (spotData.location && spotData.location.coordinates) {
       const [lng, lat] = spotData.location.coordinates;
-      // Use proper PostGIS POINT format (longitude, latitude)
       locationData = `POINT(${lng} ${lat})`;
       console.log('📍 Setting location data:', { lng, lat, locationData });
     }
@@ -402,7 +397,6 @@ export const hangoutService = {
         updated_at: new Date().toISOString()
       })
       .eq('id', spotId)
-      .eq('created_by', user.id) // Only allow owner to update
       .select(`
       *,
       user:profiles(*)
@@ -417,23 +411,24 @@ export const hangoutService = {
     return data;
   },
 
-
   async deleteHangoutSpot(spotId: string): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    if (!user) {
+      throw new Error('You must be logged in to delete a hangout spot');
+    }
 
-    console.log('Deleting hangout spot:', spotId);
+    console.log('🗑️ Performing HARD DELETE for hangout spot:', spotId, 'by user:', user.id);
 
     try {
-      // First check if user owns the spot
+      // First, verify ownership
       const { data: spot, error: checkError } = await supabase
         .from('hangout_spots')
-        .select('created_by')
+        .select('id, created_by, name')
         .eq('id', spotId)
         .single();
 
       if (checkError) {
-        console.error('Error checking spot ownership:', checkError);
+        console.error('❌ Error checking spot ownership:', checkError);
         throw new Error('Failed to verify spot ownership');
       }
 
@@ -441,28 +436,34 @@ export const hangoutService = {
         throw new Error('Hangout spot not found');
       }
 
+      console.log('📋 Spot details:', spot);
+
       if (spot.created_by !== user.id) {
         throw new Error('You can only delete your own hangout spots');
       }
 
-      // Use direct update instead of RPC function
+      // Perform HARD DELETE - completely remove the record
       const { error: deleteError } = await supabase
         .from('hangout_spots')
-        .update({
-          is_active: false,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', spotId)
-        .eq('created_by', user.id);
+        .delete()
+        .eq('id', spotId);
 
       if (deleteError) {
-        console.error('Error deleting hangout spot:', deleteError);
+        console.error('❌ Error performing hard delete:', deleteError);
+        
+        // Provide more specific error messages
+        if (deleteError.code === '42501') {
+          throw new Error('Permission denied. Please ensure you own this spot and try again.');
+        } else if (deleteError.code === 'PGRST116') {
+          throw new Error('Hangout spot not found or already deleted.');
+        }
+        
         throw new Error(deleteError.message || 'Failed to delete hangout spot');
       }
 
-      console.log('✅ Hangout spot deleted successfully');
-    } catch (error) {
-      console.error('Error in deleteHangoutSpot:', error);
+      console.log('✅ Hangout spot permanently deleted successfully');
+    } catch (error: any) {
+      console.error('❌ Error in deleteHangoutSpot:', error);
       throw error;
     }
   },
@@ -478,7 +479,6 @@ export const hangoutService = {
       user:profiles(*)
     `)
       .eq('created_by', user.id)
-      .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -578,7 +578,6 @@ export const hangoutService = {
         },
         async (payload) => {
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            // Get basic checkin data first
             const { data: checkin } = await supabase
               .from('hangout_checkins')
               .select('*')
@@ -586,7 +585,6 @@ export const hangoutService = {
               .single();
 
             if (checkin) {
-              // Get hangout spot details separately
               const { data: hangoutSpot } = await supabase
                 .from('hangout_spots')
                 .select('*')

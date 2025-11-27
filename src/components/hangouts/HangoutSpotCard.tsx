@@ -76,7 +76,7 @@ export const HangoutSpotCard: React.FC<HangoutSpotCardProps> = ({
   };
 
   const handleDelete = () => {
-    if (onDelete && window.confirm('Are you sure you want to delete this hangout spot? This action cannot be undone.')) {
+    if (onDelete) {
       onDelete(spot.id);
       setShowMenu(false);
     }

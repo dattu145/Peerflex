@@ -524,7 +524,7 @@ const HangoutSpotDetailPage: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-gray-600 dark:text-gray-300">
-            Are you sure you want to delete this hangout spot? This action cannot be undone.
+            Are you sure you want to permanently delete this hangout spot? This action cannot be undone and all data will be lost.
           </p>
           <div className="flex gap-3 justify-end">
             <Button
@@ -535,12 +535,11 @@ const HangoutSpotDetailPage: React.FC = () => {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="danger"
               onClick={handleDelete}
               isLoading={deleting}
-              className="bg-red-600 hover:bg-red-700"
             >
-              Delete
+              Delete Permanently
             </Button>
           </div>
         </div>
