@@ -1,6 +1,6 @@
 // src/pages/hangouts/CreateHangoutSpotPage.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MapPin, Users, Wifi, Coffee, Book, Utensils, Heart, Clock, ArrowLeft } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Input from '../../components/ui/Input';
@@ -32,7 +32,12 @@ interface FormData {
 
 const CreateHangoutSpotPage: React.FC = () => {
     const navigate = useNavigate();
+    const { spotId } = useParams();
     const { isAuthenticated } = useAuthStore();
+
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [existingSpot, setExistingSpot] = useState<HangoutSpot | null>(null);
+    const [loadingSpot, setLoadingSpot] = useState(false);
 
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -86,17 +91,71 @@ const CreateHangoutSpotPage: React.FC = () => {
         'Wheelchair Accessible'
     ];
 
+    // Check if we're in edit mode and load spot data
+    useEffect(() => {
+        const checkEditMode = async () => {
+            if (spotId) {
+                setIsEditMode(true);
+                setLoadingSpot(true);
+                try {
+                    const spot = await hangoutService.getHangoutSpotById(spotId);
+                    if (spot) {
+                        setExistingSpot(spot);
+                        // Pre-fill form data with existing spot
+                        setFormData({
+                            name: spot.name,
+                            description: spot.description || '',
+                            address: spot.address || '',
+                            spot_type: spot.spot_type,
+                            capacity: spot.capacity || 20,
+                            amenities: spot.amenities || [],
+                            operating_hours: spot.operating_hours || {
+                                open: '09:00',
+                                close: '22:00',
+                                days: [1, 2, 3, 4, 5, 6, 7]
+                            },
+                            contact_info: spot.contact_info || {
+                                phone: '',
+                                email: '',
+                                website: ''
+                            },
+                            images: spot.images || []
+                        });
+                        
+                        // Set location if available
+                        if (spot.location) {
+                            // Convert PostGIS point to Location format
+                            const coordinates = spot.location.coordinates || [0, 0];
+                            setSelectedLocation({
+                                latitude: coordinates[1],
+                                longitude: coordinates[0],
+                                address: spot.address
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load spot data:', error);
+                    setSubmitError('Failed to load spot data');
+                } finally {
+                    setLoadingSpot(false);
+                }
+            }
+        };
+
+        checkEditMode();
+    }, [spotId]);
+
     // Redirect if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/login', {
                 state: {
-                    from: '/hangouts/create',
-                    message: 'Please sign in to create a hangout spot'
+                    from: isEditMode ? `/hangouts/edit/${spotId}` : '/hangouts/create',
+                    message: `Please sign in to ${isEditMode ? 'edit' : 'create'} a hangout spot`
                 }
             });
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, navigate, isEditMode, spotId]);
 
     const handleInputChange = (field: keyof FormData, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -207,18 +266,26 @@ const CreateHangoutSpotPage: React.FC = () => {
                 amenities: formData.amenities
             };
 
-            await hangoutService.createHangoutSpot(spotData);
-
-            // Redirect back to hangouts page with success message
-            navigate('/hangouts', {
-                state: {
-                    message: 'Hangout spot created successfully!',
-                    type: 'success'
-                }
-            });
+            if (isEditMode && spotId) {
+                await hangoutService.updateHangoutSpot(spotId, spotData);
+                navigate('/hangouts', {
+                    state: {
+                        message: 'Hangout spot updated successfully!',
+                        type: 'success'
+                    }
+                });
+            } else {
+                await hangoutService.createHangoutSpot(spotData);
+                navigate('/hangouts', {
+                    state: {
+                        message: 'Hangout spot created successfully!',
+                        type: 'success'
+                    }
+                });
+            }
         } catch (error: any) {
-            console.error('Failed to create hangout spot:', error);
-            setSubmitError(error.message || 'Failed to create hangout spot. Please try again.');
+            console.error(`Failed to ${isEditMode ? 'update' : 'create'} hangout spot:`, error);
+            setSubmitError(error.message || `Failed to ${isEditMode ? 'update' : 'create'} hangout spot. Please try again.`);
         } finally {
             setLoading(false);
         }
@@ -241,6 +308,25 @@ const CreateHangoutSpotPage: React.FC = () => {
         );
     }
 
+    if (loadingSpot) {
+        return (
+            <Layout>
+                <div className="min-h-screen flex items-center justify-center p-4">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 xs:h-12 xs:w-12 border-b-2 border-purple-600 mx-auto mb-3 xs:mb-4"></div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm xs:text-base">Loading spot data...</p>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
+    const pageTitle = isEditMode ? 'Update Hangout Spot' : 'Add New Hangout Spot';
+    const pageDescription = isEditMode 
+        ? 'Update your hangout spot information' 
+        : 'Share a great place for people to study, socialize, and connect';
+    const submitButtonText = isEditMode ? 'Update Spot' : 'Create Spot';
+
     return (
         <Layout>
             <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-4 xs:py-6 sm:py-8">
@@ -260,10 +346,10 @@ const CreateHangoutSpotPage: React.FC = () => {
                                 <MapPin className="h-6 w-6 xs:h-8 xs:w-8 sm:h-10 sm:w-10 text-green-600 dark:text-green-400" />
                             </div>
                             <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 xs:mb-2 sm:mb-2">
-                                Add New Hangout Spot
+                                {pageTitle}
                             </h1>
                             <p className="text-gray-600 dark:text-gray-300 text-xs xs:text-sm sm:text-base max-w-2xl mx-auto px-1">
-                                Share a great place for people to study, socialize, and connect
+                                {pageDescription}
                             </p>
                         </div>
                     </div>
@@ -519,7 +605,7 @@ const CreateHangoutSpotPage: React.FC = () => {
                                     loading={loading}
                                     className="flex-1 text-sm xs:text-base py-2 xs:py-2.5 sm:py-3"
                                 >
-                                    Create Spot
+                                    {submitButtonText}
                                 </Button>
                             </div>
                         </form>
