@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
-  isLoading?: boolean;
+  isLoading?: boolean;  // Changed from loading to isLoading
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
@@ -16,7 +16,7 @@ const Button: React.FC<ButtonProps> = ({
   className,
   variant = 'primary',
   size = 'md',
-  isLoading = false,
+  isLoading = false,  // Changed prop name
   leftIcon,
   rightIcon,
   disabled,

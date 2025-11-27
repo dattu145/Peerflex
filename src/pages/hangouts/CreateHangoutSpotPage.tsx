@@ -602,7 +602,7 @@ const CreateHangoutSpotPage: React.FC = () => {
                                 <Button
                                     type="submit"
                                     variant="primary"
-                                    loading={loading}
+                                    isLoading={loading}
                                     className="flex-1 text-sm xs:text-base py-2 xs:py-2.5 sm:py-3"
                                 >
                                     {submitButtonText}

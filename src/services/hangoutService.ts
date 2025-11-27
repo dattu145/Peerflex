@@ -199,9 +199,9 @@ export const hangoutService = {
     // Fix: Proper PostGIS geography format
     let locationData = null;
     if (spotData.location && spotData.location.coordinates) {
-      // Convert to proper PostGIS POINT format
       const [lng, lat] = spotData.location.coordinates;
-      locationData = `POINT(${lng} ${lat})`;
+      // Use proper PostGIS geography format
+      locationData = `SRID=4326;POINT(${lng} ${lat})`;
     }
 
     console.log('Creating spot with location:', locationData);
@@ -377,11 +377,11 @@ export const hangoutService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    // Fix: Proper PostGIS geography format
     let locationData = null;
     if (spotData.location && spotData.location.coordinates) {
       const [lng, lat] = spotData.location.coordinates;
-      locationData = `POINT(${lng} ${lat})`;
+      // Use proper PostGIS geography format
+      locationData = `SRID=4326;POINT(${lng} ${lat})`;
     }
 
     const { data, error } = await supabase
