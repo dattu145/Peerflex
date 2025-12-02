@@ -31,8 +31,19 @@ const NotificationsPage: React.FC = () => {
     const loadNotifications = async () => {
         try {
             setLoading(true);
+            // First, clean up old notifications (older than 24 hours)
+            await notificationService.cleanupOldNotifications();
+
+            // Then fetch valid notifications
             const data = await notificationService.getUserNotifications();
             setNotifications(data);
+
+            // Mark all as read to clear badge
+            if (data.length > 0 && data.some(n => !n.is_read)) {
+                await notificationService.markAllAsRead();
+                // Update local state to reflect read status
+                setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            }
         } catch (error) {
             console.error('Failed to load notifications:', error);
         } finally {

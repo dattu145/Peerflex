@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { Event, EventAttendance, EventCategory } from '../types';
+import { notificationService } from './notificationService';
 
 export const eventService = {
   // Get all events with filters
@@ -50,7 +51,7 @@ export const eventService = {
       });
 
       if (error) throw error;
-      
+
       // Get full event details for nearby events
       if (nearbyEvents && nearbyEvents.length > 0) {
         const eventIds = nearbyEvents.map(event => event.id);
@@ -123,10 +124,19 @@ export const eventService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
+    // Fix: Proper PostGIS geography format
+    let locationData = eventData.location;
+    if (eventData.location && eventData.location.coordinates) {
+      const [lng, lat] = eventData.location.coordinates;
+      // Use proper PostGIS POINT format (longitude, latitude)
+      locationData = `POINT(${lng} ${lat})`;
+    }
+
     const { data, error } = await supabase
       .from('events')
       .insert({
         ...eventData,
+        location: locationData,
         created_by: user.id,
         is_public: eventData.is_public ?? true,
         max_attendees: eventData.max_attendees || 50,
@@ -140,6 +150,21 @@ export const eventService = {
       .single();
 
     if (error) throw error;
+
+    // Create notification
+    try {
+      await notificationService.createNotification({
+        user_id: user.id,
+        title: 'Event Created Successfully',
+        message: `Your event "${data.title}" has been created successfully.`,
+        type: 'system',
+        data: { event_id: data.id }
+      });
+    } catch (notifyError) {
+      console.error('Failed to create notification:', notifyError);
+      // Don't throw error here, as event was created successfully
+    }
+
     return data;
   },
 
@@ -159,9 +184,18 @@ export const eventService = {
       throw new Error('Not authorized to update this event');
     }
 
+    // Fix: Proper PostGIS geography format for updates
+    const updateData = { ...updates };
+    if (updates.location && updates.location.coordinates) {
+      const [lng, lat] = updates.location.coordinates;
+      // Use proper PostGIS POINT format (longitude, latitude)
+      // @ts-ignore
+      updateData.location = `POINT(${lng} ${lat})`;
+    }
+
     const { data, error } = await supabase
       .from('events')
-      .update(updates)
+      .update(updateData)
       .eq('id', eventId)
       .select(`
         *,

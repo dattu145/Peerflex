@@ -110,6 +110,9 @@ const CreateEventPage: React.FC = () => {
         try {
             const eventData = {
                 ...formData,
+                start_time: new Date(formData.start_time).toISOString(),
+                end_time: new Date(formData.end_time).toISOString(),
+                registration_deadline: formData.registration_deadline ? new Date(formData.registration_deadline).toISOString() : undefined,
                 location: selectedLocation ? {
                     type: 'Point',
                     coordinates: [selectedLocation.longitude, selectedLocation.latitude]
@@ -487,7 +490,7 @@ const CreateEventPage: React.FC = () => {
                             <Button
                                 type="submit"
                                 variant="primary"
-                                loading={loading}
+                                isLoading={loading}
                                 className="w-full sm:flex-1"
                             >
                                 Create Event

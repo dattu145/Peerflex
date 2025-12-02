@@ -2,10 +2,30 @@ import { supabase } from '../config/supabase';
 import type { Notification } from '../types';
 
 export const notificationService = {
-  // Get user's notifications
+  // Cleanup notifications older than 24 hours
+  async cleanupOldNotifications(): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', user.id)
+      .lt('created_at', oneDayAgo);
+
+    if (error) {
+      console.error('Failed to cleanup old notifications:', error);
+    }
+  },
+
+  // Get user's notifications (only from last 24 hours)
   async getUserNotifications(limit = 50): Promise<Notification[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
+
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
       .from('notifications')
@@ -14,6 +34,7 @@ export const notificationService = {
         from_user:profiles!from_user_id(*)
       `)
       .eq('user_id', user.id)
+      .gte('created_at', oneDayAgo) // Only show notifications from last 24 hours
       .order('created_at', { ascending: false })
       .limit(limit);
 

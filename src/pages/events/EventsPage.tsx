@@ -28,7 +28,10 @@ const EventsPage: React.FC = () => {
   });
 
   const { events, loading, error, registerForEvent } = useEvents({ filters });
-  const { location, requestLocation } = useLocation();
+  const { location, requestLocation } = useLocation({
+    autoRequest: true,
+    enableHighAccuracy: true
+  });
 
   const eventTypes = [
     { value: 'all', label: 'All Events' },
@@ -79,8 +82,7 @@ const EventsPage: React.FC = () => {
   };
 
   const handleViewDetails = (event: Event) => {
-    // Navigate to event details page (to be implemented)
-    console.log('View event details:', event.id);
+    navigate(`/events/${event.id}`);
   };
 
   return (

@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { Note } from '../types';
+import { notificationService } from './notificationService';
 
 export const noteService = {
   // Get all public notes with filters
@@ -223,6 +224,20 @@ export const noteService = {
       .single();
 
     if (error) throw error;
+
+    // Create notification
+    try {
+      await notificationService.createNotification({
+        user_id: user.id,
+        title: 'Note Created Successfully',
+        message: `Your note "${data.title}" has been created successfully along with its details.`,
+        type: 'system',
+        data: { note_id: data.id }
+      });
+    } catch (notifyError) {
+      console.error('Failed to create notification:', notifyError);
+    }
+
     return data;
   },
 

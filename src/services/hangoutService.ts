@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { HangoutSpot, HangoutCheckin, HangoutSpotReview, Location } from '../types';
+import { notificationService } from './notificationService';
 
 export const hangoutService = {
   // Get hangout spots with filters
@@ -232,6 +233,19 @@ export const hangoutService = {
       throw error;
     }
 
+    // Create notification
+    try {
+      await notificationService.createNotification({
+        user_id: user.id,
+        title: 'Hangout Spot Created Successfully',
+        message: `Your hangout spot "${data.name}" has been created successfully.`,
+        type: 'system',
+        data: { spot_id: data.id }
+      });
+    } catch (notifyError) {
+      console.error('Failed to create notification:', notifyError);
+    }
+
     return data;
   },
 
@@ -450,14 +464,14 @@ export const hangoutService = {
 
       if (deleteError) {
         console.error('❌ Error performing hard delete:', deleteError);
-        
+
         // Provide more specific error messages
         if (deleteError.code === '42501') {
           throw new Error('Permission denied. Please ensure you own this spot and try again.');
         } else if (deleteError.code === 'PGRST116') {
           throw new Error('Hangout spot not found or already deleted.');
         }
-        
+
         throw new Error(deleteError.message || 'Failed to delete hangout spot');
       }
 

@@ -82,11 +82,11 @@ class LocationService {
         }
       });
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      
+
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
@@ -126,9 +126,9 @@ class LocationService {
     // Try direct call first, then proxies
     const attempts = [
       { url: targetUrl, type: 'direct' },
-      ...CORS_PROXIES.map(proxy => ({ 
-        url: proxy + encodeURIComponent(targetUrl), 
-        type: 'proxy' 
+      ...CORS_PROXIES.map(proxy => ({
+        url: proxy + encodeURIComponent(targetUrl),
+        type: 'proxy'
       }))
     ];
 
@@ -139,7 +139,7 @@ class LocationService {
         const response = await this.fetchWithTimeout(attempts[i].url);
 
         const text = await response.text();
-        
+
         // Handle empty responses
         if (!text.trim()) {
           throw new Error('Empty response');
@@ -180,52 +180,60 @@ class LocationService {
 
   // Enhanced reverse geocoding with better error handling
   async getAddressFromCoords(location: Location): Promise<string> {
-    const targetUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}&zoom=18&addressdetails=1`;
+    // Primary: OpenStreetMap
+    const osmUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}&zoom=18&addressdetails=1`;
+
+    // Secondary: BigDataCloud (Free, no key required for client-side)
+    const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${location.latitude}&longitude=${location.longitude}&localityLanguage=en`;
 
     const attempts = [
-      { url: targetUrl, type: 'direct' },
-      ...CORS_PROXIES.map(proxy => ({ 
-        url: proxy + encodeURIComponent(targetUrl), 
-        type: 'proxy' 
+      { url: osmUrl, type: 'direct', parser: 'osm' },
+      { url: bdcUrl, type: 'backup', parser: 'bdc' },
+      ...CORS_PROXIES.map(proxy => ({
+        url: proxy + encodeURIComponent(osmUrl),
+        type: 'proxy',
+        parser: 'osm'
       }))
     ];
 
     for (let i = 0; i < attempts.length; i++) {
       try {
-        console.log(`📍 Reverse geocode attempt ${i + 1}: ${attempts[i].type}`);
+        // Only log if it's not the first attempt to avoid noise
+        if (i > 0) console.log(`📍 Reverse geocode attempt ${i + 1}: ${attempts[i].type}`);
 
-        const response = await this.fetchWithTimeout(attempts[i].url);
+        const response = await this.fetchWithTimeout(attempts[i].url, 5000);
+        const data = await response.json();
 
-        const text = await response.text();
-        
-        if (!text.trim()) {
-          throw new Error('Empty response');
+        let address = '';
+
+        if (attempts[i].parser === 'osm') {
+          if (data.error) throw new Error(data.error);
+          address = data.display_name;
+        } else if (attempts[i].parser === 'bdc') {
+          // BigDataCloud format
+          const parts = [
+            data.locality,
+            data.city,
+            data.principalSubdivision,
+            data.countryName
+          ].filter(Boolean);
+          address = parts.join(', ');
         }
 
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (parseError) {
-          console.warn('Failed to parse reverse geocode response:', text.substring(0, 200));
-          continue;
+        if (address) {
+          // console.log(`✅ Reverse geocode successful via ${attempts[i].type}`);
+          return address;
         }
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        const address = data.display_name || this.getFallbackAddress(location);
-        console.log(`✅ Reverse geocode successful via ${attempts[i].type}`);
-        return address;
       } catch (error) {
-        console.warn(`❌ Reverse geocode attempt ${i + 1} failed:`, error);
+        // Suppress errors for intermediate attempts
+        // console.warn(`Reverse geocode attempt ${i + 1} failed`);
         if (i < attempts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
     }
 
-    console.warn('🚨 All reverse geocode attempts failed, using fallback');
+    console.warn('Using fallback coordinates address');
     return this.getFallbackAddress(location);
   }
 
