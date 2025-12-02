@@ -1,7 +1,7 @@
 // src/components/events/EventCard.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Clock, Video, Star, TrendingUp } from 'lucide-react';
+import { Calendar, MapPin, Users, Video, Star } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import type { Event } from '../../types';
@@ -9,6 +9,7 @@ import type { Event } from '../../types';
 interface EventCardProps {
   event: Event;
   onRegister?: (eventId: string) => void;
+  onUnregister?: (eventId: string) => void;
   onViewDetails?: (event: Event) => void;
   showActions?: boolean;
   isRegistered?: boolean;
@@ -17,6 +18,7 @@ interface EventCardProps {
 export const EventCard: React.FC<EventCardProps> = ({
   event,
   onRegister,
+  onUnregister,
   onViewDetails,
   showActions = true,
   isRegistered = false
@@ -55,7 +57,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
   const isUpcoming = new Date(event.start_time) > new Date();
   const isFull = event.max_attendees && (event.attendees_count || 0) >= event.max_attendees;
-  const registrationClosed = event.registration_deadline && new Date(event.registration_deadline) < new Date();
+  const registrationClosed = !!(event.registration_deadline && new Date(event.registration_deadline) < new Date());
 
   return (
     <motion.div
@@ -67,7 +69,7 @@ export const EventCard: React.FC<EventCardProps> = ({
       <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
         {/* Event Type Header */}
         <div className={`h-2 bg-gradient-to-r ${getEventColor(event.event_type)}`} />
-        
+
         <div className="p-6">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
@@ -80,7 +82,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                   <Video className="h-5 w-5 text-blue-600" />
                 )}
               </div>
-              
+
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                 {event.description}
               </p>
@@ -93,7 +95,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               <Calendar className="h-4 w-4" />
               <span className="text-sm">{formatDateTime(event.start_time)}</span>
             </div>
-            
+
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
               <MapPin className="h-4 w-4" />
               <span className="text-sm">
@@ -101,7 +103,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 {event.is_virtual && ' (Virtual)'}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
               <Users className="h-4 w-4" />
               <span className="text-sm">
@@ -122,7 +124,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyBadge(event.difficulty_level)}`}>
               {event.difficulty_level}
             </span>
-            
+
             {event.tags?.slice(0, 3).map((tag) => (
               <span
                 key={tag}
@@ -131,7 +133,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 #{tag}
               </span>
             ))}
-            
+
             {event.tags && event.tags.length > 3 && (
               <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs">
                 +{event.tags.length - 3}
@@ -169,7 +171,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                   </span>
                 )}
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -178,22 +180,28 @@ export const EventCard: React.FC<EventCardProps> = ({
                 >
                   Details
                 </Button>
-                
+
                 {isRegistered ? (
-                  <Button variant="outline" size="sm" className="border-green-200 text-green-700">
-                    Registered ✓
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-green-200 text-green-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group/btn"
+                    onClick={() => onUnregister?.(event.id)}
+                  >
+                    <span className="group-hover/btn:hidden">Registered ✓</span>
+                    <span className="hidden group-hover/btn:inline">Unregister</span>
                   </Button>
                 ) : (
                   <Button
                     variant="primary"
                     size="sm"
                     onClick={() => onRegister?.(event.id)}
-                    disabled={!isUpcoming || isFull || registrationClosed}
+                    disabled={!isUpcoming || !!isFull || registrationClosed}
                     title={
                       !isUpcoming ? 'Event has passed' :
-                      isFull ? 'Event is full' :
-                      registrationClosed ? 'Registration closed' :
-                      'Register for event'
+                        isFull ? 'Event is full' :
+                          registrationClosed ? 'Registration closed' :
+                            'Register for event'
                     }
                   >
                     {isFull ? 'Full' : registrationClosed ? 'Closed' : 'Register'}

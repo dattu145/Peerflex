@@ -25,22 +25,22 @@ export interface Profile {
   updated_at: string;
 }
 
-import type { 
-  ConnectionRequest, 
-  UserConnection, 
-  ChatRoom, 
-  ChatMember, 
+import type {
+  ConnectionRequest,
+  UserConnection,
+  ChatRoom,
+  ChatMember,
   Message,
-  Conversation 
+  Conversation
 } from './chat';
 
-export type { 
-  ConnectionRequest, 
-  UserConnection, 
-  ChatRoom, 
-  ChatMember, 
+export type {
+  ConnectionRequest,
+  UserConnection,
+  ChatRoom,
+  ChatMember,
   Message,
-  Conversation 
+  Conversation
 };
 
 
@@ -303,7 +303,7 @@ export interface Location {
   latitude: number;
   longitude: number;
   address?: string;
-  accuracy?: number; 
+  accuracy?: number;
 }
 
 export interface MapBounds {

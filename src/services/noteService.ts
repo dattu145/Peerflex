@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import type { Note, NoteReview } from '../types';
+import type { Note } from '../types';
 
 export const noteService = {
   // Get all public notes with filters
@@ -169,6 +169,27 @@ export const noteService = {
     return data;
   },
 
+  // Upload file attachment
+  async uploadFile(file: File): Promise<{ url: string; size: number }> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('note-attachments')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('note-attachments')
+      .getPublicUrl(filePath);
+
+    return { url: data.publicUrl, size: file.size };
+  },
+
   // Create a new note
   async createNote(noteData: {
     title: string;
@@ -182,6 +203,8 @@ export const noteService = {
     is_public?: boolean;
     allow_comments?: boolean;
     show_likes?: boolean;
+    difficulty_level?: number;
+    ai_summary?: string;
   }): Promise<Note> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -325,8 +348,9 @@ export const noteService = {
     if (error) throw error;
 
     // Extract notes from the joined data with proper type assertion
-    const likedNotes = data?.map(item => item.note).filter((note): note is Note => note !== null) || [];
-    return likedNotes;
+    // @ts-ignore - Supabase type inference for joined tables can be tricky
+    const likedNotes = data?.map(item => item.note).filter((note): note is Note => note !== null && !Array.isArray(note)) || [];
+    return likedNotes as Note[];
   },
 
 

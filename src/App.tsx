@@ -25,9 +25,11 @@ import HangoutSpotsPage from './pages/hangouts/HangoutSpotsPage';
 import CreateHangoutSpotPage from './pages/hangouts/CreateHangoutSpotPage';
 import HangoutSpotDetailPage from './pages/hangouts/HangoutSpotDetailPage';
 import EventDetailPage from './pages/events/EventDetailPage';
+import CreateEventPage from './pages/events/CreateEventPage';
 import ScrollToTop from './components/ScrollToTop';
 import CreateNotePage from './pages/notes/CreateNotePage';
 import NoteDetailPage from './pages/notes/NoteDetailPage';
+import NotificationsPage from './pages/notifications/NotificationsPage';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -140,6 +142,12 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/notifications" element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          } />
+
           <Route path="/events" element={
             <ProtectedRoute>
               <EventsPage />
@@ -162,6 +170,12 @@ function App() {
           <Route path="/events/:eventId" element={
             <ProtectedRoute>
               <EventDetailPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/events/create" element={
+            <ProtectedRoute>
+              <CreateEventPage />
             </ProtectedRoute>
           } />
 

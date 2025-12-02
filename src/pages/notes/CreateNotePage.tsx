@@ -4,10 +4,12 @@ import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
-import { ArrowLeft, Tag, BookOpen, Globe, Lock, MessageCircle, Heart } from 'lucide-react';
+import { ArrowLeft, Tag, BookOpen, Globe, Lock, MessageCircle, Heart, Upload, FileText, Star, Plus } from 'lucide-react';
 import { useNotes } from '../../hooks/useNotes';
 import { useNote } from '../../hooks/useNote';
+import { noteService } from '../../services/noteService';
 import { motion } from 'framer-motion';
+import MDEditor from '@uiw/react-md-editor';
 
 const CreateNotePage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,9 +29,14 @@ const CreateNotePage: React.FC = () => {
     is_public: true,
     allow_comments: true,
     show_likes: true,
+    difficulty_level: 1,
+    file_url: '',
+    file_size: 0,
   });
 
   const [tagInput, setTagInput] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const subjects = [
     'Mathematics', 'Computer Science', 'Physics', 'Chemistry',
@@ -50,27 +57,56 @@ const CreateNotePage: React.FC = () => {
         is_public: existingNote.is_public ?? true,
         allow_comments: existingNote.allow_comments ?? true,
         show_likes: existingNote.show_likes ?? true,
+        difficulty_level: existingNote.difficulty_level || 1,
+        file_url: existingNote.file_url || '',
+        file_size: existingNote.file_size || 0,
       });
     }
   }, [isEditMode, existingNote]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const insertPageBreak = () => {
+    setFormData(prev => ({
+      ...prev,
+      content: prev.content + '\n\n---\n\n'
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let uploadedFileUrl = formData.file_url;
+      let uploadedFileSize = formData.file_size;
+
+      if (file) {
+        setUploading(true);
+        const { url, size } = await noteService.uploadFile(file);
+        uploadedFileUrl = url;
+        uploadedFileSize = size;
+        setUploading(false);
+      }
+
+      const noteData = {
+        ...formData,
+        tags: formData.tags,
+        file_url: uploadedFileUrl,
+        file_size: uploadedFileSize,
+      };
+
       if (isEditMode && noteId) {
-        await updateNote(noteId, {
-          ...formData,
-          tags: formData.tags,
-        });
+        await updateNote(noteId, noteData);
       } else {
-        await createNote({
-          ...formData,
-          tags: formData.tags,
-        });
+        await createNote(noteData);
       }
       navigate('/notes');
     } catch (error) {
       console.error(`Failed to ${isEditMode ? 'update' : 'create'} note:`, error);
+      setUploading(false);
     }
   };
 
@@ -96,16 +132,6 @@ const CreateNotePage: React.FC = () => {
       e.preventDefault();
       addTag();
     }
-  };
-
-  // Textarea auto-resize function
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, content: e.target.value }));
-
-    // Auto-resize
-    const textarea = e.target;
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 800) + 'px'; // Max height 800px
   };
 
   if (isEditMode && noteLoading) {
@@ -220,26 +246,80 @@ const CreateNotePage: React.FC = () => {
                 />
               </div>
 
-              {/* Content - IMPROVED TEXT EDITOR */}
+              {/* Content - RICH TEXT EDITOR */}
+              <div data-color-mode="auto">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Note Content *
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={insertPageBreak}
+                    title="Insert a page break for book view"
+                    className="text-xs"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Insert Page Break
+                  </Button>
+                </div>
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  {/* Fix for cursor overlap: Ensure textarea and pre have same font settings */}
+                  <style>{`
+                    .w-md-editor-text-pre, .w-md-editor-text-input {
+                      font-family: 'Inter', sans-serif !important;
+                      font-size: 16px !important;
+                      line-height: 24px !important;
+                      letter-spacing: 0.5px !important; /* Added gap */
+                    }
+                    .w-md-editor-text-input {
+                      caret-color: #2563eb; /* Blue cursor */
+                    }
+                  `}</style>
+                  <MDEditor
+                    value={formData.content}
+                    onChange={(val) => setFormData(prev => ({ ...prev, content: val || '' }))}
+                    height={500}
+                    preview="edit"
+                    className="dark:bg-gray-800"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Use the "Insert Page Break" button or type <code>---</code> to split your content into pages for the reader view.
+                </p>
+              </div>
+
+              {/* File Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Note Content *
+                  Attachment (PDF, Image)
                 </label>
-                <div className="relative">
-                  <textarea
-                    value={formData.content}
-                    onChange={handleContentChange}
-                    placeholder="Write your Note content here, Markdown formatting allowed"
-                    required
-                    rows={15}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical font-poppins text-base leading-relaxed whitespace-pre-wrap transition-all duration-200"
-                    style={{ minHeight: '300px', maxHeight: '800px' }}
-                  />
-
-                  {/* Character count */}
-                  <div className="absolute bottom-2 right-2 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded">
-                    {formData.content.length} characters
+                <div className="flex items-center gap-4">
+                  <div className="relative flex-1">
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                    >
+                      <Upload className="h-5 w-5 text-gray-400 mr-2" />
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {file ? file.name : (formData.file_url ? 'Change File' : 'Click to upload a file')}
+                      </span>
+                    </label>
                   </div>
+                  {formData.file_url && !file && (
+                    <div className="flex items-center gap-2 text-sm text-green-600">
+                      <FileText className="h-4 w-4" />
+                      <span>Current file attached</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -383,10 +463,10 @@ const CreateNotePage: React.FC = () => {
                 <Button
                   type="submit"
                   variant="primary"
-                  disabled={loading || !formData.title || !formData.content || !formData.subject}
+                  disabled={loading || uploading || !formData.title || !formData.content || !formData.subject}
                   className="font-poppins"
                 >
-                  {loading
+                  {loading || uploading
                     ? (isEditMode ? 'Updating...' : 'Publishing...')
                     : (isEditMode ? 'Update Note' : 'Publish Notes')
                   }

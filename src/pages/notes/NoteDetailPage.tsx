@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/layout/Header';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { ArrowLeft, Heart, Eye, Calendar, User, MessageCircle, X } from 'lucide-react';
+import { ArrowLeft, Heart, Eye, Calendar, User, MessageCircle, Download, BookOpen, Scroll, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNote } from '../../hooks/useNote';
 import { useNotes } from '../../hooks/useNotes';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,10 +16,17 @@ const NoteDetailPage: React.FC = () => {
   const { note, loading, error, likeNote } = useNote(noteId);
   const { incrementViewCount } = useNotes();
   const [showComments, setShowComments] = useState(false);
+  const [viewMode, setViewMode] = useState<'scroll' | 'book'>('scroll');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pages, setPages] = useState<string[]>([]);
 
   useEffect(() => {
     if (note) {
       document.title = `${note.title} - Peerflex Notes`;
+
+      // Split content into pages
+      const contentPages = note.content.split(/\n---\n/);
+      setPages(contentPages);
 
       // Increment view count when note is loaded (only once per user)
       const trackView = async () => {
@@ -53,6 +60,26 @@ const NoteDetailPage: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const handleDownload = () => {
+    if (note?.file_url) {
+      window.open(note.file_url, '_blank');
+    }
+  };
+
+  const nextPage = () => {
+    if (currentPage < pages.length - 1) {
+      setCurrentPage(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   if (loading) {
@@ -112,20 +139,46 @@ const NoteDetailPage: React.FC = () => {
                 Back to Notes
               </div>
 
-              {/* Comments Toggle Button */}
-              <Button
-                variant="primary"
-                onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span>Comments</span>
-                {note.comment_count > 0 && (
-                  <span className="bg-white text-blue-600 rounded-full text-xs px-2 py-1 min-w-[1.5rem] text-center">
-                    {note.comment_count}
-                  </span>
-                )}
-              </Button>
+              <div className="flex items-center gap-3">
+                {/* View Mode Toggle */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-1 flex items-center shadow-sm border border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => setViewMode('scroll')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'scroll'
+                      ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    title="Scroll View"
+                  >
+                    <Scroll className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('book')}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'book'
+                      ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    title="Book View (Pages)"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Comments Toggle Button */}
+                <Button
+                  variant="primary"
+                  onClick={() => setShowComments(!showComments)}
+                  className="flex items-center gap-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Comments</span>
+                  {note.comment_count > 0 && (
+                    <span className="bg-white text-blue-600 rounded-full text-xs px-2 py-1 min-w-[1.5rem] text-center">
+                      {note.comment_count}
+                    </span>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {/* Note Header */}
@@ -164,21 +217,35 @@ const NoteDetailPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Stats */}
-                <div className="flex items-center gap-6">
-                  {note.show_likes !== false && (
-                    <button
-                      onClick={handleLike}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      <Heart className="h-5 w-5" />
-                      <span className="font-semibold">{note.like_count}</span>
-                    </button>
-                  )}
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg">
-                    <Eye className="h-5 w-5" />
-                    <span className="font-semibold">{note.view_count}</span>
+                {/* Stats & Actions */}
+                <div className="flex flex-col items-end gap-3">
+                  <div className="flex items-center gap-3">
+                    {note.show_likes !== false && (
+                      <button
+                        onClick={handleLike}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        <Heart className="h-5 w-5" />
+                        <span className="font-semibold">{note.like_count}</span>
+                      </button>
+                    )}
+                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg">
+                      <Eye className="h-5 w-5" />
+                      <span className="font-semibold">{note.view_count}</span>
+                    </div>
                   </div>
+
+                  {note.file_url && (
+                    <Button
+                      variant="outline"
+                      onClick={handleDownload}
+                      className="flex items-center gap-2 w-full justify-center"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download Attachment
+                      {note.file_size && <span className="text-xs text-gray-500">({(note.file_size / 1024 / 1024).toFixed(2)} MB)</span>}
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -199,11 +266,51 @@ const NoteDetailPage: React.FC = () => {
           </motion.div>
 
           {/* Note Content with Markdown Support */}
-          <Card className="p-8">
+          <Card className="p-8 min-h-[500px] relative">
+            {viewMode === 'book' && (
+              <div className="absolute top-4 right-4 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                Page {currentPage + 1} of {pages.length}
+              </div>
+            )}
+
             <div
               className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:my-3 prose-ol:my-3 prose-li:my-1 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:dark:bg-blue-900/20 prose-pre:bg-gray-100 prose-pre:dark:bg-gray-800 prose-code:bg-gray-100 prose-code:dark:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-a:text-blue-600 prose-a:dark:text-blue-400 prose-a:no-underline text-black dark:text-white hover:prose-a:underline"
-              dangerouslySetInnerHTML={{ __html: formatMarkdown(note.content) }}
+              dangerouslySetInnerHTML={{
+                __html: formatMarkdown(viewMode === 'book' ? pages[currentPage] : note.content)
+              }}
             />
+
+            {viewMode === 'book' && (
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="ghost"
+                  onClick={prevPage}
+                  disabled={currentPage === 0}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous Page
+                </Button>
+                <div className="flex gap-1">
+                  {pages.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`h-1.5 w-1.5 rounded-full ${idx === currentPage ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={nextPage}
+                  disabled={currentPage === pages.length - 1}
+                  className="flex items-center gap-2"
+                >
+                  Next Page
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
 

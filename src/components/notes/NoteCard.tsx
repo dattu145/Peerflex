@@ -8,6 +8,7 @@ import type { Note } from '../../types';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Comments } from './Comments';
 import { formatMarkdownPreview } from '../../utils/markdownFormatter';
+import { UserProfileModal } from '../user/UserProfileModal';
 
 interface NoteCardProps {
   note: Note;
@@ -30,6 +31,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const { user } = useAuthStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [liked, setLiked] = useState(isLiked);
   const [commentCount, setCommentCount] = useState(note.comment_count || 0);
@@ -182,7 +184,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
             {/* Tags */}
             {note.tags && note.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 xs:gap-2 mb-2 xs:mb-3"> 
+              <div className="flex flex-wrap gap-1 xs:gap-2 mb-2 xs:mb-3">
                 {note.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
@@ -203,7 +205,13 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             <div className="flex items-center justify-between pt-2 xs:pt-3 border-t border-gray-200 dark:border-gray-700 mt-auto"> {/* Reduced padding */}
               {/* User Info */}
               <div className="flex items-center gap-2 xs:gap-3 min-w-0 flex-1">
-                <div className="flex items-center gap-1 xs:gap-2 min-w-0 flex-1">
+                <div
+                  className="flex items-center gap-1 xs:gap-2 min-w-0 flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowProfileModal(true);
+                  }}
+                >
                   <div className="w-6 h-6 xs:w-8 xs:h-8 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                     {note.user?.full_name?.substring(0, 2) || 'UU'}
                   </div>
@@ -277,6 +285,15 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         onCommentDeleted={() => setCommentCount(prev => Math.max(0, prev - 1))}
         mode="modal" // Explicitly set modal mode
       />
+
+      {note.user && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userId={note.user_id}
+          user={note.user}
+        />
+      )}
     </>
   );
 };

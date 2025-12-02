@@ -65,6 +65,35 @@ export const connectionService = {
     return data || [];
   },
 
+  // Get sent requests for current user
+  async getSentRequests(): Promise<ConnectionRequest[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('connection_requests')
+      .select(`
+        *,
+        to_profile:profiles!to_user_id(*)
+      `)
+      .eq('from_user_id', user.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Withdraw connection request
+  async withdrawRequest(requestId: string): Promise<void> {
+    const { error } = await supabase
+      .from('connection_requests')
+      .delete()
+      .eq('id', requestId);
+
+    if (error) throw error;
+  },
+
   // Get user's connections
   async getConnections(): Promise<UserConnection[]> {
     const { data: { user } } = await supabase.auth.getUser();
@@ -117,11 +146,11 @@ export const connectionService = {
       .single();
 
     if (sentRequest) {
-      return { 
-        isConnected: false, 
-        hasPendingRequest: true, 
+      return {
+        isConnected: false,
+        hasPendingRequest: true,
         requestFromMe: true,
-        requestId: sentRequest.id 
+        requestId: sentRequest.id
       };
     }
 
@@ -134,11 +163,11 @@ export const connectionService = {
       .single();
 
     if (receivedRequest) {
-      return { 
-        isConnected: false, 
-        hasPendingRequest: true, 
+      return {
+        isConnected: false,
+        hasPendingRequest: true,
         requestFromMe: false,
-        requestId: receivedRequest.id 
+        requestId: receivedRequest.id
       };
     }
 

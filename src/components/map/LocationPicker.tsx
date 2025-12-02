@@ -17,6 +17,7 @@ interface LocationPickerProps {
   className?: string;
   showSearch?: boolean;
   enableCurrentLocation?: boolean;
+  showInstructions?: boolean;
 }
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({
@@ -25,7 +26,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   onError,
   className = '',
   showSearch = true,
-  enableCurrentLocation = true
+  enableCurrentLocation = true,
+  showInstructions = true
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     initialLocation || null
@@ -54,7 +56,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
     try {
       const location = await locationService.getCurrentLocation();
-      
+
       setCurrentLocation(location);
       setSelectedLocation(location);
       setMapCenter([location.latitude, location.longitude]);
@@ -105,7 +107,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       try {
         const results = await locationService.searchLocations(query);
         setSearchResults(results);
-        
+
         if (results.length === 0 && query.length >= 2) {
           onError?.('No locations found. Try a different search term or check your connection.');
         }
@@ -180,7 +182,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       const coords = await locationService.getCoordsFromAddress(searchQuery);
       setSelectedLocation(coords);
       setMapCenter([coords.latitude, coords.longitude]);
-      
+
       try {
         const locationAddress = await locationService.getAddressFromCoords(coords);
         setAddress(locationAddress);
@@ -205,7 +207,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     if (initialLocation && !selectedLocation) {
       setSelectedLocation(initialLocation);
       setMapCenter([initialLocation.latitude, initialLocation.longitude]);
-      
+
       // Only fetch address if we don't already have one
       if (!address) {
         locationService.getAddressFromCoords(initialLocation)
@@ -261,7 +263,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                 </button>
               )}
             </div>
-            
+
             {enableCurrentLocation && (
               <Button
                 onClick={getCurrentLocation}
@@ -404,17 +406,19 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       )}
 
       {/* Instructions */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-        <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300 mb-1">
-          <Navigation className="h-4 w-4" />
-          <span className="text-sm font-medium">How to select a location</span>
+      {showInstructions && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300 mb-1">
+            <Navigation className="h-4 w-4" />
+            <span className="text-sm font-medium">How to select a location</span>
+          </div>
+          <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
+            <li>• Search for any address, place, or landmark</li>
+            <li>• Click directly on the map to select a location</li>
+            <li>• Use the crosshair button for your current location</li>
+          </ul>
         </div>
-        <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
-          <li>• Search for any address, place, or landmark</li>
-          <li>• Click directly on the map to select a location</li>
-          <li>• Use the crosshair button for your current location</li>
-        </ul>
-      </div>
+      )}
     </div>
   );
 };

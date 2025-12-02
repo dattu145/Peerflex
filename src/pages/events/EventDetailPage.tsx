@@ -2,13 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
-import { Calendar, MapPin, Users, Clock, Video, ArrowLeft, Share, Bookmark, Star } from 'lucide-react';
+import { Calendar, MapPin, Users, Video, ArrowLeft, Share, Bookmark, Star } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { eventService } from '../../services/eventService';
 import { useEvents } from '../../hooks/useEvents';
-import type { Event, EventAttendance } from '../../types';
+import type { Event } from '../../types';
 import { motion } from 'framer-motion';
+import { UserProfileModal } from '../../components/user/UserProfileModal';
+
+import EventAttendeesList from '../../components/events/EventAttendeesList';
 
 const EventDetailPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -17,13 +20,15 @@ const EventDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAttendees, setShowAttendees] = useState(false);
 
   const { registerForEvent, cancelRegistration } = useEvents();
 
   useEffect(() => {
     const loadEvent = async () => {
       if (!eventId) return;
-      
+
       try {
         setLoading(true);
         const eventData = await eventService.getEventById(eventId);
@@ -46,10 +51,11 @@ const EventDetailPage: React.FC = () => {
 
   const handleRegister = async () => {
     if (!event) return;
-    
+
     try {
       await registerForEvent(event.id);
       setIsRegistered(true);
+      setEvent(prev => prev ? { ...prev, attendees_count: (prev.attendees_count || 0) + 1 } : null);
     } catch (err: any) {
       console.error('Failed to register:', err);
     }
@@ -57,10 +63,11 @@ const EventDetailPage: React.FC = () => {
 
   const handleCancelRegistration = async () => {
     if (!event) return;
-    
+
     try {
       await cancelRegistration(event.id);
       setIsRegistered(false);
+      setEvent(prev => prev ? { ...prev, attendees_count: Math.max((prev.attendees_count || 0) - 1, 0) } : null);
     } catch (err: any) {
       console.error('Failed to cancel registration:', err);
     }
@@ -82,12 +89,12 @@ const EventDetailPage: React.FC = () => {
     const eventDate = new Date(dateString);
     const now = new Date();
     const diffMs = eventDate.getTime() - now.getTime();
-    
+
     if (diffMs <= 0) return 'Event has passed';
-    
+
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
+
     if (diffDays > 0) return `In ${diffDays} days`;
     if (diffHours > 0) return `In ${diffHours} hours`;
     return 'Very soon';
@@ -157,7 +164,7 @@ const EventDetailPage: React.FC = () => {
               ) : (
                 <div className="w-full h-64 bg-gradient-to-r from-purple-500 to-pink-500" />
               )}
-              
+
               <div className="absolute inset-0 bg-black bg-opacity-40" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
@@ -218,7 +225,10 @@ const EventDetailPage: React.FC = () => {
                       {event.organizer_name && (
                         <div className="flex items-center gap-3">
                           <Star className="h-5 w-5 text-gray-400" />
-                          <div>
+                          <div
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setShowProfileModal(true)}
+                          >
                             <p className="font-medium">Organizer</p>
                             <p className="text-gray-600 dark:text-gray-400">
                               {event.organizer_name}
@@ -293,7 +303,7 @@ const EventDetailPage: React.FC = () => {
                         <Button
                           variant="primary"
                           onClick={handleRegister}
-                          disabled={!isUpcoming || isFull}
+                          disabled={!isUpcoming || !!isFull}
                           className="w-full"
                         >
                           {isFull ? 'Event Full' : !isUpcoming ? 'Event Passed' : 'Register Now'}
@@ -313,6 +323,14 @@ const EventDetailPage: React.FC = () => {
                   <Card>
                     <h3 className="font-semibold mb-3">Event Actions</h3>
                     <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => setShowAttendees(true)}
+                      >
+                        <Users className="h-4 w-4 mr-2" />
+                        View Attendees ({event.attendees_count || 0})
+                      </Button>
                       <Button variant="outline" className="w-full justify-start">
                         <Share className="h-4 w-4 mr-2" />
                         Share Event
@@ -356,6 +374,24 @@ const EventDetailPage: React.FC = () => {
           </motion.div>
         </div>
       </div>
+      {event && event.created_by && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userId={event.created_by}
+          user={event.user}
+        />
+      )}
+
+      {/* Attendees List Modal */}
+      {event && (
+        <EventAttendeesList
+          eventId={event.id}
+          isOpen={showAttendees}
+          onClose={() => setShowAttendees(false)}
+          isOrganizer={event.created_by === event.user?.id} // Assuming current user ID is available or we need to fetch it
+        />
+      )}
     </Layout>
   );
 };

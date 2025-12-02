@@ -15,6 +15,7 @@ import { useHangouts } from '../../hooks/useHangouts';
 import { useAuthStore } from '../../store/useAuthStore';
 import type { HangoutSpot } from '../../types';
 import HangoutSpotsMap from '../../components/map/HangoutSpotsMap';
+import { UserProfileModal } from '../../components/user/UserProfileModal';
 
 const HangoutSpotDetailPage: React.FC = () => {
   const { spotId } = useParams<{ spotId: string }>();
@@ -27,6 +28,7 @@ const HangoutSpotDetailPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { user } = useAuthStore();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -222,9 +224,19 @@ const HangoutSpotDetailPage: React.FC = () => {
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                           {spot.name}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300 capitalize">
-                          {spotIcon.label}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-gray-600 dark:text-gray-300 capitalize">
+                            {spotIcon.label}
+                          </p>
+                          {spot.user && (
+                            <span
+                              className="text-sm text-blue-600 dark:text-blue-400 cursor-pointer hover:underline"
+                              onClick={() => setShowProfileModal(true)}
+                            >
+                              by {spot.user.full_name}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       {spot.is_verified && (
                         <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium flex items-center gap-1">
@@ -544,6 +556,15 @@ const HangoutSpotDetailPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {spot && spot.created_by && (
+        <UserProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userId={spot.created_by}
+          user={spot.user}
+        />
+      )}
     </Layout>
   );
 };

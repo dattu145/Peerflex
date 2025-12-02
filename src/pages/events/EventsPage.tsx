@@ -1,27 +1,25 @@
 // src/pages/events/EventsPage.tsx
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/layout/Layout';
-import { Calendar, MapPin, Users, Clock, Plus, Video, Filter, Map, List, Search } from 'lucide-react';
+import { Calendar, MapPin, Plus, Map, List, Search } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import EventCard from '../../components/events/EventCard';
-import EventForm from '../../components/events/EventForm';
 import EventsMap from '../../components/map/EventsMap';
 import { useEvents } from '../../hooks/useEvents';
 import { useLocation } from '../../hooks/useLocation';
 import { eventService } from '../../services/eventService';
 import type { Event, EventCategory } from '../../types';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const EventsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [categories, setCategories] = useState<EventCategory[]>([]);
   const [filters, setFilters] = useState({
     eventType: 'all',
     search: '',
@@ -29,7 +27,7 @@ const EventsPage: React.FC = () => {
     nearLocation: undefined as { lat: number; lng: number; radius: number } | undefined
   });
 
-  const { events, loading, error, registerForEvent, cancelRegistration } = useEvents({ filters });
+  const { events, loading, error, registerForEvent } = useEvents({ filters });
   const { location, requestLocation } = useLocation();
 
   const eventTypes = [
@@ -42,18 +40,7 @@ const EventsPage: React.FC = () => {
     { value: 'sports', label: 'Sports' }
   ];
 
-  // Load event categories
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const categoriesData = await eventService.getEventCategories();
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      }
-    };
-    loadCategories();
-  }, []);
+
 
   // Apply filters with debounce
   useEffect(() => {
@@ -69,16 +56,7 @@ const EventsPage: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [eventTypeFilter, searchQuery, location]);
 
-  const handleCreateEvent = async (eventData: any) => {
-    try {
-      await eventService.createEvent(eventData);
-      setShowCreateModal(false);
-      // Events will refresh automatically via the hook subscription
-    } catch (error) {
-      console.error('Failed to create event:', error);
-      throw error;
-    }
-  };
+
 
   const handleRegister = async (eventId: string) => {
     try {
@@ -138,27 +116,25 @@ const EventsPage: React.FC = () => {
                   leftIcon={<Search className="h-4 w-4" />}
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 {/* View Mode Toggle */}
                 <div className="flex bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-1">
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-md transition-colors ${
-                      viewMode === 'list'
-                        ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'list'
+                      ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <List className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('map')}
-                    className={`p-2 rounded-md transition-colors ${
-                      viewMode === 'map'
-                        ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'map'
+                      ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <Map className="h-4 w-4" />
                   </button>
@@ -175,9 +151,9 @@ const EventsPage: React.FC = () => {
                 </Button>
 
                 {/* Create Event Button */}
-                <Button 
-                  variant="primary" 
-                  onClick={() => setShowCreateModal(true)}
+                <Button
+                  variant="primary"
+                  onClick={() => navigate('/events/create')}
                   className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
                 >
                   <Plus className="h-5 w-5 mr-2" />
@@ -192,11 +168,10 @@ const EventsPage: React.FC = () => {
                 <button
                   key={type.value}
                   onClick={() => setEventTypeFilter(type.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    eventTypeFilter === type.value
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${eventTypeFilter === type.value
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400'
+                    }`}
                 >
                   {type.label}
                 </button>
@@ -249,21 +224,21 @@ const EventsPage: React.FC = () => {
                         No events found
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-4">
-                        {searchQuery || eventTypeFilter !== 'all' 
+                        {searchQuery || eventTypeFilter !== 'all'
                           ? 'Try adjusting your filters to see more events.'
                           : 'Be the first to create an event in your area!'
                         }
                       </p>
-                      <Button 
-                        variant="primary" 
-                        onClick={() => setShowCreateModal(true)}
+                      <Button
+                        variant="primary"
+                        onClick={() => navigate('/events/create')}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Create First Event
                       </Button>
                     </div>
                   ) : (
-                    events.map((event, index) => (
+                    events.map((event) => (
                       <EventCard
                         key={event.id}
                         event={event}
@@ -310,19 +285,6 @@ const EventsPage: React.FC = () => {
             </motion.div>
           )}
         </div>
-
-        {/* Create Event Modal */}
-        <Modal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          title="Create New Event"
-          size="lg"
-        >
-          <EventForm
-            onSubmit={handleCreateEvent}
-            onCancel={() => setShowCreateModal(false)}
-          />
-        </Modal>
       </div>
     </Layout>
   );
