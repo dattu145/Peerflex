@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,7 +9,6 @@ import {
   User,
   LogOut,
   Settings,
-  GraduationCap,
   Calendar,
   MapPin,
   Bell
@@ -23,25 +22,34 @@ import Button from '../ui/Button';
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuthStore();
-  const { theme, language, isMenuOpen, setTheme, setMenuOpen } = useAppStore();
-  const [unreadCount, setUnreadCount] = React.useState(0);
+  const { user, profile, logout, isAuthenticated } = useAuthStore();
+  const { language, theme, setTheme } = useAppStore();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      // Initial fetch
-      notificationService.getUnreadCount().then(setUnreadCount);
+  useEffect(() => {
+    if (!user) return;
 
-      // Subscribe to real-time updates
-      const subscription = notificationService.subscribeToNotifications(() => {
-        setUnreadCount(prev => prev + 1);
-      });
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await notificationService.getUnreadCount();
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+      }
+    };
 
-      return () => {
-        // Cleanup handled by service/supabase
-      };
-    }
-  }, [isAuthenticated]);
+    fetchUnreadCount();
+
+    // Subscribe to notifications
+    const subscription = notificationService.subscribeToNotifications(() => {
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    return () => {
+      subscription.then((sub) => sub?.unsubscribe());
+    };
+  }, [user]);
 
   const navigation = [
     { name: 'Features', href: '#', isDropdown: true },
@@ -237,7 +245,7 @@ const Header: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setMenuOpen(!isMenuOpen)}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
               >
                 <AnimatePresence mode="wait">
@@ -292,7 +300,7 @@ const Header: React.FC = () => {
                             key={feature.name}
                             to={feature.href}
                             className="flex items-center space-x-3 pl-6 pr-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                            onClick={() => setMenuOpen(false)}
+                            onClick={() => setIsMenuOpen(false)}
                           >
                             {IconComponent && <IconComponent className="h-4 w-4" />}
                             <span>{feature.name}</span>
@@ -308,7 +316,7 @@ const Header: React.FC = () => {
                         ? 'text-purple-600 bg-purple-50 dark:bg-purple-900/20'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
-                      onClick={() => setMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       {item.name}
                     </Link>
@@ -316,12 +324,12 @@ const Header: React.FC = () => {
                 ))}
                 {!isAuthenticated && (
                   <div className="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700 space-y-3 px-2">
-                    <Link to="/login" onClick={() => setMenuOpen(false)} className="block">
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block">
                       <Button variant="ghost" className="w-full justify-center border border-gray-200 dark:border-gray-700">
                         {getTranslation('login', language)}
                       </Button>
                     </Link>
-                    <Link to="/signup" onClick={() => setMenuOpen(false)} className="block">
+                    <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="block">
                       <Button variant="primary" className="w-full justify-center shadow-lg shadow-purple-600/20">
                         {getTranslation('signup', language)}
                       </Button>
@@ -333,7 +341,7 @@ const Header: React.FC = () => {
                     <Link
                       to="/events"
                       className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <Calendar className="h-5 w-5 text-purple-500" />
                       <span>Events</span>
@@ -341,7 +349,7 @@ const Header: React.FC = () => {
                     <Link
                       to="/hangouts"
                       className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      onClick={() => setMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <MapPin className="h-5 w-5 text-purple-500" />
                       <span>Hangouts</span>
@@ -349,7 +357,7 @@ const Header: React.FC = () => {
                     <button
                       onClick={() => {
                         handleLogout();
-                        setMenuOpen(false);
+                        setIsMenuOpen(false);
                       }}
                       className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >

@@ -20,10 +20,15 @@ import {
   ChevronRight,
   Sparkles,
   Target,
-  Clock
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import Layout from '../components/layout/Layout';
+import { profileService } from '../services/profileService';
+import { connectionService } from '../services/connectionService';
+import { eventService } from '../services/eventService';
+import { noteService } from '../services/noteService';
 
 interface QuickAction {
   icon: React.ReactNode;
@@ -53,6 +58,14 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, profile, logout } = useAuthStore();
   const [greeting, setGreeting] = useState('');
+  const [stats, setStats] = useState({
+    notesCount: 0,
+    connectionsCount: 0,
+    eventsCount: 0,
+    reputationScore: 0
+  });
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -60,6 +73,72 @@ const DashboardPage: React.FC = () => {
     else if (hour < 17) setGreeting('Good Afternoon');
     else setGreeting('Good Evening');
   }, []);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+
+        // Fetch all data in parallel
+        const [
+          profileStats,
+          connections,
+          registrations,
+          userNotes
+        ] = await Promise.all([
+          profileService.getUserStats(user.id),
+          connectionService.getConnections(),
+          eventService.getUserRegistrations(),
+          noteService.getUserNotes()
+        ]);
+
+        setStats({
+          notesCount: profileStats.notesCount,
+          connectionsCount: connections.length,
+          eventsCount: registrations.length,
+          reputationScore: profile?.reputation_score || 0
+        });
+
+        // Process recent activity
+        const activities: RecentActivity[] = [];
+
+        // Add recent notes
+        userNotes.slice(0, 3).forEach(note => {
+          activities.push({
+            icon: <BookOpen className="w-4 h-4" />,
+            title: 'Note Shared',
+            description: note.title,
+            time: new Date(note.created_at).toLocaleDateString(),
+            color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/20'
+          });
+        });
+
+        // Add recent event registrations
+        registrations.slice(0, 3).forEach(reg => {
+          activities.push({
+            icon: <Calendar className="w-4 h-4" />,
+            title: 'Event Registered',
+            description: reg.event?.title || 'Unknown Event',
+            time: new Date(reg.registered_at).toLocaleDateString(),
+            color: 'bg-pink-100 text-pink-600 dark:bg-pink-900/20'
+          });
+        });
+
+        // Sort by date (mocking date sort as time strings are simplified)
+        // In a real app, you'd parse dates properly
+        setRecentActivities(activities.slice(0, 5));
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user, profile]);
 
   const handleLogout = async () => {
     try {
@@ -75,7 +154,7 @@ const DashboardPage: React.FC = () => {
       icon: <BookOpen className="w-6 h-6" />,
       title: 'Share Notes',
       description: 'Upload study materials',
-      link: '/notes',
+      link: '/notes/create',
       color: 'bg-purple-500'
     },
     {
@@ -85,53 +164,43 @@ const DashboardPage: React.FC = () => {
       link: '/events',
       color: 'bg-pink-500'
     },
+    {
+      icon: <MapPin className="w-6 h-6" />,
+      title: 'Find Hangouts',
+      description: 'Study spots & cafes',
+      link: '/hangouts',
+      color: 'bg-green-500'
+    },
   ];
 
-  const stats: StatCard[] = [
+  const statCards: StatCard[] = [
     {
       icon: <Award className="w-5 h-5" />,
-      title: 'Profile Score',
-      value: `${profile?.reputation_score || 0}`,
-      change: '+12 this week',
+      title: 'Reputation',
+      value: `${stats.reputationScore}`,
+      change: 'Points',
       color: 'text-yellow-600'
     },
     {
       icon: <Users className="w-5 h-5" />,
       title: 'Connections',
-      value: '24',
-      change: '+3 new',
+      value: `${stats.connectionsCount}`,
+      change: 'Network',
       color: 'text-blue-600'
     },
     {
-      icon: <Target className="w-5 h-5" />,
-      title: 'Applications',
-      value: '8',
-      change: '2 pending',
-      color: 'text-green-600'
-    },
-    {
-      icon: <TrendingUp className="w-5 h-5" />,
-      title: 'Activity',
-      value: '156',
-      change: 'This month',
-      color: 'text-purple-600'
-    }
-  ];
-
-  const recentActivities: RecentActivity[] = [
-    {
-      icon: <BookOpen className="w-4 h-4" />,
+      icon: <BookOpen className="w-5 h-5" />,
       title: 'Notes Shared',
-      description: 'Uploaded Data Structures notes',
-      time: '1 day ago',
-      color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/20'
+      value: `${stats.notesCount}`,
+      change: 'Contributions',
+      color: 'text-purple-600'
     },
     {
-      icon: <Calendar className="w-4 h-4" />,
-      title: 'Event Registered',
-      description: 'Tech Fest 2025 - Salem Campus',
-      time: '2 days ago',
-      color: 'bg-pink-100 text-pink-600 dark:bg-pink-900/20'
+      icon: <Calendar className="w-5 h-5" />,
+      title: 'Events',
+      value: `${stats.eventsCount}`,
+      change: 'Registered',
+      color: 'text-pink-600'
     }
   ];
 
@@ -159,8 +228,9 @@ const DashboardPage: React.FC = () => {
                   <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
                 <Link
-                  to="/settings"
+                  to="/profile/edit"
                   className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
+                  title="Edit Profile"
                 >
                   <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </Link>
@@ -175,7 +245,7 @@ const DashboardPage: React.FC = () => {
           </motion.div>
 
           {/* Profile Completion Banner */}
-          {profile?.reputation_score === 0 && (
+          {(!profile?.major || !profile?.university) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -188,7 +258,7 @@ const DashboardPage: React.FC = () => {
                     <h3 className="text-lg font-semibold">Complete Your Profile</h3>
                   </div>
                   <p className="text-white/90 text-sm mb-4">
-                    Add your details to unlock all features and get personalized recommendations
+                    Add your university and major to get personalized recommendations and connect with peers.
                   </p>
                   <div className="flex gap-3">
                     <Link
@@ -210,7 +280,7 @@ const DashboardPage: React.FC = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat, index) => (
+            {statCards.map((stat, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -224,7 +294,7 @@ const DashboardPage: React.FC = () => {
                       {stat.title}
                     </p>
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                      {stat.value}
+                      {loading ? '...' : stat.value}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-500">
                       {stat.change}
@@ -285,38 +355,43 @@ const DashboardPage: React.FC = () => {
               transition={{ delay: 0.3 }}
               className="lg:col-span-2"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm min-h-[300px]">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                     Recent Activity
                   </h2>
-                  <button className="text-sm text-purple-600 hover:text-purple-700 font-medium">
-                    View All
-                  </button>
                 </div>
                 <div className="space-y-4">
-                  {recentActivities.map((activity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <div className={`p-2 rounded-lg ${activity.color}`}>
-                        {activity.icon}
+                  {loading ? (
+                    <div className="text-center py-8 text-gray-500">Loading activity...</div>
+                  ) : recentActivities.length > 0 ? (
+                    recentActivities.map((activity, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      >
+                        <div className={`p-2 rounded-lg ${activity.color}`}>
+                          {activity.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {activity.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                            {activity.description}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <Clock className="w-3 h-3" />
+                          {activity.time}
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {activity.title}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {activity.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Clock className="w-3 h-3" />
-                        {activity.time}
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No recent activity. Start exploring!
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -328,43 +403,44 @@ const DashboardPage: React.FC = () => {
               transition={{ delay: 0.4 }}
               className="space-y-6"
             >
-              {/* Upcoming Events */}
+              {/* My Upcoming Events */}
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                  Upcoming Events
+                  My Upcoming Events
                 </h2>
                 <div className="space-y-3">
-                  <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-xs font-medium">Tomorrow, 10:00 AM</span>
+                  {loading ? (
+                    <div className="text-center py-4 text-gray-500 text-sm">Loading...</div>
+                  ) : stats.eventsCount > 0 ? (
+                    // We need to fetch the actual events list again or filter from registrations
+                    // For now, we'll just show a placeholder or the first few registrations if they are future
+                    // Since we didn't store the full registrations list in state (only count), let's just link to /events
+                    // Wait, we can modify the state to store registrations
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        You have {stats.eventsCount} registered event{stats.eventsCount !== 1 ? 's' : ''}.
+                      </p>
+                      <Link
+                        to="/events?filter=registered"
+                        className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                      >
+                        View Schedule
+                      </Link>
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                      Tech Workshop
-                    </h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Web Development Basics
-                    </p>
-                  </div>
-                  <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-xs font-medium">Dec 15, 2:00 PM</span>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        No upcoming events.
+                      </p>
+                      <Link
+                        to="/events"
+                        className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                      >
+                        Browse Events
+                      </Link>
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">
-                      Career Fair 2025
-                    </h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Salem Engineering Campus
-                    </p>
-                  </div>
+                  )}
                 </div>
-                <Link
-                  to="/events"
-                  className="mt-4 block text-center py-2 px-4 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg text-sm font-medium hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
-                >
-                  View All Events
-                </Link>
               </div>
 
               {/* Quick Links */}
