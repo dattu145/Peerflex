@@ -172,7 +172,7 @@ const HomePage = () => {
             <Link to="/signup" className="flex-1 sm:flex-none">
               <Button
                 size="lg"
-                className="w-full bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-4 font-semibold"
+                className="bg-gray-600 hover:bg-gray-700 text-white"
               >
                 Start Your Journey
                 <Sparkles className="ml-2 h-5 w-5" />
@@ -182,7 +182,7 @@ const HomePage = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full border-white text-white hover:bg-white/10 text-lg px-8 py-4 font-semibold"
+                className="bg-purple-600 hover:bg-purple-700 text-black hover:text-white"
               >
                 Sign In
               </Button>
