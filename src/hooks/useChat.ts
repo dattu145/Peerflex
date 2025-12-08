@@ -9,22 +9,26 @@ export const useChat = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const loadConversations = useCallback(async () => {
+    const loadConversations = useCallback(async (silent = false) => {
         try {
-            setLoading(true);
+            // Only show loading spinner if we don't have data and it's not a silent update
+            if (!silent && conversations.length === 0) {
+                setLoading(true);
+            }
             const data = await chatService.getConversations();
             setConversations(data);
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load conversations');
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
-    }, []);
+    }, [conversations.length]);
 
     const loadMessages = useCallback(async (chatRoomId: string) => {
         try {
             const data = await chatService.getMessages(chatRoomId);
+            console.log('Loaded messages:', data.length, data.map(m => m.id));
             setMessages(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load messages');
@@ -42,21 +46,10 @@ export const useChat = () => {
 
     const sendMessage = useCallback(async (chatRoomId: string, content: string) => {
         try {
-            const newMessage = await chatService.sendMessage(chatRoomId, content);
-            setMessages(prev => [...prev, newMessage]);
-
-            // Update conversation last message
-            setConversations(prev =>
-                prev.map(conv =>
-                    conv.id === chatRoomId
-                        ? {
-                            ...conv,
-                            lastMessage: content,
-                            timestamp: new Date().toISOString()
-                        }
-                        : conv
-                )
-            );
+            await chatService.sendMessage(chatRoomId, content);
+            // We don't manually add the message here anymore because the subscription 
+            // will pick it up, and we want to avoid duplicates and race conditions.
+            // The subscription also handles updating the conversation list.
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to send message');
             throw err;
@@ -70,7 +63,17 @@ export const useChat = () => {
         const subscription = chatService.subscribeToMessages(
             currentConversation.id,
             (newMessage) => {
-                setMessages(prev => [...prev, newMessage]);
+                console.log('Subscription received message:', newMessage.id, newMessage.content);
+                setMessages(prev => {
+                    // Prevent duplicates - ensure we compare strings
+                    const exists = prev.some(m => String(m.id) === String(newMessage.id));
+                    if (exists) {
+                        console.log('Duplicate message ignored:', newMessage.id);
+                        return prev;
+                    }
+                    console.log('Adding new message from subscription:', newMessage.id);
+                    return [...prev, newMessage];
+                });
 
                 // Update conversation last message
                 setConversations(prev =>
@@ -98,7 +101,7 @@ export const useChat = () => {
         const setupSubscription = async () => {
             try {
                 subscription = await chatService.subscribeToConversations(() => {
-                    loadConversations();
+                    loadConversations(true);
                 });
             } catch (error) {
                 console.error('Failed to subscribe to conversations:', error);
@@ -113,6 +116,8 @@ export const useChat = () => {
             }
         };
     }, [loadConversations]);
+
+
 
     useEffect(() => {
         loadConversations();

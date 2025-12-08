@@ -12,6 +12,8 @@ import { supabase } from '../../config/supabase';
 import type { ConnectionRequest } from '../../types';
 
 const ChatPage: React.FC = () => {
+
+
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [activeTab, setActiveTab] = useState<'messages' | 'requests' | 'sent'>('messages');
@@ -150,8 +152,12 @@ const ChatPage: React.FC = () => {
 
   const handleSendMessage = async () => {
     if (messageInput.trim() && selectedConversation) {
-      await sendMessage(selectedConversation, messageInput);
-      setMessageInput('');
+      try {
+        await sendMessage(selectedConversation, messageInput);
+        setMessageInput('');
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      }
     }
   };
 
@@ -161,12 +167,7 @@ const ChatPage: React.FC = () => {
     setSidebarOpen(false); // Close sidebar on mobile after selection
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -210,23 +211,36 @@ const ChatPage: React.FC = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden absolute top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-lg shadow-lg"
+                className="md:hidden absolute top-3 left-3 z-50 p-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
               >
-                <Menu className="h-5 w-5" />
+                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
 
-              {/* Sidebar */}
+              {/* Sidebar Overlay */}
               <AnimatePresence>
+                {sidebarOpen && window.innerWidth < 768 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.5 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setSidebarOpen(false)}
+                    className="absolute inset-0 bg-black z-30 md:hidden"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Sidebar */}
+              <AnimatePresence mode="wait">
                 {(sidebarOpen || window.innerWidth >= 768) && (
                   <motion.div
-                    initial={{ x: -300 }}
-                    animate={{ x: 0 }}
-                    exit={{ x: -300 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className={`${sidebarOpen ? 'absolute' : 'relative'
+                    initial={{ x: -300, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -300, opacity: 0 }}
+                    transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+                    className={`${sidebarOpen ? 'absolute inset-y-0 left-0 shadow-2xl' : 'relative'
                       } md:relative w-full sm:w-80 md:w-1/3 max-w-sm border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-800 z-40 h-full`}
                   >
-                    <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 pl-14 md:pl-4">
                       <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                           <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
@@ -238,40 +252,41 @@ const ChatPage: React.FC = () => {
                       </div>
 
                       {/* Enhanced Tabs with Badges */}
-                      <div className="flex p-1 bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 sm:mb-4">
+                      {/* Enhanced Tabs with Badges */}
+                      <div className="flex flex-wrap gap-1 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 sm:mb-4">
                         <button
                           onClick={() => setActiveTab('messages')}
-                          className={`flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'messages'
-                              ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                          className={`flex-1 min-w-[70px] py-1.5 px-1 sm:py-2 sm:px-3 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'messages'
+                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                         >
                           <span className="truncate">Messages</span>
                         </button>
                         <button
                           onClick={() => setActiveTab('requests')}
-                          className={`flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'requests'
-                              ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                          className={`flex-1 min-w-[70px] py-1.5 px-1 sm:py-2 sm:px-3 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'requests'
+                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                         >
                           <span className="truncate">Requests</span>
                           {pendingRequests.length > 0 && (
-                            <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full animate-pulse">
+                            <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 bg-red-500 text-white text-[10px] sm:text-xs flex items-center justify-center rounded-full animate-pulse">
                               {pendingRequests.length > 9 ? '9+' : pendingRequests.length}
                             </span>
                           )}
                         </button>
                         <button
                           onClick={() => setActiveTab('sent')}
-                          className={`flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'sent'
-                              ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                          className={`flex-1 min-w-[70px] py-1.5 px-1 sm:py-2 sm:px-3 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-all relative ${activeTab === 'sent'
+                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                         >
                           <span className="truncate">Sent</span>
                           {sentRequests.length > 0 && (
-                            <span className="absolute -top-1 -right-1 h-5 w-5 bg-blue-500 text-white text-xs flex items-center justify-center rounded-full">
+                            <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 bg-blue-500 text-white text-[10px] sm:text-xs flex items-center justify-center rounded-full">
                               {sentRequests.length > 9 ? '9+' : sentRequests.length}
                             </span>
                           )}
@@ -305,8 +320,8 @@ const ChatPage: React.FC = () => {
                               whileHover={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}
                               onClick={() => handleSelectConversation(conversation.id)}
                               className={`p-3 sm:p-4 cursor-pointer border-b border-gray-200 dark:border-gray-700 ${selectedConversation === conversation.id
-                                  ? 'bg-blue-50 dark:bg-blue-900/20'
-                                  : ''
+                                ? 'bg-blue-50 dark:bg-blue-900/20'
+                                : ''
                                 }`}
                             >
                               <div className="flex items-start gap-2 sm:gap-3">
@@ -445,7 +460,7 @@ const ChatPage: React.FC = () => {
               {activeTab === 'messages' ? (
                 selectedConversation && currentConversation ? (
                   <div className="flex-1 flex flex-col">
-                    <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-14 md:pl-4">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                           {currentConversation.avatar}
@@ -478,8 +493,8 @@ const ChatPage: React.FC = () => {
                               <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md ${isOwnMessage ? 'order-2' : 'order-1'}`}>
                                 <div
                                   className={`rounded-lg px-3 py-2 sm:px-4 sm:py-2 ${isOwnMessage
-                                      ? 'bg-blue-600 text-white'
-                                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                                     }`}
                                 >
                                   <p className="text-xs sm:text-sm break-words">{message.content}</p>
@@ -498,15 +513,23 @@ const ChatPage: React.FC = () => {
                     <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                       <div className="flex items-center gap-2">
                         <input
+                          id="message-input"
+                          name="message"
                           type="text"
                           value={messageInput}
                           onChange={(e) => setMessageInput(e.target.value)}
-                          onKeyPress={handleKeyPress}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendMessage();
+                            }
+                          }}
                           placeholder="Type a message..."
                           className="flex-1 px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <Button
                           variant="primary"
+                          type="button"
                           onClick={handleSendMessage}
                           disabled={!messageInput.trim()}
                           className="flex-shrink-0"

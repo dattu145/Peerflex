@@ -7,24 +7,47 @@ export const chatService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Not authenticated');
 
-        // Check if private room already exists
-        const { data: existingRoom } = await supabase
-            .from('chat_rooms')
-            .select(`
-        *,
-        chat_members(*)
-      `)
-            .eq('is_group', false)
-            .filter('chat_members.user_id', 'in', `(${user.id},${otherUserId})`)
-            .then(({ data }) => {
-                return data?.find(room =>
-                    room.chat_members.length === 2 &&
-                    room.chat_members.some((m: any) => m.user_id === user.id) &&
-                    room.chat_members.some((m: any) => m.user_id === otherUserId)
-                );
+        // Check if private room already exists using a more robust query
+        // We find rooms where both users are members and count is exactly 2
+        const { data: existingRooms } = await supabase
+            .rpc('get_private_chat_room', {
+                user1_id: user.id,
+                user2_id: otherUserId
             });
 
-        if (existingRoom) return existingRoom as ChatRoom;
+        if (existingRooms && existingRooms.length > 0) {
+            return existingRooms[0] as ChatRoom;
+        }
+
+        // Fallback to client-side check if RPC fails or doesn't exist (temporary safety)
+        const { data: userRooms } = await supabase
+            .from('chat_members')
+            .select('chat_room_id')
+            .eq('user_id', user.id);
+
+        if (userRooms && userRooms.length > 0) {
+            const roomIds = userRooms.map(r => r.chat_room_id);
+
+            const { data: commonRooms } = await supabase
+                .from('chat_members')
+                .select('chat_room_id')
+                .eq('user_id', otherUserId)
+                .in('chat_room_id', roomIds);
+
+            if (commonRooms && commonRooms.length > 0) {
+                // Found a common room, verify it's a private room (not group)
+                const { data: privateRoom } = await supabase
+                    .from('chat_rooms')
+                    .select('*')
+                    .eq('id', commonRooms[0].chat_room_id)
+                    .eq('is_group', false)
+                    .single();
+
+                if (privateRoom) {
+                    return privateRoom as ChatRoom;
+                }
+            }
+        }
 
         // Create new private room
         const { data: newRoom, error: roomError } = await supabase
@@ -83,8 +106,8 @@ export const chatService = {
             const otherUser = otherMembers[0]?.profile as Profile | undefined;
 
             // Get last message (most recent one)
-            const lastMessage = room.messages && room.messages.length > 0 
-                ? room.messages[room.messages.length - 1] 
+            const lastMessage = room.messages && room.messages.length > 0
+                ? room.messages[room.messages.length - 1]
                 : null;
 
             return {
