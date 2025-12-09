@@ -22,7 +22,12 @@ const forgotPasswordSchema = z.object({
 // Schema for reset password
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    password: z.string()
+      .min(8, 'Password must be at least 8 characters long')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number')
+      .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -55,13 +60,7 @@ const ResetPasswordPage: React.FC = () => {
       setCheckingSession(true);
 
       try {
-        console.log('Reset password page loaded:', {
-          hash: window.location.hash,
-          search: window.location.search,
-          isResetMode
-        });
-
-        // Check if we have a valid session first
+        // Check for valid session first
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
@@ -74,7 +73,6 @@ const ResetPasswordPage: React.FC = () => {
 
         // If we have a valid session, we're good to go
         if (session?.user) {
-          console.log('Valid session found for user:', session.user.email);
           setHasValidSession(true);
           setCheckingSession(false);
           return;
@@ -100,7 +98,6 @@ const ResetPasswordPage: React.FC = () => {
               setError('Invalid or expired reset link. Please request a new one.');
               setHasValidSession(false);
             } else {
-              console.log('Session set successfully from hash tokens');
               setHasValidSession(true);
               // Clear the hash from URL
               window.history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -121,7 +118,6 @@ const ResetPasswordPage: React.FC = () => {
             setError('Invalid or expired password reset link. Please request a new one.');
             setHasValidSession(false);
           } else {
-            console.log('Code exchanged successfully');
             setHasValidSession(true);
             // Clear the code from URL
             const newUrl = window.location.pathname + window.location.search.replace(/code=[^&]*&?/, '').replace(/&$/, '').replace(/\?$/, '');
@@ -431,6 +427,16 @@ const ResetPasswordPage: React.FC = () => {
                       try again
                     </button>
                   </p>
+
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => navigate('/login')}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      I've Reset My Password
+                    </Button>
+                  </div>
                 </div>
               )}
             </form>

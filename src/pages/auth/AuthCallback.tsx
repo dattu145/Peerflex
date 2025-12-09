@@ -29,14 +29,6 @@ const AuthCallback: React.FC = () => {
     const handleAuthCallback = async () => {
       try {
         setHasProcessed(true);
-        console.log('Auth callback started:', {
-          hash: window.location.hash,
-          search: window.location.search,
-          isRecovery,
-          code: !!code,
-          hasHash: window.location.hash.length > 0
-        });
-
         // Check for OAuth errors first
         if (error) {
           throw new Error(errorDescription || `OAuth error: ${error}`);

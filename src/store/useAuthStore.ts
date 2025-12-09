@@ -267,17 +267,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   // --------------------------------
 
   logout: async () => {
-    console.log('🔄 Logout started...');
     set({ isLoading: true });
     try {
-      console.log('📤 Calling supabase.auth.signOut()...');
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('❌ Supabase signOut error:', error);
         throw error;
       }
 
-      console.log('🗑️ Clearing storage and subscriptions...');
       await supabase.removeAllChannels();
 
       // Clear all storage
@@ -286,7 +283,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       localStorage.clear();
       sessionStorage.clear();
 
-      console.log('🔄 Updating Zustand state...');
       // Force state update - use setTimeout to ensure React batch update completes
       setTimeout(() => {
         set({
@@ -295,7 +291,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isAuthenticated: false,
           isLoading: false,
         });
-        console.log('✅ Zustand state updated - user should be logged out');
       }, 0);
 
     } catch (err: any) {

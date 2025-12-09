@@ -40,8 +40,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuthStore();
 
-  console.log('🛡️ ProtectedRoute - Auth state:', { isAuthenticated, isLoading });
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -54,21 +52,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    console.log('🔒 Redirecting to login - not authenticated');
     return <Navigate to="/login" replace />;
   }
 
-  console.log('✅ ProtectedRoute - Rendering children');
   return <>{children}</>;
 };
 
 function App() {
   const { theme } = useAppStore();
-  const { initializeAuth, isAuthenticated, isLoading } = useAuthStore();
+  const { initializeAuth } = useAuthStore();
 
   // Initialize auth only once on app mount
   useEffect(() => {
-    console.log('🚀 App mounted - Initializing auth');
     initializeAuth();
   }, [initializeAuth]);
 
@@ -76,11 +71,6 @@ function App() {
     // Apply theme to document
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
-
-  // Debug auth state
-  useEffect(() => {
-    console.log('🔐 App - Auth state changed:', { isAuthenticated, isLoading });
-  }, [isAuthenticated, isLoading]);
 
   return (
     <Router>
