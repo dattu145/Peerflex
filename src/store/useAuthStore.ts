@@ -349,7 +349,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true });
     try {
       // Use the Site URL from your Supabase configuration
-      const redirectTo = `${window.location.origin}/reset-password`;
+      const redirectTo = `${window.location.origin}/auth/callback?type=recovery`;
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectTo
