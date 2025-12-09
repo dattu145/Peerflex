@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
+    flowType: 'implicit',
     // Use localStorage by default for persistence
     storage: localStorage,
     storageKey: 'supabase.auth.token',
@@ -32,7 +32,7 @@ if (import.meta.env.DEV) {
   supabase.auth.onAuthStateChange((event, session) => {
     if (event !== 'INITIAL_SESSION' && event !== 'TOKEN_REFRESHED') {
       console.log('Supabase Auth Event:', event, session?.user?.email);
-      
+
       // Log storage info for debugging
       if (event === 'SIGNED_IN') {
         const hasLocalStorage = !!localStorage.getItem('supabase.auth.token');

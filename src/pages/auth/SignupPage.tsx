@@ -65,7 +65,7 @@ const SignupPage: React.FC = () => {
       setUserEmail(data.email);
       const { confirmPassword, ...signupData } = data;
       await signup(signupData);
-      
+
       // Show email confirmation message ONLY if no error was thrown
       setEmailSent(true);
     } catch (error: any) {
@@ -125,7 +125,7 @@ const SignupPage: React.FC = () => {
                     <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Check Your Email
@@ -142,6 +142,16 @@ const SignupPage: React.FC = () => {
                   <p className="text-sm text-blue-800 dark:text-blue-300">
                     Click the confirmation link in the email to activate your account and complete the signup process.
                   </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={() => navigate('/login')}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    I've Verified My Email
+                  </Button>
                 </div>
 
                 <div className="space-y-3">
