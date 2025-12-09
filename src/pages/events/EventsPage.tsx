@@ -109,7 +109,7 @@ const EventsPage: React.FC = () => {
           {/* Filters and Controls */}
           <div className="mb-8 space-y-4">
             {/* Search Bar */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <Input
                   value={searchQuery}
@@ -119,7 +119,7 @@ const EventsPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 items-center justify-between sm:justify-end">
                 {/* View Mode Toggle */}
                 <div className="flex bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-1">
                   <button
@@ -146,20 +146,22 @@ const EventsPage: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={handleUseMyLocation}
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap flex-1 sm:flex-none justify-center"
                 >
                   <MapPin className="h-4 w-4 mr-2" />
-                  {location ? 'Update Location' : 'Use My Location'}
+                  <span className="hidden sm:inline">{location ? 'Update Location' : 'Use My Location'}</span>
+                  <span className="sm:hidden">{location ? 'Update' : 'Location'}</span>
                 </Button>
 
                 {/* Create Event Button */}
                 <Button
                   variant="primary"
                   onClick={() => navigate('/events/create')}
-                  className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                  className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap flex-1 sm:flex-none justify-center"
                 >
                   <Plus className="h-5 w-5 mr-2" />
-                  Create Event
+                  <span className="hidden sm:inline">Create Event</span>
+                  <span className="sm:hidden">Create</span>
                 </Button>
               </div>
             </div>
@@ -170,7 +172,7 @@ const EventsPage: React.FC = () => {
                 <button
                   key={type.value}
                   onClick={() => setEventTypeFilter(type.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${eventTypeFilter === type.value
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${eventTypeFilter === type.value
                     ? 'bg-purple-600 text-white shadow-lg'
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400'
                     }`}

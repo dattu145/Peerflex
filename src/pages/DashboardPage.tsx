@@ -2,26 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Home,
-  FileText,
-  Briefcase,
   Calendar,
-  MessageSquare,
   Users,
-  User,
-  Code,
   BookOpen,
-  TrendingUp,
   Award,
+  MapPin,
   Bell,
   Settings,
   LogOut,
-  Plus,
-  ChevronRight,
+  User,
+  Briefcase,
   Sparkles,
-  Target,
+  ChevronRight,
   Clock,
-  MapPin
+  MessageSquare
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import Layout from '../components/layout/Layout';
@@ -224,9 +218,13 @@ const DashboardPage: React.FC = () => {
                 </p>
               </div>
               <div className="flex gap-3">
-                <button className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                <Link
+                  to="/notifications"
+                  className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
+                  title="Notifications"
+                >
                   <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                </button>
+                </Link>
                 <Link
                   to="/profile/edit"
                   className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
@@ -244,33 +242,128 @@ const DashboardPage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Profile Completion Banner */}
-          {(!profile?.major || !profile?.university) && (
+          {/* Profile Details Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm"
+          >
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Avatar & Basic Info */}
+              <div className="flex flex-col items-center md:items-start gap-4 min-w-[200px]">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-md">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <User className="w-12 h-12" />
+                    </div>
+                  )}
+                </div>
+                <div className="text-center md:text-left">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{profile?.full_name || 'Anonymous User'}</h2>
+                  <p className="text-sm text-gray-500">@{profile?.username || user?.email?.split('@')[0]}</p>
+                  {profile?.current_location && (
+                    <div className="flex items-center justify-center md:justify-start gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>{profile.current_location.city || 'Location not set'}</span>
+                    </div>
+                  )}
+                </div>
+                <Link
+                  to="/profile/edit"
+                  className="w-full py-2 px-4 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg text-sm font-medium hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors text-center"
+                >
+                  Edit Profile
+                </Link>
+              </div>
+
+              {/* Detailed Info */}
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Bio</h3>
+                    <p className="text-gray-900 dark:text-white text-sm">
+                      {profile?.bio || <span className="text-gray-400 italic">No bio added yet.</span>}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Education</h3>
+                    <div className="space-y-1">
+                      <p className="text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-gray-400" />
+                        {profile?.university || <span className="text-gray-400 italic">University not set</span>}
+                      </p>
+                      <p className="text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-gray-400" />
+                        {profile?.major || <span className="text-gray-400 italic">Major not set</span>}
+                        {profile?.year_of_study && <span className="text-gray-500">• Year {profile.year_of_study}</span>}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.skills && profile.skills.length > 0 ? (
+                        profile.skills.map((skill: string, i: number) => (
+                          <span key={i} className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded text-xs font-medium">
+                            {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-400 italic text-sm">No skills added.</span>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.interests && profile.interests.length > 0 ? (
+                        profile.interests.map((interest: string, i: number) => (
+                          <span key={i} className="px-2 py-1 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 rounded text-xs font-medium">
+                            {interest}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-400 italic text-sm">No interests added.</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Profile Completion Banner - Only show if critical info is missing */}
+          {(!profile?.major || !profile?.university || !profile?.bio) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 bg-purple-600 rounded-2xl p-6 text-white"
+              className="mb-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5" />
+                    <Sparkles className="w-5 h-5 text-yellow-300" />
                     <h3 className="text-lg font-semibold">Complete Your Profile</h3>
                   </div>
-                  <p className="text-white/90 text-sm mb-4">
-                    Add your university and major to get personalized recommendations and connect with peers.
+                  <p className="text-white/90 text-sm mb-4 max-w-xl">
+                    You are missing some profile details. Adding your university, major, and bio helps you connect with the right peers and get better recommendations.
                   </p>
                   <div className="flex gap-3">
                     <Link
                       to="/profile/edit"
-                      className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-gray-100 transition-colors shadow-sm"
                     >
                       Complete Profile
                     </Link>
                   </div>
                 </div>
                 <div className="hidden sm:block">
-                  <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
                     <span className="text-2xl"><User /></span>
                   </div>
                 </div>
@@ -412,10 +505,6 @@ const DashboardPage: React.FC = () => {
                   {loading ? (
                     <div className="text-center py-4 text-gray-500 text-sm">Loading...</div>
                   ) : stats.eventsCount > 0 ? (
-                    // We need to fetch the actual events list again or filter from registrations
-                    // For now, we'll just show a placeholder or the first few registrations if they are future
-                    // Since we didn't store the full registrations list in state (only count), let's just link to /events
-                    // Wait, we can modify the state to store registrations
                     <div className="text-center py-4">
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                         You have {stats.eventsCount} registered event{stats.eventsCount !== 1 ? 's' : ''}.

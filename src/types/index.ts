@@ -228,6 +228,7 @@ export interface EventAttendance {
   left_at?: string;
   attendance_duration?: number;
   user?: Profile;
+  event?: Event;
 }
 
 

@@ -30,6 +30,7 @@ import ScrollToTop from './components/ScrollToTop';
 import CreateNotePage from './pages/notes/CreateNotePage';
 import NoteDetailPage from './pages/notes/NoteDetailPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
+import EditProfilePage from './pages/profile/EditProfilePage';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -205,10 +206,19 @@ function App() {
           } />
 
           <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <EditProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/profile"
             element={
               <ProtectedRoute>
-                <div>Profile Page - TODO</div>
+                <Navigate to="/dashboard" replace />
               </ProtectedRoute>
             }
           />

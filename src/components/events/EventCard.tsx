@@ -65,47 +65,48 @@ export const EventCard: React.FC<EventCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
+      className="h-full"
     >
-      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
+      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col">
         {/* Event Type Header */}
         <div className={`h-2 bg-gradient-to-r ${getEventColor(event.event_type)}`} />
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 flex-1 flex flex-col">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+          <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors break-words">
                   {event.title}
                 </h3>
                 {event.is_virtual && (
-                  <Video className="h-5 w-5 text-blue-600" />
+                  <Video className="h-5 w-5 text-blue-600 flex-shrink-0" />
                 )}
               </div>
 
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 break-words">
                 {event.description}
               </p>
             </div>
           </div>
 
           {/* Event Details */}
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-4 flex-1">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <Calendar className="h-4 w-4" />
-              <span className="text-sm">{formatDateTime(event.start_time)}</span>
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span className="text-sm truncate">{formatDateTime(event.start_time)}</span>
             </div>
 
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm">
+              <MapPin className="h-4 w-4 flex-shrink-0" />
+              <span className="text-sm truncate">
                 {event.venue_name || event.address}
                 {event.is_virtual && ' (Virtual)'}
               </span>
             </div>
 
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <Users className="h-4 w-4" />
+              <Users className="h-4 w-4 flex-shrink-0" />
               <span className="text-sm">
                 {event.attendees_count || 0} / {event.max_attendees} participants
               </span>
@@ -113,8 +114,8 @@ export const EventCard: React.FC<EventCardProps> = ({
 
             {event.organizer_name && (
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                <Star className="h-4 w-4" />
-                <span className="text-sm">by {event.organizer_name}</span>
+                <Star className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm truncate">by {event.organizer_name}</span>
               </div>
             )}
           </div>
@@ -128,7 +129,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             {event.tags?.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs"
+                className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs truncate max-w-[100px]"
               >
                 #{tag}
               </span>
@@ -159,7 +160,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
           {/* Actions */}
           {showActions && (
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 gap-3 mt-auto">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 {event.price > 0 ? (
                   <span className="font-semibold text-green-600 dark:text-green-400">
@@ -172,11 +173,12 @@ export const EventCard: React.FC<EventCardProps> = ({
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => onViewDetails?.(event)}
+                  className="flex-1 sm:flex-none justify-center"
                 >
                   Details
                 </Button>
@@ -185,7 +187,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-green-200 text-green-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group/btn"
+                    className="flex-1 sm:flex-none justify-center border-green-200 text-green-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors group/btn"
                     onClick={() => onUnregister?.(event.id)}
                   >
                     <span className="group-hover/btn:hidden">Registered ✓</span>
@@ -197,6 +199,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                     size="sm"
                     onClick={() => onRegister?.(event.id)}
                     disabled={!isUpcoming || !!isFull || registrationClosed}
+                    className="flex-1 sm:flex-none justify-center"
                     title={
                       !isUpcoming ? 'Event has passed' :
                         isFull ? 'Event is full' :
