@@ -52,7 +52,9 @@ const ResetPasswordPage: React.FC = () => {
   const [hasValidSession, setHasValidSession] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  const isResetMode = searchParams.get('code') !== null || window.location.hash.includes('type=recovery');
+  const isResetMode = searchParams.get('code') !== null ||
+    window.location.hash.includes('type=recovery') ||
+    searchParams.get('reset') === 'true';
 
   // Check for valid session and handle token exchange
   useEffect(() => {

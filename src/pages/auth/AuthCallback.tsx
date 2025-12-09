@@ -68,7 +68,7 @@ const AuthCallback: React.FC = () => {
           // Clear the URL hash and redirect to reset password page
           window.history.replaceState(null, '', window.location.pathname);
           setTimeout(() => {
-            navigate('/reset-password', { replace: true });
+            navigate('/reset-password?reset=true', { replace: true });
           }, 1500);
           return;
         }
@@ -223,7 +223,7 @@ const AuthCallback: React.FC = () => {
         // Clear the URL
         window.history.replaceState(null, '', window.location.pathname);
         setTimeout(() => {
-          navigate('/reset-password', { replace: true });
+          navigate('/reset-password?reset=true', { replace: true });
         }, 1500);
       } else {
         setMessage('Successfully signed in!');
