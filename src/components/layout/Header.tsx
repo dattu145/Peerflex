@@ -184,9 +184,17 @@ const Header: React.FC = () => {
             {isAuthenticated ? (
               <div className="relative group">
                 <Button variant="ghost" size="sm" className="flex items-center space-x-2 pl-2 pr-3 rounded-full border border-transparent hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-                  <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                    <User className="h-5 w-5" />
-                  </div>
+                  {profile?.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.full_name || 'User'}
+                      className="h-8 w-8 rounded-full object-cover border border-purple-200 dark:border-purple-900"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                      <User className="h-5 w-5" />
+                    </div>
+                  )}
                   <span className="hidden sm:inline max-w-[80px] lg:max-w-[140px] truncate text-sm font-medium text-gray-700 dark:text-gray-200">
                     {user?.email?.split('@')[0] || 'User'}
                   </span>
