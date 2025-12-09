@@ -96,11 +96,10 @@ const HeroSection3D: React.FC<HeroSection3DProps> = ({ onExploreClick }) => {
             onExploreClick();
         } else {
             // Default scroll behavior
-            gsap.to(window, {
-                duration: 1,
-                scrollTo: "#features",
-                ease: "power2.inOut"
-            });
+            const featuresSection = document.getElementById('features');
+            if (featuresSection) {
+                featuresSection.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     };
 
@@ -177,7 +176,7 @@ const HeroSection3D: React.FC<HeroSection3DProps> = ({ onExploreClick }) => {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="mt-4 sm:mt-6 md:mt-8 text-base xs:text-lg sm:text-xl md:text-2xl text-black/90 dark:text-white/90 max-w-3xl mx-auto leading-relaxed px-2 drop-shadow-lg backdrop-blur-sm"
                 >
-                    An all-in-one digital ecosystem designed exclusively for college students,
+                    A platform designed exclusively for college students,
                     helping them live smarter, learn collaboratively, and grow professionally.
                 </motion.p>
 

@@ -48,8 +48,7 @@ const AboutPage: React.FC = () => {
     const projectStats = [
         { value: 'All-in-One', label: 'Digital Ecosystem', icon: Rocket },
         { value: 'College', label: 'Students Focused', icon: Users },
-        { value: 'Salem', label: 'Starting Location', icon: Target },
-        { value: '6', label: 'Core Features', icon: Lightbulb }
+        { value: '5', label: 'Core Features', icon: Lightbulb }
     ];
 
     const values = [
@@ -155,7 +154,7 @@ const AboutPage: React.FC = () => {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="mt-6 text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed"
                             >
-                                An all-in-one digital ecosystem designed exclusively for college students,
+                                A Digital ecosystem designed exclusively for college students,
                                 helping them live smarter, learn collaboratively, and grow professionally.
                             </motion.p>
                         </motion.div>
@@ -170,7 +169,7 @@ const AboutPage: React.FC = () => {
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true }}
-                            className="grid grid-cols-2 lg:grid-cols-4 gap-8"
+                            className="grid grid-cols-2 lg:grid-cols-3 gap-8"
                         >
                             {projectStats.map((stat, index) => {
                                 const Icon = stat.icon;
@@ -181,7 +180,7 @@ const AboutPage: React.FC = () => {
                                         whileHover={{ scale: 1.05 }}
                                         className="text-center group"
                                     >
-                                        <div className="flex justify-center mb-4">
+                                        <div className="flex justify-center items-center mb-4">
                                             <div className="p-4 rounded-2xl bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40 transition-colors">
                                                 <Icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                                             </div>

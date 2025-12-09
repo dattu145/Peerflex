@@ -15,8 +15,10 @@ import {
   Zap,
 } from 'lucide-react';
 import Button from '../components/ui/Button';
+import { useAuthStore } from '../store/useAuthStore';
 
 const HomePage = () => {
+  const { user } = useAuthStore();
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const videoRef = useRef(null);
 
@@ -65,7 +67,7 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -149,47 +151,49 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-purple-700 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white rounded-full filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-cyan-300 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto text-center relative z-10"
-        >
-          <Zap className="h-16 w-16 text-white mx-auto mb-6" />
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            Ready to Transform Your Student Life?
-          </h2>
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of students already using PeerFlex to succeed in their academic journey with AI-powered tools
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/signup" className="flex-1 sm:flex-none">
-              <Button
-                size="lg"
-                className="bg-gray-600 hover:bg-gray-700 text-white"
-              >
-                Start Your Journey
-                <Sparkles className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/login" className="flex-1 sm:flex-none">
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-purple-600 hover:bg-purple-700 text-black hover:text-white"
-              >
-                Sign In
-              </Button>
-            </Link>
+      {!user && (
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-purple-700 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white rounded-full filter blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-cyan-300 rounded-full filter blur-3xl animate-pulse delay-1000"></div>
           </div>
-        </motion.div>
-      </section>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center relative z-10"
+          >
+            <Zap className="h-16 w-16 text-white mx-auto mb-6" />
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+              Ready to Transform Your Student Life?
+            </h2>
+            <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Join thousands of students already using PeerFlex to succeed in their academic journey with AI-powered tools
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/signup" className="flex-1 sm:flex-none">
+                <Button
+                  size="lg"
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
+                >
+                  Start Your Journey
+                  <Sparkles className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/login" className="flex-1 sm:flex-none">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="bg-purple-600 hover:bg-purple-700 text-black hover:text-white"
+                >
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </section>
+      )}
     </Layout>
   );
 };
