@@ -15,7 +15,8 @@ import {
   Sparkles,
   ChevronRight,
   Clock,
-  MessageSquare
+  MessageSquare,
+  Camera
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import Layout from '../components/layout/Layout';
@@ -251,14 +252,38 @@ const DashboardPage: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-6">
               {/* Avatar & Basic Info */}
               <div className="flex flex-col items-center md:items-start gap-4 min-w-[200px]">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-md">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <User className="w-12 h-12" />
-                    </div>
-                  )}
+                <div className="relative group">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-4 border-white dark:border-gray-600 shadow-md">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <User className="w-12 h-12" />
+                      </div>
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 p-2 bg-purple-600 rounded-full text-white cursor-pointer shadow-lg hover:bg-purple-700 transition-colors opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="w-4 h-4" />
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        if (!e.target.files || e.target.files.length === 0) return;
+                        try {
+                          const file = e.target.files[0];
+                          const publicUrl = await profileService.uploadAvatar(file);
+                          // Update profile with new avatar
+                          const updatedProfile = await profileService.updateProfile({ avatar_url: publicUrl });
+                          // Update local state via useAuthStore
+                          useAuthStore.getState().setProfile(updatedProfile);
+                        } catch (error) {
+                          console.error('Error uploading avatar:', error);
+                          alert('Failed to upload avatar');
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
                 <div className="text-center md:text-left">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">{profile?.full_name || 'Anonymous User'}</h2>

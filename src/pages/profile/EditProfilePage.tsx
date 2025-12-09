@@ -15,7 +15,14 @@ const EditProfilePage: React.FC = () => {
     const { user, profile, setProfile } = useAuthStore();
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [formData, setFormData] = useState<Partial<Profile>>({});
+    const [formData, setFormData] = useState<Partial<Profile>>({
+        username: '',
+        full_name: '',
+        bio: '',
+        university: '',
+        major: '',
+        year_of_study: undefined
+    });
     const [skillsInput, setSkillsInput] = useState('');
     const [interestsInput, setInterestsInput] = useState('');
 
@@ -226,7 +233,7 @@ const EditProfilePage: React.FC = () => {
                                             className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                                         >
                                             <option value="">Select Year</option>
-                                            {[1, 2, 3, 4, 5].map(year => (
+                                            {[1, 2, 3, 4].map(year => (
                                                 <option key={year} value={year}>Year {year}</option>
                                             ))}
                                         </select>

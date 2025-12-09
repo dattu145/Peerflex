@@ -72,7 +72,7 @@ const AuthCallback: React.FC = () => {
 
           setStatus('success');
           setMessage('Redirecting to password reset...');
-          
+
           // Clear the URL hash and redirect to reset password page
           window.history.replaceState(null, '', window.location.pathname);
           setTimeout(() => {
@@ -99,11 +99,11 @@ const AuthCallback: React.FC = () => {
         // ✅ Handle OAuth callback with code parameter (PKCE flow)
         if (code && !window.location.hash) {
           setMessage('Completing OAuth sign in...');
-          
+
           // For OAuth with code, let Supabase handle the code exchange automatically
           // The supabase client should automatically handle this via getSession()
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
+
           if (sessionError) {
             console.error('Session error after OAuth:', sessionError);
             throw sessionError;
@@ -171,7 +171,7 @@ const AuthCallback: React.FC = () => {
       // Check if profile exists
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, avatar_url')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -206,6 +206,20 @@ const AuthCallback: React.FC = () => {
         if (insertError) {
           console.error('Profile creation error:', insertError);
           // Don't throw here - we can still proceed with auth
+        }
+      } else if (!existingProfile.avatar_url && (user.user_metadata.avatar_url || user.user_metadata.picture)) {
+        // ✅ Sync Google Avatar if missing in existing profile
+        console.log("🔄 Syncing Google Avatar on Callback...");
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            avatar_url: user.user_metadata.avatar_url || user.user_metadata.picture,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (updateError) {
+          console.error('Error syncing avatar on callback:', updateError);
         }
       }
 

@@ -92,9 +92,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.error("Profile fetch error:", profileError);
       }
 
+      // ✅ Sync Google Avatar if missing in profile
+      let finalProfile = profile;
+      if (profile && !profile.avatar_url && session.user.user_metadata?.avatar_url) {
+        console.log("🔄 Syncing Google Avatar...");
+        const { data: updatedProfile, error: updateError } = await supabase
+          .from("profiles")
+          .update({
+            avatar_url: session.user.user_metadata.avatar_url,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", session.user.id)
+          .select()
+          .single();
+
+        if (!updateError && updatedProfile) {
+          finalProfile = updatedProfile;
+        }
+      }
+
       set({
         user: session.user,
-        profile: profile || null,
+        profile: finalProfile || null,
         isAuthenticated: true,
         isLoading: false,
       });
