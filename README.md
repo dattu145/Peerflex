@@ -2,7 +2,7 @@
 
 Peerflex is a comprehensive student life platform designed to connect students, provide essential services, and enhance the overall academic and social experience. It features a robust set of tools for networking, resource sharing, and event management.
 
-## 🚀 Features
+## Features
 
 - **Authentication & User Management**
   - Secure Login and Signup via Supabase
@@ -30,7 +30,7 @@ Peerflex is a comprehensive student life platform designed to connect students, 
   - **3D Visuals:** Integrated 3D elements using Three.js and React Three Fiber.
   - **Maps:** Interactive maps using Leaflet for events and hangout spots.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend:** React, TypeScript, Vite
 - **Styling:** Tailwind CSS, PostCSS
@@ -42,7 +42,7 @@ Peerflex is a comprehensive student life platform designed to connect students, 
 - **Maps:** Leaflet, React Leaflet
 - **Forms:** React Hook Form, Zod
 
-## 📦 Installation
+## Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -67,17 +67,17 @@ Peerflex is a comprehensive student life platform designed to connect students, 
     npm run dev
     ```
 
-## 📜 Scripts
+## Scripts
 
 - `npm run dev`: Starts the development server.
 - `npm run build`: Builds the app for production.
 - `npm run preview`: Locally preview the production build.
 - `npm run lint`: Runs ESLint to check for code quality issues.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## License
 
 [MIT](LICENSE)
